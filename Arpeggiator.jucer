@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="lfxRzK" name="Arpeggiator" projectType="audioplug" jucerVersion="5.4.3"
-              pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn">
+              pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginFormats="buildVST3">
   <MAINGROUP id="jeytrH" name="Arpeggiator">
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
-      <FILE id="Sw95xR" name="ArpeggiatorTutorial.h" compile="0" resource="0"
-            file="Source/ArpeggiatorTutorial.h"/>
+      <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
       <FILE id="THPtuo" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
   </MAINGROUP>

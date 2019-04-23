@@ -1,5 +1,5 @@
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "ArpeggiatorTutorial.h"
+#include "Arpeggiator.h"
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

@@ -8,7 +8,7 @@ public:
 			.withInput("Input", AudioChannelSet::stereo(), true)
 		) // add no audio buses at all
     {
-        addParameter (speed = new AudioParameterFloat ("speed", "Arpeggiator Speed", 0.0, 1.0, 0.5));
+        addParameter (lengthFactor = new AudioParameterFloat ("length", "Note Length", 0.1, 0.9, 0.5));
     }
 
     ~Arpeggiator() {}
@@ -18,7 +18,8 @@ public:
         notes.clear();
         currentNote = 0;
         lastNoteValue = -1;
-        time = 0.0;
+        intervalTime = 0.0;
+		timeElapsedFromLastNoteOn = 0.0;
         rate = static_cast<float> (sampleRate);
     }
 
@@ -37,7 +38,8 @@ public:
 		auto samplesPerBeat = rate / bps;			//number of samples per beat/quarternote is samples per sec / beats per second
 
         // set note duration
-		auto noteDuration = static_cast<int> (std::ceil(samplesPerBeat * 0.25f ));		// for a 16th note
+		auto noteInterval = static_cast<int> (std::ceil(samplesPerBeat * 0.25f ));		// for a 16th note
+		auto noteLength = static_cast<int> (std::ceil(noteInterval * *lengthFactor));	// set note length
 
 		auto numSamples = buffer.getNumSamples();	// number of samples in each buffer
 
@@ -59,26 +61,38 @@ public:
 
         midiMessages.clear();
 
-        if ((time + numSamples) >= noteDuration)
+		if(timeElapsedFromLastNoteOn >= noteLength && lastNoteValue > 0)	// check if last note was a note-on and if we need to add a note off inside this buffer
+		{
+			auto offsetForNoteOff = jmin((numSamples - (timeElapsedFromLastNoteOn - noteLength)), numSamples -1);
+			midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offsetForNoteOff);
+			lastNoteValue = -1;
+		}
+
+        if ((intervalTime + numSamples) >= noteInterval)
         {
-            auto offset = jmax (0, jmin ((int) (noteDuration - time), numSamples - 1));
+            auto offset = jmax (0, jmin ((int) (noteInterval - intervalTime), numSamples - 1));
 
-            if (lastNoteValue > 0)
+            if (notes.size() > 0)	// if there are notes in 'notes' collection
             {
-                midiMessages.addEvent (MidiMessage::noteOff (1, lastNoteValue), offset);
-                lastNoteValue = -1;
+                currentNote = (currentNote + 1) % notes.size();		// advance to next note in collection
+                lastNoteValue = notes[currentNote];					// set last note to current note
+                midiMessages.addEvent (MidiMessage::noteOn  (1, lastNoteValue, (uint8) 127), offset);	// add last note to buffer at sample pos = offset
+
+				timeElapsedFromLastNoteOn = numSamples - offset;	// set time starting from note-on event
             }
 
-            if (notes.size() > 0) // if there are notes in 'notes' coolection
-            {
-                currentNote = (currentNote + 1) % notes.size();  // advance to next note in collection
-                lastNoteValue = notes[currentNote];  // set last note to current note
-                midiMessages.addEvent (MidiMessage::noteOn  (1, lastNoteValue, (uint8) 127), offset); // add last note to buffer at sample pos = offset
-            }
+			if((numSamples - offset) >= noteLength)		// check if note-off should occur within this buffer
+			{
+				auto OffsetForNoteOff = jmin((offset + noteLength), numSamples - 1);
+				midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), OffsetForNoteOff);
+				lastNoteValue = -1;		// set flag that last note was a note-off
+			}
 
         }
 
-        time = (time + numSamples) % noteDuration;
+		intervalTime = (intervalTime + numSamples) % noteInterval;		// update interval time
+
+		timeElapsedFromLastNoteOn = (timeElapsedFromLastNoteOn + numSamples);	// update elapsed time since note-off 
     }
 
     bool isMidiEffect() const override                     { return true; }
@@ -100,18 +114,19 @@ public:
 
     void getStateInformation (MemoryBlock& destData) override
     {
-        MemoryOutputStream (destData, true).writeFloat (*speed);
+        MemoryOutputStream (destData, true).writeFloat (*lengthFactor);
     }
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-        speed->setValueNotifyingHost (MemoryInputStream (data, static_cast<size_t> (sizeInBytes), false).readFloat());
+		lengthFactor->setValueNotifyingHost (MemoryInputStream (data, static_cast<size_t> (sizeInBytes), false).readFloat());
     }
 
 private:
-    AudioParameterFloat* speed;
+    AudioParameterFloat* lengthFactor;
     int currentNote, lastNoteValue;
-    int time;
+    int intervalTime;
+	int timeElapsedFromLastNoteOn;
     float rate;
     SortedSet<int> notes;
 
