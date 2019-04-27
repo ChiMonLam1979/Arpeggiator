@@ -36,11 +36,11 @@ public:
 		AudioPlayHead::CurrentPositionInfo positionInfo;
 		playHead->getCurrentPosition(positionInfo);
 
-		auto bpm = positionInfo.bpm;															// bpm is quarterNotesPerMinute
-		auto bps = bpm / 60;																	// bps is quarterNotesPerSecond
-		auto samplesPerBeat = rate / bps;														// number of samples per beat/quarternote is samples per sec / beats per second
-		auto samplesPerNoteDivision = samplesPerBeat / noteDivisionFactor;						// set note division
-		auto noteLength = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));	// set note length
+		auto bpm = positionInfo.bpm;																		// bpm is quarterNotesPerMinute
+		auto bps = bpm / 60;																				// bps is quarterNotesPerSecond
+		auto samplesPerBeat = rate / bps;																	// number of samples per beat/quarternote is samples per sec / beats per second
+		auto samplesPerNoteDivision = samplesPerBeat / noteDivisionFactor;									// set note division
+		auto noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));	// set note length
 
 		auto numSamples = buffer.getNumSamples();	// number of samples in each buffer
 
@@ -70,9 +70,9 @@ public:
 		// ppqPosition is only changing when the transport is playing.
 		if (positionInfo.isPlaying)
 		{
-			if (samplesSinceNoteOn >= noteLength && lastNoteValue > 0)	// check if last note was a note-on. if true we need to add a note off inside this buffer
+			if (samplesSinceNoteOn >= noteLengthInSamples && lastNoteValue > 0)	// check if last note was a note-on. if true we need to add a note off inside this buffer
 			{
-				auto offsetForNoteOff = jmin((numSamples - (samplesSinceNoteOn - noteLength)), numSamples - 1);
+				auto offsetForNoteOff = jmin((numSamples - (samplesSinceNoteOn - noteLengthInSamples)), numSamples - 1);
 				midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offsetForNoteOff);
 				lastNoteValue = -1;
 			}
@@ -92,9 +92,9 @@ public:
 					samplesSinceNoteOn = numSamples - offset;
 				}
 
-				if (samplesSinceNoteOn >= noteLength)		// check if note-off should occur within this buffer
+				if (samplesSinceNoteOn >= noteLengthInSamples)		// check if note-off should occur within this buffer
 				{
-					auto OffsetForNoteOff = jmin((offset + noteLength), numSamples - 1);
+					auto OffsetForNoteOff = jmin((offset + noteLengthInSamples), numSamples - 1);
 					midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), OffsetForNoteOff);
 					lastNoteValue = -1;		// set flag that last note was a note-off
 				}
