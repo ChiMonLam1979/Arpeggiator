@@ -18,37 +18,39 @@ public:
 	void prepareToPlay(double sampleRate, int) override
 	{
 		notes.clear();
-		currentNote = 0;
+		currentNoteIndex = 0;
 		lastNoteValue = -1;
+		lastNoteWasNoteOn = false;
 		rate = sampleRate;
-		samplesSinceNoteOn = 0;
+		samplesUntilBufferEnds = 0;
+		noteDivisionFactor = 1;
+		noteDivisionFactorChanged = false;
+		noteOffRequiredThisBuffer = false;
 	}
 
 	void releaseResources() override {}
 
 	void processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
 	{
-		noteDivisionFactor = noteDivisionDictionary[noteDivision->getCurrentChoiceName()];
-
 		AudioPlayHead* playHead = getPlayHead();
 		if (playHead == nullptr) return;
 
 		AudioPlayHead::CurrentPositionInfo positionInfo;
 		playHead->getCurrentPosition(positionInfo);
 
-		auto bpm = positionInfo.bpm;																		// bpm is quarterNotesPerMinute
-		auto bps = bpm / 60;																				// bps is quarterNotesPerSecond
-		auto samplesPerBeat = rate / bps;																	// number of samples per beat/quarternote is samples per sec / beats per second
-		auto samplesPerNoteDivision = samplesPerBeat / noteDivisionFactor;									// set note division
-		auto noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));	// set note length
-
-		auto numSamples = buffer.getNumSamples();	// number of samples in each buffer
+		const auto beatsPerMinute = positionInfo.bpm;																// quarterNotesPerMinute
+		const auto beatsPerSecond = beatsPerMinute / 60;															// quarterNotesPerSecond
+		const auto samplesPerBeat = rate / beatsPerSecond;															// number of samples per beat/quarternote is samples per sec / beats per second
+		const auto samplesPerNoteDivision = samplesPerBeat / noteDivisionFactor;									// set note division
+		const auto noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));		// set note length
+		const auto numberOfSamplesInBuffer = buffer.getNumSamples();
 
 		//work out which notes will occur in the buffer
-		const double ppqBegin = positionInfo.ppqPosition * noteDivisionFactor;
-		const double ppqEnd = ppqBegin + (numSamples / samplesPerNoteDivision);
-		const int ippqBegin = std::ceil(ppqBegin);
-		const int ippqEnd = std::floor(ppqEnd);
+		const double partsPerQuarterNoteStart = positionInfo.ppqPosition;
+		const double partsPerNoteDivisionStart = partsPerQuarterNoteStart * noteDivisionFactor;
+		const double partsPerNoteDivisionEnd = partsPerNoteDivisionStart + (numberOfSamplesInBuffer / samplesPerNoteDivision);
+		const int partsPerNoteDivisionStartAsInt = std::ceil(partsPerNoteDivisionStart);
+		const int partsPerNoteDivisionEndAsInt = std::floor(partsPerNoteDivisionEnd);
 
 		MidiMessage message;
 		int ignore;
@@ -67,40 +69,50 @@ public:
 
 		midiMessages.clear();
 
-		// ppqPosition is only changing when the transport is playing.
+		auto currentNoteDivisionFactor = noteDivisionDictionary[noteDivision->getCurrentChoiceName()];
+
+		noteDivisionFactorChanged = noteDivisionFactor != currentNoteDivisionFactor;
+		if (noteDivisionFactorChanged)
+		{
+			noteDivisionFactor = currentNoteDivisionFactor;
+		}
+
 		if (positionInfo.isPlaying)
 		{
-			if (samplesSinceNoteOn >= noteLengthInSamples && lastNoteValue > 0)	// check if last note was a note-on. if true we need to add a note off inside this buffer
+			noteOffRequiredThisBuffer = samplesUntilBufferEnds >= noteLengthInSamples;
+			if ((noteOffRequiredThisBuffer || noteDivisionFactorChanged) && lastNoteWasNoteOn)
 			{
-				auto offsetForNoteOff = jmin((numSamples - (samplesSinceNoteOn - noteLengthInSamples)), numSamples - 1);
+				auto offsetForNoteOff = jmin((numberOfSamplesInBuffer - (samplesUntilBufferEnds - noteLengthInSamples)), numberOfSamplesInBuffer - 1);
 				midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offsetForNoteOff);
-				lastNoteValue = -1;
+				lastNoteWasNoteOn = false;
 			}
 
 			// for each note transition in the buffer...
-			for (int i = ippqBegin; i <= ippqEnd; ++i)
+			for (int i = partsPerNoteDivisionStartAsInt; i <= partsPerNoteDivisionEndAsInt; ++i)
 			{
 				//work out the exact sample where the note occurs
-				const int offset = (int)samplesPerNoteDivision * (i - ppqBegin);
+				const int offset = (int)samplesPerNoteDivision * (i - partsPerNoteDivisionStart);
 
-				if (notes.size() > 0) // if there are notes in 'notes' coolection
+				if (notes.size() > 0)
 				{
-					currentNote = (currentNote + 1) % notes.size();  // advance to next note in collection
-					lastNoteValue = notes[currentNote];  // set flag that last note was a note-on
-					midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset); // add last note to buffer at sample pos = offset
+					currentNoteIndex = (currentNoteIndex + 1) % notes.size();
+					lastNoteValue = notes[currentNoteIndex];
+					midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
 
-					samplesSinceNoteOn = numSamples - offset;
+					lastNoteWasNoteOn = true;
+					samplesUntilBufferEnds = numberOfSamplesInBuffer - offset;
 				}
 
-				if (samplesSinceNoteOn >= noteLengthInSamples)		// check if note-off should occur within this buffer
+				noteOffRequiredThisBuffer = samplesUntilBufferEnds >= noteLengthInSamples;
+				if (noteOffRequiredThisBuffer)
 				{
-					auto OffsetForNoteOff = jmin((offset + noteLengthInSamples), numSamples - 1);
+					const auto OffsetForNoteOff = jmin((offset + noteLengthInSamples), numberOfSamplesInBuffer - 1);
 					midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), OffsetForNoteOff);
-					lastNoteValue = -1;		// set flag that last note was a note-off
+					lastNoteWasNoteOn = false;
 				}
 			}
 
-			samplesSinceNoteOn = (samplesSinceNoteOn + numSamples);	// update elapsed time since note-off 
+			samplesUntilBufferEnds = (samplesUntilBufferEnds + numberOfSamplesInBuffer);	// add next buffer size
 		}
 	}
 
@@ -138,8 +150,12 @@ private:
 	AudioParameterChoice* noteDivision;
 	AudioParameterFloat* lengthFactor;
 	int noteDivisionFactor;
-	int currentNote, lastNoteValue;
-	int samplesSinceNoteOn;
+	bool noteDivisionFactorChanged;
+	bool lastNoteWasNoteOn;
+	bool noteOffRequiredThisBuffer;
+	int currentNoteIndex;
+	int lastNoteValue;
+	int samplesUntilBufferEnds;
 	double rate;
 	SortedSet<int> notes;
 	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };
