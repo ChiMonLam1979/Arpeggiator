@@ -20,6 +20,7 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	lastNoteWasNoteOn = false;
 	noteDivisionFactorChanged = false;
 	noteOffRequiredThisBuffer = false;
+	notesToPlay.ensureStorageAllocated(100);
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)

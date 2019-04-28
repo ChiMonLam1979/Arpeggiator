@@ -34,6 +34,7 @@ private:
 
 	AudioParameterChoice* noteDivision;
 	AudioParameterFloat* lengthFactor;
+	SortedSet<int> notesToPlay;
 	int noteDivisionFactor;
 	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
@@ -45,7 +46,6 @@ private:
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;
 	double rate;
-	SortedSet<int> notesToPlay;
 	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };
 
 	void UpdateNoteDivision();
