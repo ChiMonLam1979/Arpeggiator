@@ -33,6 +33,7 @@ public:
 private:
 
 	AudioParameterChoice* noteDivision;
+	AudioParameterChoice* arpDirection;
 	AudioParameterFloat* lengthFactor;
 	SortedSet<int> notesToPlay;
 	int noteDivisionFactor;
@@ -40,15 +41,21 @@ private:
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool isSameBufferAsLastNoteOn;
+	bool playDirectionHasChanged;
 	int currentNoteIndex;
 	int lastNoteValue;
 	int noteLengthInSamples;
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;
+	int numberOfNotesToPlay;
 	double rate;
-	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };
-
+	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };;
 	void UpdateNoteDivision();
+	enum arpPlayDirection { up, down, random };
+	void GetArpDirection();
+	arpPlayDirection playDirection;
+	arpPlayDirection currentPlayDirection;
+	void UpdateCurrentNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
 	void UpdateNoteValue();
