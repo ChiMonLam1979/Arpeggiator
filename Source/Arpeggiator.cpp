@@ -4,14 +4,14 @@
 Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
 	addParameter(noteDivision = new AudioParameterChoice("divisions", "Note Divisions", { "1/4 note", "1/16 note", "1/32 note" }, 0));
-	addParameter(lengthFactor = new AudioParameterFloat("length", "Note Length", 0.1f, 0.9f, 0.5f));
+	addParameter(lengthFactor = new AudioParameterFloat("length", "Note Length", 0.1f, 0.9f, 0.8f));
 }
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
 {
 	notesToPlay.clear();
 	rate = sampleRate;
-	currentNoteIndex = 0;
+	currentNoteIndex = 0; // should this be -1 ?
 	lastNoteValue = -1;
 	noteDivisionFactor = 1;
 	samplesFromLastNoteOnUntilBufferEnds = 0;
@@ -62,17 +62,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	midiMessages.clear();
 
-	UpdateNoteDivision();
-
 	if (positionInfo.isPlaying)
 	{
-		if ((NoteOffIsRequiredThisBuffer() || noteDivisionFactorChanged) && lastNoteWasNoteOn)
-		{
-			isSameBufferAsLastNoteOn = false;
-			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
-			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-		}
-
 		for (int i = NoteDivisionStartPositionAsInt; i <= NoteDivisionEndPositionAsInt; ++i)
 		{
 			const int noteOnOffset = (int)samplesPerNoteDivision * (i - NoteDivisionStartPosition);
@@ -93,6 +84,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		}
 
 		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
+
+		UpdateNoteDivision();
+
+		if ((NoteOffIsRequiredThisBuffer() || noteDivisionFactorChanged) && lastNoteWasNoteOn)
+		{
+			isSameBufferAsLastNoteOn = false;
+			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
+			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+		}
 	}
 }
 
