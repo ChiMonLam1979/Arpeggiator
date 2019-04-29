@@ -1,10 +1,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Arpeggiator.h"
+#include "Extensions.h"
+#include <set>
 
 Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
 	addParameter(noteDivision = new AudioParameterChoice("noteDivisions", "Note Divisions", { "1/4 note", "1/16 note", "1/32 note" }, 0));
-	addParameter(arpDirection = new AudioParameterChoice("arpDirection", "Arp Direction", { "Up", "Down", "Random" }, 0));
+	addParameter(arpDirection = new AudioParameterChoice("arpDirection", "Arp Direction", { "Up", "Down", "Random", "Played" }, 0));
 	addParameter(lengthFactor = new AudioParameterFloat("length", "Note Length", 0.1f, 0.9f, 0.5f));
 }
 
@@ -19,10 +21,10 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteLengthInSamples = 0;
 	numberOfSamplesInBuffer = 0;
 	noteOffRequiredThisBuffer = false;
-	notesToPlay.ensureStorageAllocated(100);
+	notesToPlay.reserve(100);
 	numberOfNotesToPlay = 0;
-	playDirection = up;
-	currentPlayDirection = up;
+	playDirection = arpPlayDirection::up;
+	currentPlayDirection = arpPlayDirection::up;
 	playDirectionHasChanged = false;
 	noteDivisionFactor = 1;
 	noteDivisionFactorChanged = false;
@@ -57,19 +59,19 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		if (message.isNoteOn())
 		{
-			notesToPlay.add(message.getNoteNumber());
+			notesToPlay.push_back(message.getNoteNumber());
 		}
 		else if (message.isNoteOff())
 		{
-			notesToPlay.removeValue(message.getNoteNumber());
+			erase(notesToPlay, message.getNoteNumber());
 		}
 	}
+
+	SetArpDirection();
 
 	numberOfNotesToPlay = notesToPlay.size();
 
 	midiMessages.clear();
-
-	GetArpDirection();
 
 	if (positionInfo.isPlaying)
 	{
@@ -116,7 +118,7 @@ void Arpeggiator::UpdateNoteDivision()
 	}
 }
 
-void Arpeggiator::GetArpDirection()
+void Arpeggiator::SetArpDirection()
 {
 	playDirection = static_cast<arpPlayDirection>(arpDirection->getIndex());
 
@@ -125,7 +127,16 @@ void Arpeggiator::GetArpDirection()
 	{
 		currentPlayDirection = playDirection;
 
+		UpdateNotesToPlay();
 		UpdateCurrentNoteIndex();
+	}
+}
+
+void Arpeggiator::UpdateNotesToPlay()
+{
+	if(currentPlayDirection != arpPlayDirection::played && AnyNotesToPlay())
+	{
+		std::sort(notesToPlay.begin(), notesToPlay.end());
 	}
 }
 
@@ -135,11 +146,14 @@ void Arpeggiator::UpdateCurrentNoteIndex()
 
 	switch (currentPlayDirection)
 	{
-	case up: currentNoteIndex = -1;
-		break;
-	case down: currentNoteIndex = lastIndexOfNotesToPlay;
-		break;
-	case random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, lastIndexOfNotesToPlay + 1));
+		case arpPlayDirection::up: currentNoteIndex = -1;
+			break;
+		case arpPlayDirection::down: currentNoteIndex = lastIndexOfNotesToPlay;
+			break;
+		case arpPlayDirection::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+			break;
+		case arpPlayDirection:: played: currentNoteIndex = -1;
+			break;
 	}
 }
 
@@ -147,11 +161,13 @@ void Arpeggiator::UpdateNoteValue()
 {
 	switch (currentPlayDirection)
 	{
-	case up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-		break;
-	case down:currentNoteIndex = currentNoteIndex > 0 ? (currentNoteIndex - 1) % numberOfNotesToPlay : numberOfNotesToPlay - 1;
-		break;
-	case random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+		case arpPlayDirection::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+			break;
+		case arpPlayDirection::down: currentNoteIndex = currentNoteIndex > 0 ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
+			break;
+		case arpPlayDirection::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+			break;
+		case arpPlayDirection::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
 	}
 
 	lastNoteValue = notesToPlay[currentNoteIndex];
@@ -191,7 +207,7 @@ int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 
 bool Arpeggiator::AnyNotesToPlay() const
 {
-	return notesToPlay.size() > 0;
+	return !notesToPlay.empty();
 }
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
