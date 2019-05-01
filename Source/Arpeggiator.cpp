@@ -97,7 +97,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		UpdateNoteDivision();
 
-		if ((NoteOffIsRequiredThisBuffer() || noteDivisionFactorChanged) && lastNoteWasNoteOn)
+		if (NoteOffIsRequiredThisBuffer() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
 		{
 			isSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
@@ -124,7 +124,7 @@ void Arpeggiator::SetPlayMode()
 	UpdateOrderOfNotesToPlay();
 
 	playModeHasChanged = currentPlayMode != selectedPlayMode;
-	if(playModeHasChanged)
+	if(playModeHasChanged || !AnyNotesToPlay())
 	{
 		currentPlayMode = selectedPlayMode;
 
@@ -188,7 +188,7 @@ void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
 
 bool Arpeggiator::NoteOffIsRequiredThisBuffer() const
 {
-	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples;
+	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn;
 }
 
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
