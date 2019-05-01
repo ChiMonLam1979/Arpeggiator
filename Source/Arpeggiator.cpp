@@ -27,7 +27,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	playModeHasChanged = false;
 	noteDivisionFactor = 1;
 	noteDivisionFactorChanged = false;
-	wasPlaying = false;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -75,8 +74,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		wasPlaying = true;
-
 		for (int i = NoteDivisionStartPositionAsInt; i <= NoteDivisionEndPositionAsInt; ++i)
 		{
 			const int noteOnOffset = (int)(samplesPerNoteDivision * (i - NoteDivisionStartPosition));
@@ -100,7 +97,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		UpdateNoteDivision();
 
-		if ((NoteOffIsRequiredThisBuffer() || noteDivisionFactorChanged) && lastNoteWasNoteOn)
+		// move this block to top to stop dangling note-off?
+		if (NoteOffIsRequiredThisBuffer() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
 		{
 			isSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
@@ -108,9 +106,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		}
 	}
 
-	if(!positionInfo.isPlaying && wasPlaying)
+	if (!positionInfo.isPlaying)
 	{
-		wasPlaying = false;
+		midiMessages.clear();
 		notesToPlay.clear();
 		numberOfNotesToPlay = notesToPlay.size();
 		UpdateCurrentNoteIndex();
@@ -199,7 +197,7 @@ void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
 
 bool Arpeggiator::NoteOffIsRequiredThisBuffer() const
 {
-	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples;
+	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn;
 }
 
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const

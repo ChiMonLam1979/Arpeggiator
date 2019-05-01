@@ -76,7 +76,6 @@ private:
 	bool AnyNotesToPlay() const;
 	bool NoteOffIsRequiredThisBuffer() const;
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
-	bool wasPlaying;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
