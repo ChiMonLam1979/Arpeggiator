@@ -1,4 +1,17 @@
 #pragma once
+#define NOTE_DIVISION_ID "noteDivisions"
+#define NOTE_DIVISION_NAME "Note Division"
+#define ARP_PLAYMODE_ID "arpPlayMode"
+#define ARP_PLAYMODE_NAME "Play Mode"
+#define PLAYMODE_UP "Up"
+#define PLAYMODE_DOWN "Down"
+#define PLAYMODE_RANDOM "Random"
+#define PLAYMODE_PLAYED "Played"
+#define NOTE_LENGTH_ID "noteLength"
+#define NOTE_LENGTH_NAME "Note Length"
+#define QUARTER_NOTE_DIVISION "1/4 Note"
+#define SIXTEENTH_NOTE_DIVISION "1/16 Note"
+#define THIRTY_SECOND_NOTE_DIVISION "1/32 Note"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -32,20 +45,20 @@ public:
 
 private:
 
-	AudioParameterChoice* noteDivision;
-	AudioParameterChoice* arpDirection;
-	AudioParameterFloat* lengthFactor;
+	AudioParameterChoice* noteDivision = new AudioParameterChoice{ NOTE_DIVISION_ID, NOTE_DIVISION_NAME, { QUARTER_NOTE_DIVISION, SIXTEENTH_NOTE_DIVISION, THIRTY_SECOND_NOTE_DIVISION }, 0 };
+	AudioParameterChoice* arpPlayMode = new AudioParameterChoice{ ARP_PLAYMODE_ID, ARP_PLAYMODE_NAME, { PLAYMODE_UP, PLAYMODE_DOWN, PLAYMODE_RANDOM, PLAYMODE_PLAYED }, 0};
+	AudioParameterFloat* lengthFactor = new AudioParameterFloat{ NOTE_LENGTH_ID, NOTE_LENGTH_NAME, 0.1f, 0.9f, 0.5f };
 	std::vector<int> notesToPlay;
-	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };;
-	enum arpPlayDirection { up, down, random, played };
-	arpPlayDirection playDirection;
-	arpPlayDirection currentPlayDirection;
+	std::map<juce::String, int> noteDivisionDictionary = { { QUARTER_NOTE_DIVISION, 1}, { SIXTEENTH_NOTE_DIVISION, 4}, { THIRTY_SECOND_NOTE_DIVISION, 8} };;
+	enum playMode { up, down, random, played };
+	playMode selectedPlayMode;
+	playMode currentPlayMode;
 	int noteDivisionFactor;
 	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool isSameBufferAsLastNoteOn;
-	bool playDirectionHasChanged;
+	bool playModeHasChanged;
 	int currentNoteIndex;
 	int lastNoteValue;
 	int noteLengthInSamples;
@@ -55,7 +68,7 @@ private:
 	double rate;
 	void UpdateNoteDivision();
 	void UpdateOrderOfNotesToPlay();
-	void SetArpDirection();
+	void SetPlayMode();
 	void UpdateCurrentNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
