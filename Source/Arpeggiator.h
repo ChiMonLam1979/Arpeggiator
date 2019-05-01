@@ -36,6 +36,10 @@ private:
 	AudioParameterChoice* arpDirection;
 	AudioParameterFloat* lengthFactor;
 	std::vector<int> notesToPlay;
+	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };;
+	enum arpPlayDirection { up, down, random, played };
+	arpPlayDirection playDirection;
+	arpPlayDirection currentPlayDirection;
 	int noteDivisionFactor;
 	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
@@ -49,13 +53,9 @@ private:
 	int numberOfSamplesInBuffer;
 	int numberOfNotesToPlay;
 	double rate;
-	std::map<juce::String, int> noteDivisionDictionary = { {"1/4 note", 1}, {"1/16 note", 4}, {"1/32 note", 8} };;
 	void UpdateNoteDivision();
-	void UpdateNotesToPlay();
-	enum arpPlayDirection { up, down, random, played };
+	void UpdateOrderOfNotesToPlay();
 	void SetArpDirection();
-	arpPlayDirection playDirection;
-	arpPlayDirection currentPlayDirection;
 	void UpdateCurrentNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);

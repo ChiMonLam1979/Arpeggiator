@@ -67,11 +67,11 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		}
 	}
 
-	SetArpDirection();
-
 	numberOfNotesToPlay = notesToPlay.size();
 
 	midiMessages.clear();
+
+	SetArpDirection();
 
 	if (positionInfo.isPlaying)
 	{
@@ -122,19 +122,20 @@ void Arpeggiator::SetArpDirection()
 {
 	playDirection = static_cast<arpPlayDirection>(arpDirection->getIndex());
 
+	UpdateOrderOfNotesToPlay();
+
 	playDirectionHasChanged = currentPlayDirection != playDirection;
 	if(playDirectionHasChanged)
 	{
 		currentPlayDirection = playDirection;
 
-		UpdateNotesToPlay();
 		UpdateCurrentNoteIndex();
 	}
 }
 
-void Arpeggiator::UpdateNotesToPlay()
+void Arpeggiator::UpdateOrderOfNotesToPlay()
 {
-	if(currentPlayDirection != arpPlayDirection::played && AnyNotesToPlay())
+	if(currentPlayDirection != arpPlayDirection::played)
 	{
 		std::sort(notesToPlay.begin(), notesToPlay.end());
 	}
@@ -163,11 +164,12 @@ void Arpeggiator::UpdateNoteValue()
 	{
 		case arpPlayDirection::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
 			break;
-		case arpPlayDirection::down: currentNoteIndex = currentNoteIndex > 0 ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
+		case arpPlayDirection::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
 			break;
 		case arpPlayDirection::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
 			break;
 		case arpPlayDirection::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+			break;
 	}
 
 	lastNoteValue = notesToPlay[currentNoteIndex];
