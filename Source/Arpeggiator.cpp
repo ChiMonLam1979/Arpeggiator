@@ -27,6 +27,7 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	playModeHasChanged = false;
 	noteDivisionFactor = 1;
 	noteDivisionFactorChanged = false;
+	wasPlaying = false;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -74,9 +75,11 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
+		wasPlaying = true;
+
 		for (int i = NoteDivisionStartPositionAsInt; i <= NoteDivisionEndPositionAsInt; ++i)
 		{
-			const int noteOnOffset = (int)samplesPerNoteDivision * (i - NoteDivisionStartPosition);
+			const int noteOnOffset = (int)(samplesPerNoteDivision * (i - NoteDivisionStartPosition));
 
 			if (AnyNotesToPlay())
 			{
@@ -97,12 +100,20 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		UpdateNoteDivision();
 
-		if (NoteOffIsRequiredThisBuffer() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
+		if ((NoteOffIsRequiredThisBuffer() || noteDivisionFactorChanged) && lastNoteWasNoteOn)
 		{
 			isSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
 			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 		}
+	}
+
+	if(!positionInfo.isPlaying && wasPlaying)
+	{
+		wasPlaying = false;
+		notesToPlay.clear();
+		numberOfNotesToPlay = notesToPlay.size();
+		UpdateCurrentNoteIndex();
 	}
 }
 
@@ -188,21 +199,21 @@ void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
 
 bool Arpeggiator::NoteOffIsRequiredThisBuffer() const
 {
-	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn;
+	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples;
 }
 
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 {
-	const auto startOfLastSampleInBuffer = numberOfSamplesInBuffer - 1;
+	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
 	if(isSameBufferAsLastNoteOn)
 	{
 		const auto offset = noteOnOffset + noteLengthInSamples;
-		return jmin(offset, startOfLastSampleInBuffer);
+		return jmin(offset, lastSampleInCurrentBuffer);
 	}
 	else
 	{
 		const auto offset = numberOfSamplesInBuffer - (samplesFromLastNoteOnUntilBufferEnds - noteLengthInSamples);
-		return jmin(offset, startOfLastSampleInBuffer);
+		return jmin(offset, lastSampleInCurrentBuffer);
 	}
 }
 
