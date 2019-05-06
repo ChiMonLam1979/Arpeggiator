@@ -7,11 +7,13 @@ Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", 
 	addParameter(noteDivision);
 	addParameter(arpPlayMode);
 	addParameter(lengthFactor);
+	addParameter(arpLatchMode);
 }
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
 {
 	notesToPlay.clear();
+	notesToPlayLatchMode.clear();
 	rate = sampleRate;
 	currentNoteIndex = -1;
 	lastNoteValue = 0;
@@ -21,12 +23,15 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	numberOfSamplesInBuffer = 0;
 	noteOffRequiredThisBuffer = false;
 	notesToPlay.reserve(100);
+	notesToPlayLatchMode.reserve(200);
 	numberOfNotesToPlay = 0;
 	selectedPlayMode = playMode::up;
 	currentPlayMode = playMode::up;
 	playModeHasChanged = false;
 	noteDivisionFactor = 1;
 	noteDivisionFactorChanged = false;
+	currentLatchMode = latchMode::off;
+	selectedLatchMode = latchMode::off;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -51,6 +56,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
 
+	SetLatchMode();
+
 	MidiMessage message;
 	int ignore;
 
@@ -59,6 +66,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		if (message.isNoteOn())
 		{
 			notesToPlay.push_back(message.getNoteNumber());
+
+			notesToPlayLatchMode.push_back(message.getNoteNumber());
 		}
 		else if (message.isNoteOff())
 		{
@@ -66,7 +75,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		}
 	}
 
-	numberOfNotesToPlay = notesToPlay.size();
+	numberOfNotesToPlay = GetNumberOfNotesToPlay();
 
 	midiMessages.clear();
 
@@ -87,7 +96,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 			if (NoteOffIsRequiredThisBuffer())
 			{
-				isSameBufferAsLastNoteOn = true;
+				noteOffOccursInSameBufferAsLastNoteOn = true;
 				const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 				AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 			}
@@ -97,10 +106,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		UpdateNoteDivision();
 
-		// move this block to top to stop dangling note-off?
 		if (NoteOffIsRequiredThisBuffer() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
 		{
-			isSameBufferAsLastNoteOn = false;
+			noteOffOccursInSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
 			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 		}
@@ -110,7 +118,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		midiMessages.clear();
 		notesToPlay.clear();
-		numberOfNotesToPlay = notesToPlay.size();
+		notesToPlayLatchMode.clear();
+		numberOfNotesToPlay = GetNumberOfNotesToPlay();
 		UpdateCurrentNoteIndex();
 	}
 }
@@ -141,11 +150,39 @@ void Arpeggiator::SetPlayMode()
 	}
 }
 
+void Arpeggiator::SetLatchMode()
+{
+	selectedLatchMode = static_cast<latchMode>(arpLatchMode->getIndex());
+
+	const auto latchModeHasChanged = currentLatchMode != selectedLatchMode;
+	if(latchModeHasChanged)
+	{
+		currentLatchMode = selectedLatchMode;
+
+		UpdateNotesToPlayIfLatched();
+	}
+
+	if (currentLatchMode == latchMode::off)
+	{
+		notesToPlayLatchMode.clear();
+	}
+}
+
+void Arpeggiator::UpdateNotesToPlayIfLatched()
+{
+	if (currentLatchMode == latchMode::on)
+	{
+		notesToPlayLatchMode = notesToPlay;
+	}
+}
+
 void Arpeggiator::UpdateOrderOfNotesToPlay()
 {
-	if(currentPlayMode != playMode::played)
+	if(currentPlayMode != playMode::played && LatchModeIsOff())
 	{
 		std::sort(notesToPlay.begin(), notesToPlay.end());
+
+		std::sort(notesToPlayLatchMode.begin(), notesToPlayLatchMode.end());
 	}
 }
 
@@ -180,7 +217,12 @@ void Arpeggiator::UpdateNoteValue()
 			break;
 	}
 
-	lastNoteValue = notesToPlay[currentNoteIndex];
+	lastNoteValue = SetLastNoteValue();
+}
+
+int Arpeggiator::SetLastNoteValue()
+{
+	return LatchModeIsOff() ? notesToPlay[currentNoteIndex] : notesToPlayLatchMode[currentNoteIndex];
 }
 
 void Arpeggiator::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
@@ -203,27 +245,40 @@ bool Arpeggiator::NoteOffIsRequiredThisBuffer() const
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 {
 	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
-	if(isSameBufferAsLastNoteOn)
+	int offset;
+
+	if(noteOffOccursInSameBufferAsLastNoteOn)
 	{
-		const auto offset = noteOnOffset + noteLengthInSamples;
-		return jmin(offset, lastSampleInCurrentBuffer);
+		offset = noteOnOffset + noteLengthInSamples;
 	}
 	else
 	{
-		const auto offset = numberOfSamplesInBuffer - (samplesFromLastNoteOnUntilBufferEnds - noteLengthInSamples);
-		return jmin(offset, lastSampleInCurrentBuffer);
+		offset = numberOfSamplesInBuffer - (samplesFromLastNoteOnUntilBufferEnds - noteLengthInSamples);
 	}
+
+	return jmin(offset, lastSampleInCurrentBuffer);
 }
 
 bool Arpeggiator::AnyNotesToPlay() const
 {
-	return !notesToPlay.empty();
+	return LatchModeIsOff() ? !notesToPlay.empty() : !notesToPlayLatchMode.empty();
+}
+
+int Arpeggiator::GetNumberOfNotesToPlay() const
+{
+	return LatchModeIsOff() ? notesToPlay.size() : notesToPlayLatchMode.size();
+}
+
+bool Arpeggiator::LatchModeIsOff() const
+{
+	return currentLatchMode == latchMode::off;
 }
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*noteDivision);
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
+	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 }
 
@@ -232,4 +287,5 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	noteDivision->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpPlayMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }
