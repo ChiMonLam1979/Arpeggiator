@@ -126,6 +126,7 @@ private:
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
 	bool playModeHasChanged;
+	bool latchModeHasChanged;
 	int currentNoteIndex;
 	int lastNoteValue;
 	int noteLengthInSamples;
@@ -147,7 +148,7 @@ private:
 	bool LatchModeIsOff() const;
 	int GetNumberOfNotesToPlay() const;
 	int SetLastNoteValue();
-	void UpdateNotesToPlayIfLatched();
+	void UpdateNotesToPlay();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

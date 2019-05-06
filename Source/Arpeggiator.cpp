@@ -32,6 +32,7 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteDivisionFactorChanged = false;
 	currentLatchMode = latchMode::off;
 	selectedLatchMode = latchMode::off;
+	latchModeHasChanged = false;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -57,6 +58,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
 
 	SetLatchMode();
+
+	UpdateNotesToPlay();
 
 	MidiMessage message;
 	int ignore;
@@ -154,25 +157,23 @@ void Arpeggiator::SetLatchMode()
 {
 	selectedLatchMode = static_cast<latchMode>(arpLatchMode->getIndex());
 
-	const auto latchModeHasChanged = currentLatchMode != selectedLatchMode;
+	latchModeHasChanged = currentLatchMode != selectedLatchMode;
 	if(latchModeHasChanged)
 	{
 		currentLatchMode = selectedLatchMode;
+	}
+}
 
-		UpdateNotesToPlayIfLatched();
+void Arpeggiator::UpdateNotesToPlay()
+{
+	if (currentLatchMode == latchMode::on && latchModeHasChanged)
+	{
+		notesToPlayLatchMode = notesToPlay;
 	}
 
 	if (currentLatchMode == latchMode::off)
 	{
 		notesToPlayLatchMode.clear();
-	}
-}
-
-void Arpeggiator::UpdateNotesToPlayIfLatched()
-{
-	if (currentLatchMode == latchMode::on)
-	{
-		notesToPlayLatchMode = notesToPlay;
 	}
 }
 
