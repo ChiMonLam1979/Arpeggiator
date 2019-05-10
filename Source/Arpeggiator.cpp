@@ -50,10 +50,13 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 
+	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition;
+	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
 	const double NoteDivisionStartPosition = partsPerQuarterNoteStartPosition * noteDivisionFactor;
+	// end position of the current buffer in ticks with respect to host timeline
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
-	// trick to calculate when a new note should occur..
+	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
 
@@ -83,6 +86,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	midiMessages.clear();
 
 	SetPlayMode();
+
+	//const int beatsPerBar = 4 * noteDivisionFactor; // to play with for delaying changes until next whole bar
 
 	if (positionInfo.isPlaying)
 	{
@@ -158,28 +163,37 @@ void Arpeggiator::SetLatchMode()
 	selectedLatchMode = static_cast<latchMode>(arpLatchMode->getIndex());
 
 	latchModeHasChanged = currentLatchMode != selectedLatchMode;
-	if(latchModeHasChanged)
-	{
-		currentLatchMode = selectedLatchMode;
-	}
+
+	currentLatchMode = latchModeHasChanged ? selectedLatchMode : currentLatchMode;
+
+	//if(latchModeHasChanged) ??
+	//{
+	//	currentLatchMode = selectedLatchMode;
+	//}
 }
 
 void Arpeggiator::UpdateNotesToPlay()
 {
-	if (currentLatchMode == latchMode::on && latchModeHasChanged)
+	if(latchModeHasChanged || LatchModeIsOff())
 	{
 		notesToPlayLatchMode = notesToPlay;
 	}
 
-	if (currentLatchMode == latchMode::off)
-	{
-		notesToPlayLatchMode.clear();
-	}
+	//if (currentLatchMode == latchMode::on && latchModeHasChanged) ??
+	//{
+	//	notesToPlayLatchMode = notesToPlay;
+	//}
+
+	//if (currentLatchMode == latchMode::off)
+	//{
+	//	notesToPlayLatchMode.clear();
+	//}
 }
 
 void Arpeggiator::UpdateOrderOfNotesToPlay()
 {
-	if(currentPlayMode != playMode::played && LatchModeIsOff())
+	//if(currentPlayMode != playMode::played && LatchModeIsOff()) ??
+	if (currentPlayMode != playMode::played)
 	{
 		std::sort(notesToPlay.begin(), notesToPlay.end());
 
