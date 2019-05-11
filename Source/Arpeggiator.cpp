@@ -8,6 +8,7 @@ Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", 
 	addParameter(arpPlayMode);
 	addParameter(lengthFactor);
 	addParameter(arpLatchMode);
+	addParameter(arpLatchLock);
 }
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
@@ -32,7 +33,9 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteDivisionFactorChanged = false;
 	currentLatchMode = latchMode::off;
 	selectedLatchMode = latchMode::off;
+	previousLatchMode = latchMode::off;
 	latchModeHasChanged = false;
+	latchLockState = latchLock::unlocked;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -64,6 +67,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	UpdateNotesToPlay();
 
+	const bool transpose = IsLockedForTranspose();
+
 	MidiMessage message;
 	int ignore;
 
@@ -73,7 +78,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		{
 			notesToPlay.push_back(message.getNoteNumber());
 
-			notesToPlayLatchMode.push_back(message.getNoteNumber());
+			transpose ? transposeNotes(notesToPlayLatchMode, message.getNoteNumber()) : notesToPlayLatchMode.push_back(message.getNoteNumber());
 		}
 		else if (message.isNoteOff())
 		{
@@ -86,8 +91,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	midiMessages.clear();
 
 	SetPlayMode();
-
-	//const int beatsPerBar = 4 * noteDivisionFactor; // to play with for delaying changes until next whole bar
 
 	if (positionInfo.isPlaying)
 	{
@@ -162,37 +165,24 @@ void Arpeggiator::SetLatchMode()
 {
 	selectedLatchMode = static_cast<latchMode>(arpLatchMode->getIndex());
 
+	latchLockState = static_cast<latchLock>(arpLatchLock->getIndex());
+
 	latchModeHasChanged = currentLatchMode != selectedLatchMode;
 
-	currentLatchMode = latchModeHasChanged ? selectedLatchMode : currentLatchMode;
-
-	//if(latchModeHasChanged) ??
-	//{
-	//	currentLatchMode = selectedLatchMode;
-	//}
+	if(latchModeHasChanged)
+	{
+		previousLatchMode = currentLatchMode;
+		currentLatchMode = selectedLatchMode;
+	}
 }
 
 void Arpeggiator::UpdateNotesToPlay()
 {
-	if(latchModeHasChanged || LatchModeIsOff())
-	{
-		notesToPlayLatchMode = notesToPlay;
-	}
-
-	//if (currentLatchMode == latchMode::on && latchModeHasChanged) ??
-	//{
-	//	notesToPlayLatchMode = notesToPlay;
-	//}
-
-	//if (currentLatchMode == latchMode::off)
-	//{
-	//	notesToPlayLatchMode.clear();
-	//}
+	notesToPlayLatchMode = (latchModeHasChanged && previousLatchMode == latchMode::off) ? notesToPlay : notesToPlayLatchMode;
 }
 
 void Arpeggiator::UpdateOrderOfNotesToPlay()
 {
-	//if(currentPlayMode != playMode::played && LatchModeIsOff()) ??
 	if (currentPlayMode != playMode::played)
 	{
 		std::sort(notesToPlay.begin(), notesToPlay.end());
@@ -289,11 +279,19 @@ bool Arpeggiator::LatchModeIsOff() const
 	return currentLatchMode == latchMode::off;
 }
 
+bool Arpeggiator::IsLockedForTranspose() const
+{
+	return (currentLatchMode == latchMode::transpose 
+			&& latchLockState == latchLock::locked 
+			&& !notesToPlayLatchMode.empty());
+}
+
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*noteDivision);
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
+	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 }
 
@@ -303,4 +301,5 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	arpPlayMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }

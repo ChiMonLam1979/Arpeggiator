@@ -13,3 +13,19 @@ bool inRange(T value, T minExclusive, T maxInclusive)
 {
 	return (value > minExclusive && value <= maxInclusive);
 }
+
+template<typename T>
+void transposeNotes(std::vector<T>& vector, T const& noteValue)
+{
+	T firstNote = vector[0];
+
+	if(noteValue != firstNote)
+	{
+		T transposeValue = (noteValue - firstNote);
+
+		for (T& note : vector)
+		{
+			note = note + transposeValue;
+		}
+	}
+}

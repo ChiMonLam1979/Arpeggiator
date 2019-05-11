@@ -19,7 +19,12 @@
 #define LATCH_MODE_ID "latchMode"
 #define LATCH_MODE_NAME "Latch Mode"
 #define LATCH_MODE_OFF "Latch Off"
-#define LATCH_MODE_ON "Latch On"
+#define LATCH_MODE_ADD "Latch Add"
+#define LATCH_MODE_TRANSPOSE "Latch_Transpose"
+#define LATCH_LOCK_ID "latchLock"
+#define LATCH_LOCK_NAME "Latch Lock"
+#define LATCH_LOCK_OFF "Latch Lock Off"
+#define LATCH_LOCK_ON "Latch Lock On"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -33,7 +38,7 @@ public:
 	void processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 	bool isMidiEffect() const override { return true; }
 
-	AudioProcessorEditor* createEditor() override { return new GenericAudioProcessorEditor(this); }
+	AudioProcessorEditor*  createEditor() override { return new GenericAudioProcessorEditor(this); }
 	bool hasEditor() const override { return true; }
 
 	const String getName() const override { return "Arpeggiator"; }
@@ -87,7 +92,19 @@ private:
 		LATCH_MODE_NAME,
 		{
 			LATCH_MODE_OFF,
-			LATCH_MODE_ON,
+			LATCH_MODE_ADD,
+			LATCH_MODE_TRANSPOSE
+		},
+		0
+	};
+
+	AudioParameterChoice* arpLatchLock = new AudioParameterChoice
+	{
+		LATCH_LOCK_ID,
+		LATCH_LOCK_NAME,
+		{
+			LATCH_LOCK_OFF,
+			LATCH_LOCK_ON
 		},
 		0
 	};
@@ -115,11 +132,14 @@ private:
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
 	enum playMode { up, down, random, played };
-	enum latchMode { off, on };
+	enum latchMode { off, add, transpose };
+	enum latchLock {unlocked, locked };
 	playMode selectedPlayMode;
 	playMode currentPlayMode;
 	latchMode currentLatchMode;
 	latchMode selectedLatchMode;
+	latchMode previousLatchMode;
+	latchLock latchLockState;
 	int noteDivisionFactor;
 	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
@@ -149,6 +169,8 @@ private:
 	int GetNumberOfNotesToPlay() const;
 	int SetLastNoteValue();
 	void UpdateNotesToPlay();
+	bool latchIsLocked;
+	bool IsLockedForTranspose() const;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
