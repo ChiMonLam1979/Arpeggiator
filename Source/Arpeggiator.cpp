@@ -9,6 +9,7 @@ Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", 
 	addParameter(lengthFactor);
 	addParameter(arpLatchMode);
 	addParameter(arpLatchLock);
+	addParameter(noteShift);
 }
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
@@ -36,6 +37,7 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	latchModeHasChanged = false;
 	latchLockState = latchLock::unlocked;
 	transposeIsEnabled = false;
+	shiftFactor = 0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -53,10 +55,14 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 
+	shiftFactor = noteShift->get();
+	const auto samplesPerMillisecond = rate / 1000;
+	const auto shiftInSamples = samplesPerMillisecond * shiftFactor;
+
 	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition;
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-	const double NoteDivisionStartPosition = partsPerQuarterNoteStartPosition * noteDivisionFactor;
+	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - shiftInSamples;
 	// end position of the current buffer in ticks with respect to host timeline
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
@@ -94,14 +100,14 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		{
 			const int noteOnOffset = (int)(samplesPerNoteDivision * (i - NoteDivisionStartPosition));
 
-			if (AnyNotesToPlay())
+			if (ShouldAddNoteOn())
 			{
 				UpdateNoteValue();
 				AddNoteOnToBuffer(midiMessages, noteOnOffset);
 				samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
 			}
 
-			if (NoteOffIsRequiredThisBuffer())
+			if (ShouldAddNoteOff())
 			{
 				noteOffOccursInSameBufferAsLastNoteOn = true;
 				const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
@@ -113,7 +119,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		UpdateNoteDivision();
 
-		if (NoteOffIsRequiredThisBuffer() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
+		if (ShouldAddNoteOff() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
 		{
 			noteOffOccursInSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
@@ -245,9 +251,14 @@ void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
 	lastNoteWasNoteOn = true;
 }
 
-bool Arpeggiator::NoteOffIsRequiredThisBuffer() const
+bool Arpeggiator::ShouldAddNoteOn() const
 {
-	return samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn;
+	return (AnyNotesToPlay() && !lastNoteWasNoteOn);
+}
+
+bool Arpeggiator::ShouldAddNoteOff() const
+{
+	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
 }
 
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
@@ -295,6 +306,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
+	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 }
 
@@ -305,4 +317,5 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }

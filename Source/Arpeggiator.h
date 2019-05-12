@@ -24,6 +24,8 @@
 #define LATCH_LOCK_NAME "Latch Lock"
 #define LATCH_LOCK_OFF "Latch Lock Off"
 #define LATCH_LOCK_ON "Latch Lock On"
+#define NOTE_SHIFT_ID "noteShift"
+#define NOTE_SHIFT_NAME "Note Shift"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -116,6 +118,15 @@ private:
 		0.5f 
 	};
 
+	AudioParameterInt* noteShift = new AudioParameterInt
+	{
+		NOTE_SHIFT_ID,
+		NOTE_SHIFT_NAME,
+		-20,
+		20,
+		0
+	};
+
 	std::map<juce::String, int> noteDivisionDictionary =
 	{
 		{ QUARTER_NOTE_DIVISION, 1 },
@@ -144,12 +155,15 @@ private:
 	bool noteOffOccursInSameBufferAsLastNoteOn;
 	bool playModeHasChanged;
 	bool latchModeHasChanged;
+	bool latchIsLocked;
+	bool transposeIsEnabled;
 	int currentNoteIndex;
 	int lastNoteValue;
 	int noteLengthInSamples;
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;
 	int numberOfNotesToPlay;
+	int shiftFactor;
 	double rate;
 	void UpdateNoteDivision();
 	void SortNotesToPlay();
@@ -160,15 +174,14 @@ private:
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
 	void UpdateNoteValue();
 	bool AnyNotesToPlay() const;
-	bool NoteOffIsRequiredThisBuffer() const;
+	bool ShouldAddNoteOff() const;
+	bool ShouldAddNoteOn() const;
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
 	bool IsLatchModeOff() const;
 	int GetNumberOfNotesToPlay() const;
 	int SetLastNoteValue();
 	void UpdateNotesToPlay();
-	bool latchIsLocked;
 	bool IsTransposeEnabled() const;
-	bool transposeIsEnabled;
 	void SetNoteRecieveMode();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
