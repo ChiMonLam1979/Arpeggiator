@@ -122,8 +122,8 @@ private:
 	{
 		NOTE_SHIFT_ID,
 		NOTE_SHIFT_NAME,
-		-20,
-		20,
+		-32,
+		32,
 		0
 	};
 

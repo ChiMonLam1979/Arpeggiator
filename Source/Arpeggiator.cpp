@@ -54,15 +54,12 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const auto samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
 	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));
 	numberOfSamplesInBuffer = buffer.getNumSamples();
-
 	shiftFactor = noteShift->get();
-	const auto samplesPerMillisecond = rate / 1000;
-	const auto shiftInSamples = samplesPerMillisecond * shiftFactor;
 
 	// start position of the current buffer in quarter note ticks with respect to host timeline
-	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition;
+	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (0.03125 * shiftFactor);
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - shiftInSamples;
+	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 	// end position of the current buffer in ticks with respect to host timeline
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
