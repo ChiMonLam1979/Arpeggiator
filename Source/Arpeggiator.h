@@ -19,8 +19,7 @@
 #define LATCH_MODE_ID "latchMode"
 #define LATCH_MODE_NAME "Latch Mode"
 #define LATCH_MODE_OFF "Latch Off"
-#define LATCH_MODE_ADD "Latch Add"
-#define LATCH_MODE_TRANSPOSE "Latch_Transpose"
+#define LATCH_MODE_ON "Latch On"
 #define LATCH_LOCK_ID "latchLock"
 #define LATCH_LOCK_NAME "Latch Lock"
 #define LATCH_LOCK_OFF "Latch Lock Off"
@@ -92,8 +91,7 @@ private:
 		LATCH_MODE_NAME,
 		{
 			LATCH_MODE_OFF,
-			LATCH_MODE_ADD,
-			LATCH_MODE_TRANSPOSE
+			LATCH_MODE_ON,
 		},
 		0
 	};
@@ -132,13 +130,12 @@ private:
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
 	enum playMode { up, down, random, played };
-	enum latchMode { off, add, transpose };
+	enum latchMode { off, on };
 	enum latchLock {unlocked, locked };
 	playMode selectedPlayMode;
 	playMode currentPlayMode;
 	latchMode currentLatchMode;
 	latchMode selectedLatchMode;
-	latchMode previousLatchMode;
 	latchLock latchLockState;
 	int noteDivisionFactor;
 	bool noteDivisionFactorChanged;
@@ -155,22 +152,24 @@ private:
 	int numberOfNotesToPlay;
 	double rate;
 	void UpdateNoteDivision();
-	void UpdateOrderOfNotesToPlay();
+	void SortNotesToPlay();
 	void SetPlayMode();
 	void SetLatchMode();
-	void UpdateCurrentNoteIndex();
+	void InitializeNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
 	void UpdateNoteValue();
 	bool AnyNotesToPlay() const;
 	bool NoteOffIsRequiredThisBuffer() const;
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
-	bool LatchModeIsOff() const;
+	bool IsLatchModeOff() const;
 	int GetNumberOfNotesToPlay() const;
 	int SetLastNoteValue();
 	void UpdateNotesToPlay();
 	bool latchIsLocked;
-	bool IsLockedForTranspose() const;
+	bool IsTransposeEnabled() const;
+	bool transposeIsEnabled;
+	void SetNoteRecieveMode();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

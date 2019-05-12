@@ -19,13 +19,10 @@ void transposeNotes(std::vector<T>& vector, T const& noteValue)
 {
 	T firstNote = vector[0];
 
-	if(noteValue != firstNote)
-	{
-		T transposeValue = (noteValue - firstNote);
+	T transposeValue = (noteValue - firstNote);
 
-		for (T& note : vector)
-		{
-			note = note + transposeValue;
-		}
+	for (T& note : vector)
+	{
+		note = note + transposeValue;
 	}
 }
