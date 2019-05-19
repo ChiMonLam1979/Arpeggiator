@@ -26,6 +26,8 @@
 #define LATCH_LOCK_ON "Latch Lock On"
 #define NOTE_SHIFT_ID "noteShift"
 #define NOTE_SHIFT_NAME "Note Shift"
+#define SWING_PERCENTAGE_ID "swingAmount"
+#define SWING_PERCENTAGE_NAME "Swing Amount"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -114,8 +116,17 @@ private:
 		NOTE_LENGTH_ID,
 		NOTE_LENGTH_NAME,
 		0.1f,
-		0.9f,
+		1.0f,
 		0.5f 
+	};
+
+	AudioParameterFloat* swingFactor = new AudioParameterFloat
+	{
+		SWING_PERCENTAGE_ID,
+		SWING_PERCENTAGE_NAME,
+		0.0f,
+		1.0f,
+		0.0f
 	};
 
 	AudioParameterInt* noteShift = new AudioParameterInt
@@ -183,6 +194,12 @@ private:
 	void UpdateNotesToPlay();
 	bool IsTransposeEnabled() const;
 	void SetNoteRecieveMode();
+	bool IsEven(double notePosition) const;
+	double SetStartPosition(double position) const;
+	double SetSwungStartPosition(double position) const;
+	const double PPQ128th = 0.03125;
+	double samplesPerNoteDivision;
+	double samplesPerQuarterNote;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

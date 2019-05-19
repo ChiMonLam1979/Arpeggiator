@@ -7,6 +7,7 @@ Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", 
 	addParameter(noteDivision);
 	addParameter(arpPlayMode);
 	addParameter(lengthFactor);
+	addParameter(swingFactor);
 	addParameter(arpLatchMode);
 	addParameter(arpLatchLock);
 	addParameter(noteShift);
@@ -38,6 +39,8 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	latchLockState = latchLock::unlocked;
 	transposeIsEnabled = false;
 	shiftFactor = 0;
+	samplesPerQuarterNote = 0.0;
+	samplesPerNoteDivision = 0.0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -50,14 +53,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
-	const auto samplesPerQuarterNote = rate / quarterNotesPerSecond;
-	const auto samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
+	samplesPerQuarterNote = rate / quarterNotesPerSecond;
+	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
 	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
 	// start position of the current buffer in quarter note ticks with respect to host timeline
-	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (0.03125 * shiftFactor);
+	// check if the current position is closest to an even/odd quarternote tick - even notes should not be swung 0,2,4,6... odd notes should be swung 1,3,5,7...
+	const double partsPerQuarterNoteStartPosition = IsEven(positionInfo.ppqPosition) ? SetStartPosition(positionInfo.ppqPosition) : SetSwungStartPosition(positionInfo.ppqPosition);
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
 	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 	// end position of the current buffer in ticks with respect to host timeline
@@ -297,6 +301,34 @@ bool Arpeggiator::IsTransposeEnabled() const
 			&& !notesToPlayLatchMode.empty());
 }
 
+bool Arpeggiator::IsEven(double notePosition) const
+{
+	const auto notePositionForDivision = (notePosition * noteDivisionFactor);
+
+	return static_cast<int>(std::round(notePositionForDivision)) % 2 == 0;
+}
+
+double Arpeggiator::SetStartPosition(double position) const
+{
+	// shift factor is seperate from the swing and is zero as default
+	return position + (PPQ128th * shiftFactor);
+}
+
+double Arpeggiator::SetSwungStartPosition(double position) const
+{
+	// max lenght in ticks of a note at the selected division
+	const auto noteLenghtPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
+
+	// how much a note can be swung taking into account the current note length
+	// if note-length is set to max = 1.0 then notes cannot be swung
+	const auto swingRange = (noteLenghtPPQ - (noteLenghtPPQ * *lengthFactor));
+
+	const auto startPosition = SetStartPosition(position);
+
+	// subtract the ticks to delay the swung note
+	return startPosition - (swingRange * *swingFactor);
+}
+
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*noteDivision);
@@ -305,6 +337,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
+	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
 }
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
@@ -314,5 +347,6 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }
