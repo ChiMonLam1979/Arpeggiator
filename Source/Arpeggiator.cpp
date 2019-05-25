@@ -61,9 +61,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
 	samplesPerQuarterNote = rate / quarterNotesPerSecond;
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
-	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
+	const auto samplesPer128thNote = (samplesPerQuarterNote / 13);
 	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
-	noteLengthInSamples = jmax((std::ceil(samplesPerNoteDivision * *lengthFactor)) / 2, samplesPer128thNote);
+	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
