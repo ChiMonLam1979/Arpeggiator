@@ -2,7 +2,7 @@
 #include "Arpeggiator.h"
 #include "Extensions.h"
 
-Arpeggiator::Arpeggiator(): AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
+Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
 	addParameter(noteDivision);
 	addParameter(arpPlayMode);
@@ -41,6 +41,10 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	shiftFactor = 0;
 	samplesPerQuarterNote = 0.0;
 	samplesPerNoteDivision = 0.0;
+	noteDivisionLengthPPQ = 0;
+	noteLength = 0;
+	maxSwingPPQ = 0;
+	noteOnOffset = 0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -55,18 +59,29 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
 	samplesPerQuarterNote = rate / quarterNotesPerSecond;
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
-	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor));
+	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor)) / 2;
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
+	noteDivisionLengthPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
+	noteLength = (noteDivisionLengthPPQ * *lengthFactor);
+	maxSwingPPQ = (noteDivisionLengthPPQ - noteLength) / (2 / noteDivisionFactor);
+
 	// start position of the current buffer in quarter note ticks with respect to host timeline
-	// check if the current position is closest to an even/odd quarternote tick - even notes should not be swung 0,2,4,6... odd notes should be swung 1,3,5,7...
-	const double partsPerQuarterNoteStartPosition = IsEven(positionInfo.ppqPosition) ? SetStartPosition(positionInfo.ppqPosition) : SetSwungStartPosition(positionInfo.ppqPosition);
+	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
+
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
+	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - (noteDivisionLengthPPQ / (2 / noteDivisionFactor)) - (maxSwingPPQ * *swingFactor);
 	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
+
 	// end position of the current buffer in ticks with respect to host timeline
+	const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
+
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
+	const int OddNoteDivisionStartPositionAsInt = std::ceil(OddNoteDivisionStartPosition);
+	const int OddNoteDivisionEndPositionAsInt = std::floor(OddNoteDivisionEndPosition);
+
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
 
@@ -97,23 +112,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		for (int i = NoteDivisionStartPositionAsInt; i <= NoteDivisionEndPositionAsInt; ++i)
+		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
-			const int noteOnOffset = (int)(samplesPerNoteDivision * (i - NoteDivisionStartPosition));
-
-			if (ShouldAddNoteOn())
-			{
-				UpdateNoteValue();
-				AddNoteOnToBuffer(midiMessages, noteOnOffset);
-				samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
-			}
-
-			if (ShouldAddNoteOff())
-			{
-				noteOffOccursInSameBufferAsLastNoteOn = true;
-				const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
-				AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-			}
+			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
+			AddNotes(midiMessages);
+		}
+		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
+		{
+			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
+			AddNotes(midiMessages);
 		}
 
 		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
@@ -135,6 +142,28 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		notesToPlayLatchMode.clear();
 		numberOfNotesToPlay = GetNumberOfNotesToPlay();
 		InitializeNoteIndex();
+	}
+}
+
+int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
+{
+	return (int)(samplesPerNoteDivision * (beatPos - notePos));
+}
+
+void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
+{
+	if (ShouldAddNoteOn())
+	{
+		UpdateNoteValue();
+		AddNoteOnToBuffer(midiMessages, noteOnOffset);
+		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
+	}
+
+	if (ShouldAddNoteOff())
+	{
+		noteOffOccursInSameBufferAsLastNoteOn = true;
+		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
+		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 	}
 }
 
@@ -183,7 +212,7 @@ void Arpeggiator::SetPlayMode()
 	SortNotesToPlay();
 
 	playModeHasChanged = currentPlayMode != selectedPlayMode;
-	if(playModeHasChanged || !AnyNotesToPlay())
+	if (playModeHasChanged || !AnyNotesToPlay())
 	{
 		currentPlayMode = selectedPlayMode;
 
@@ -207,14 +236,14 @@ void Arpeggiator::InitializeNoteIndex()
 
 	switch (currentPlayMode)
 	{
-		case playMode::up: currentNoteIndex = -1;
-			break;
-		case playMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
-			break;
-		case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-			break;
-		case playMode:: played: currentNoteIndex = -1;
-			break;
+	case playMode::up: currentNoteIndex = -1;
+		break;
+	case playMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
+		break;
+	case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+		break;
+	case playMode::played: currentNoteIndex = -1;
+		break;
 	}
 }
 
@@ -222,14 +251,14 @@ void Arpeggiator::UpdateNoteValue()
 {
 	switch (currentPlayMode)
 	{
-		case playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-			break;
-		case playMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
-			break;
-		case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-			break;
-		case playMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-			break;
+	case playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+		break;
+	case playMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
+		break;
+	case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+		break;
+	case playMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+		break;
 	}
 
 	lastNoteValue = SetLastNoteValue();
@@ -267,7 +296,7 @@ int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
 	int offset;
 
-	if(noteOffOccursInSameBufferAsLastNoteOn)
+	if (noteOffOccursInSameBufferAsLastNoteOn)
 	{
 		offset = noteOnOffset + noteLengthInSamples;
 	}
@@ -296,42 +325,14 @@ bool Arpeggiator::IsLatchModeOff() const
 
 bool Arpeggiator::IsTransposeEnabled() const
 {
-	return (currentLatchMode == latchMode::on 
-			&& latchLockState == latchLock::locked 
-			&& !notesToPlayLatchMode.empty());
-}
-
-bool Arpeggiator::IsEven(double notePosition) const
-{
-	const auto notePositionForDivision = (notePosition * noteDivisionFactor);
-
-	return static_cast<int>(std::round(notePositionForDivision)) % 2 == 0;
-}
-
-double Arpeggiator::SetStartPosition(double position) const
-{
-	// shift factor is seperate from the swing and is zero as default
-	return position + (PPQ128th * shiftFactor);
-}
-
-double Arpeggiator::SetSwungStartPosition(double position) const
-{
-	// max lenght in ticks of a note at the selected division
-	const auto noteLenghtPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
-
-	// how much a note can be swung taking into account the current note length
-	// if note-length is set to max = 1.0 then notes cannot be swung
-	const auto swingRange = (noteLenghtPPQ - (noteLenghtPPQ * *lengthFactor));
-
-	const auto startPosition = SetStartPosition(position);
-
-	// subtract the ticks to delay the swung note
-	return startPosition - (swingRange * *swingFactor);
+	return (currentLatchMode == latchMode::on
+		&& latchLockState == latchLock::locked
+		&& !notesToPlayLatchMode.empty());
 }
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
-	MemoryOutputStream(destData, true).writeInt(*noteDivision);
+	MemoryOutputStream(destData, true).writeFloat(*noteDivision);
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);

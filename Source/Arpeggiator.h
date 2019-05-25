@@ -138,15 +138,15 @@ private:
 		0
 	};
 
-	std::map<juce::String, int> noteDivisionDictionary =
+	std::map<juce::String, float> noteDivisionDictionary =
 	{
-		{ QUARTER_NOTE_DIVISION, 1 },
-		{ EIGHTH_NOTE_DIVISION, 2 },
-		{ EIGHTH_NOTE_TRIPLET_DIVISION, 3 },
-		{ SIXTEENTH_NOTE_DIVISION, 4 },
-		{ SIXTEENTH_NOTE_TRIPLET_DIVISION, 6 },
-		{ THIRTY_SECOND_NOTE_DIVISION, 8 },
-		{ THIRTY_SECOND_NOTE_TRIPLET_DIVISION, 12 }
+		{ QUARTER_NOTE_DIVISION, 0.5f },
+		{ EIGHTH_NOTE_DIVISION, 1.0f },
+		{ EIGHTH_NOTE_TRIPLET_DIVISION, 3.0f },
+		{ SIXTEENTH_NOTE_DIVISION, 2.0f },
+		{ SIXTEENTH_NOTE_TRIPLET_DIVISION, 6.0f },
+		{ THIRTY_SECOND_NOTE_DIVISION, 4.0f },
+		{ THIRTY_SECOND_NOTE_TRIPLET_DIVISION, 12.0f }
 	};
 
 	std::vector<int> notesToPlay;
@@ -159,7 +159,7 @@ private:
 	latchMode currentLatchMode;
 	latchMode selectedLatchMode;
 	latchLock latchLockState;
-	int noteDivisionFactor;
+	float noteDivisionFactor;
 	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
@@ -194,12 +194,15 @@ private:
 	void UpdateNotesToPlay();
 	bool IsTransposeEnabled() const;
 	void SetNoteRecieveMode();
-	bool IsEven(double notePosition) const;
-	double SetStartPosition(double position) const;
-	double SetSwungStartPosition(double position) const;
 	const double PPQ128th = 0.03125;
 	double samplesPerNoteDivision;
 	double samplesPerQuarterNote;
+	double noteDivisionLengthPPQ;
+	double noteLength;
+	double maxSwingPPQ;
+	int CalculateNoteOnOffset(int beatPos, double notePos) const;
+	int noteOnOffset;
+	void AddNotes(MidiBuffer& midiMessages);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
