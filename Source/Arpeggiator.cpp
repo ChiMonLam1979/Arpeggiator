@@ -55,11 +55,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	AudioPlayHead::CurrentPositionInfo positionInfo{};
 	playHead->getCurrentPosition(positionInfo);
 
+	UpdateNoteDivision();
+
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
 	samplesPerQuarterNote = rate / quarterNotesPerSecond;
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
-	noteLengthInSamples = static_cast<int> (std::ceil(samplesPerNoteDivision * *lengthFactor)) / 2;
+	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
+	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
+	noteLengthInSamples = jmax((std::ceil(samplesPerNoteDivision * *lengthFactor)) / 2, samplesPer128thNote);
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
@@ -70,8 +74,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
 
+	const auto OddNoteOffset = noteDivisionLengthPPQ / (2 / noteDivisionFactor);
+	const auto SwingOffset = maxSwingPPQ * *swingFactor;
+	const auto TotalOddNoteOffset = OddNoteOffset + SwingOffset;
+
+	DBG("ODD OFFSET:  " << TotalOddNoteOffset);
+
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - (noteDivisionLengthPPQ / (2 / noteDivisionFactor)) - (maxSwingPPQ * *swingFactor);
+
+	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - TotalOddNoteOffset;
 	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 
 	// end position of the current buffer in ticks with respect to host timeline
@@ -84,6 +95,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
+
+	DBG("EVEN START:  " << NoteDivisionStartPosition << "   EVEN END:  " << NoteDivisionEndPosition << "   ODD START:  " << OddNoteDivisionStartPosition << "   ODD END:  " << OddNoteDivisionEndPosition << "   ESINT:  " << NoteDivisionStartPositionAsInt << "   EEINT:  " << NoteDivisionEndPositionAsInt << "  OSINT:  " << OddNoteDivisionStartPositionAsInt << "   EEINT:  " << OddNoteDivisionEndPositionAsInt);
 
 	SetNoteRecieveMode();
 
@@ -114,11 +127,15 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
+			DBG("EVEN TRIGGERED");
+
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
 		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
 		{
+			DBG("ODD TRIGGERED");
+
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
@@ -154,6 +171,8 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 {
 	if (ShouldAddNoteOn())
 	{
+		DBG("NOTE ON");
+
 		UpdateNoteValue();
 		AddNoteOnToBuffer(midiMessages, noteOnOffset);
 		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
