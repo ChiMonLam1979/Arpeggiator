@@ -197,7 +197,6 @@ private:
 	const double PPQ128th = 0.03125;
 	double samplesPerNoteDivision;
 	double samplesPerQuarterNote;
-	double noteDivisionLengthPPQ;
 	double noteLength;
 	double maxSwingPPQ;
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;

@@ -41,7 +41,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	shiftFactor = 0;
 	samplesPerQuarterNote = 0.0;
 	samplesPerNoteDivision = 0.0;
-	noteDivisionLengthPPQ = 0;
 	noteLength = 0;
 	maxSwingPPQ = 0;
 	noteOnOffset = 0;
@@ -75,36 +74,21 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
-	noteDivisionLengthPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
-	//noteDivisionLengthPPQ = (samplesPerNoteDivisionHalved / samplesPerQuarterNote);
-
-
-	//noteLength = (noteDivisionLengthPPQ * *lengthFactor);
-	//maxSwingPPQ = (noteDivisionLengthPPQ - noteLength) / (2 / noteDivisionFactor);
+	noteLength = (0.5 * *lengthFactor);
+	maxSwingPPQ = (0.5 - noteLength);
 
 	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
 
-	//const auto OddNoteOffset = noteDivisionLengthPPQ / (2 / noteDivisionFactor);
-	//const auto OddNoteOffset = noteDivisionLengthPPQ * 2;
-
-	//const auto SwingOffset = maxSwingPPQ * *swingFactor;
-	//const auto TotalOddNoteOffset = OddNoteOffset + SwingOffset;
-
-	//const auto TotalOddNoteOffset = noteDivisionLengthPPQ * noteDivisionFactor / 2;
-	const auto TotalOddNoteOffset = 0.5;
+	const auto oddNoteOffset = 0.5;
+	const auto SwingOffset = maxSwingPPQ * *swingFactor;
+	const auto TotalOddNoteOffset = oddNoteOffset + SwingOffset;
 
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-	//const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - TotalOddNoteOffset;
-	//const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
-
-	//const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor * 2) - TotalOddNoteOffset;
 	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactorHalved) - TotalOddNoteOffset;
 	const double EvenNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactorHalved);
 
 	// end position of the current buffer in ticks with respect to host timeline
-	//const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
-
 	const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivisionHalved);
 	const double EvenNoteDivisionEndPosition = EvenNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivisionHalved);
 
@@ -154,6 +138,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, EvenNoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
+
 		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
@@ -178,7 +163,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 {
 	return (int)(samplesPerNoteDivisionHalved * (beatPos - notePos));
-	//return (int)(samplesPerNoteDivision * (beatPos - notePos));
 }
 
 void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
