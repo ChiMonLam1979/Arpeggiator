@@ -78,10 +78,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const auto SwingOffset = maxSwingPPQ * *swingFactor;
 	const auto TotalOddNoteOffset = OddNoteOffset + SwingOffset;
 
-	DBG("ODD OFFSET:  " << TotalOddNoteOffset);
-
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-
 	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - TotalOddNoteOffset;
 	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 
@@ -95,8 +92,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
-
-	DBG("EVEN START:  " << NoteDivisionStartPosition << "   EVEN END:  " << NoteDivisionEndPosition << "   ODD START:  " << OddNoteDivisionStartPosition << "   ODD END:  " << OddNoteDivisionEndPosition << "   ESINT:  " << NoteDivisionStartPositionAsInt << "   EEINT:  " << NoteDivisionEndPositionAsInt << "  OSINT:  " << OddNoteDivisionStartPositionAsInt << "   EEINT:  " << OddNoteDivisionEndPositionAsInt);
 
 	SetNoteRecieveMode();
 
@@ -127,15 +122,11 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
-			DBG("EVEN TRIGGERED");
-
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
 		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
 		{
-			DBG("ODD TRIGGERED");
-
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
@@ -171,8 +162,6 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 {
 	if (ShouldAddNoteOn())
 	{
-		DBG("NOTE ON");
-
 		UpdateNoteValue();
 		AddNoteOnToBuffer(midiMessages, noteOnOffset);
 		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
