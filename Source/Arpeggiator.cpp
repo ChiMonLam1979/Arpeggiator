@@ -303,8 +303,6 @@ bool Arpeggiator::ShouldAddNoteOn() const
 
 bool Arpeggiator::ShouldAddNoteOff() const
 {
-	DBG("SAMPLES SINCE LAST NOTE-ON:  " << samplesFromLastNoteOnUntilBufferEnds);
-
 	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
 }
 
