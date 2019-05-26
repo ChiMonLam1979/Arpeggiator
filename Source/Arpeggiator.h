@@ -176,6 +176,14 @@ private:
 	int numberOfNotesToPlay;
 	int shiftFactor;
 	double rate;
+	const double PPQ128th = 0.03125;
+	double samplesPerNoteDivision;
+	double samplesPerQuarterNote;
+	double noteLength;
+	double maxSwingPPQ;
+	int noteOnOffset;
+	float noteDivisionFactorHalved;
+	double samplesPerNoteDivisionHalved;
 	void UpdateNoteDivision();
 	void SortNotesToPlay();
 	void SetPlayMode();
@@ -194,16 +202,8 @@ private:
 	void UpdateNotesToPlay();
 	bool IsTransposeEnabled() const;
 	void SetNoteRecieveMode();
-	const double PPQ128th = 0.03125;
-	double samplesPerNoteDivision;
-	double samplesPerQuarterNote;
-	double noteLength;
-	double maxSwingPPQ;
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
-	int noteOnOffset;
 	void AddNotes(MidiBuffer& midiMessages);
-	float noteDivisionFactorHalved;
-	double samplesPerNoteDivisionHalved;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
