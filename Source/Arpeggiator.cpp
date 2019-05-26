@@ -57,22 +57,22 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	UpdateNoteDivision();
 
+	noteDivisionFactor = noteDivisionFactor / 2;
+
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
 	samplesPerQuarterNote = rate / quarterNotesPerSecond;
+	//samplesPerNoteDivision = (samplesPerQuarterNote / noteDivisionFactor);
+
+	//samplesPerNoteDivision = (samplesPerQuarterNote / (noteDivisionFactor / 2));
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
 
-	//const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
-	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor);
-	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision);
+	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
+	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPer128thNote);
 
-	DBG("NOTE LENGTH IN SAMPLES INT:  " << NoteLengthInSamplesAsInt);
+	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor);
 
-	//const auto samplesPer128thNote = (samplesPerQuarterNote / 12.84);
-	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
-
-	//noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
-	noteLengthInSamples = NoteLengthInSamplesAsInt;
+	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
@@ -98,6 +98,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	// end position of the current buffer in ticks with respect to host timeline
 	//const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
+
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
@@ -106,8 +107,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
-
-	DBG("EVEN START:  " << NoteDivisionStartPosition << "   EVEN END:  " << NoteDivisionEndPosition << "   ESINT:  " << NoteDivisionStartPositionAsInt << "   EEINT:  " << NoteDivisionEndPositionAsInt);
 
 	SetNoteRecieveMode();
 
@@ -136,6 +135,13 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
+		if (ShouldAddNoteOff() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
+		{
+			noteOffOccursInSameBufferAsLastNoteOn = false;
+			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
+			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+		}
+
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
@@ -150,15 +156,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
 		UpdateNoteDivision();
-
-		if (ShouldAddNoteOff() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
-		{
-			noteOffOccursInSameBufferAsLastNoteOn = false;
-			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
-			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-
-			DBG("NOTE-OFF WITH OFFSET:  " << offsetForNoteOff);
-		}
 	}
 
 	if (!positionInfo.isPlaying)
@@ -183,8 +180,6 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 		UpdateNoteValue();
 		AddNoteOnToBuffer(midiMessages, noteOnOffset);
 		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
-
-		DBG("NOTE-ON WITH OFFSET:  " << noteOnOffset);
 	}
 
 	if (ShouldAddNoteOff())
@@ -192,8 +187,6 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 		noteOffOccursInSameBufferAsLastNoteOn = true;
 		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-
-		DBG("NOTE-OFF WITH OFFSET:  " << offsetForNoteOff);
 	}
 }
 
