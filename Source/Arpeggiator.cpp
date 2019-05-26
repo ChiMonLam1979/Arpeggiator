@@ -45,6 +45,8 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteLength = 0;
 	maxSwingPPQ = 0;
 	noteOnOffset = 0;
+	noteDivisionFactorHalved = 0;
+	samplesPerNoteDivisionHalved = 0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -57,7 +59,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	UpdateNoteDivision();
 
-	noteDivisionFactor = noteDivisionFactor / 2;
+	//noteDivisionFactor = noteDivisionFactor / 2;
+	noteDivisionFactorHalved = noteDivisionFactor / 2;
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
@@ -66,11 +69,13 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	//samplesPerNoteDivision = (samplesPerQuarterNote / (noteDivisionFactor / 2));
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
+	samplesPerNoteDivisionHalved = samplesPerQuarterNote / noteDivisionFactorHalved;
 
 	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
 	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPer128thNote);
 
-	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
+	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor);
+	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
 
 	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
 	numberOfSamplesInBuffer = buffer.getNumSamples();
@@ -94,19 +99,22 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	//const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 
 	//const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor * 2) - TotalOddNoteOffset;
-	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
+
+	const double EvenNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactorHalved);
+	//const double EvenNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 
 	// end position of the current buffer in ticks with respect to host timeline
 	//const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 
-	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
+	const double EvenNoteDivisionEndPosition = EvenNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivisionHalved);
+	//const double EvenNoteDivisionEndPosition = EvenNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
 	//const int OddNoteDivisionStartPositionAsInt = std::ceil(OddNoteDivisionStartPosition);
 	//const int OddNoteDivisionEndPositionAsInt = std::floor(OddNoteDivisionEndPosition);
 
-	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
-	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
+	const int NoteDivisionStartPositionAsInt = std::ceil(EvenNoteDivisionStartPosition);
+	const int NoteDivisionEndPositionAsInt = std::floor(EvenNoteDivisionEndPosition);
 
 	SetNoteRecieveMode();
 
@@ -144,7 +152,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
-			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
+			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, EvenNoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
 		//if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
@@ -170,7 +178,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 {
-	return (int)(samplesPerNoteDivision * (beatPos - notePos));
+	return (int)(samplesPerNoteDivisionHalved * (beatPos - notePos));
+	//return (int)(samplesPerNoteDivision * (beatPos - notePos));
 }
 
 void Arpeggiator::AddNotes(MidiBuffer& midiMessages)

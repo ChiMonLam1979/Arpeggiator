@@ -203,6 +203,8 @@ private:
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 	int noteOnOffset;
 	void AddNotes(MidiBuffer& midiMessages);
+	float noteDivisionFactorHalved;
+	double samplesPerNoteDivisionHalved;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
