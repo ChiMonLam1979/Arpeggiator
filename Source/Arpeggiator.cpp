@@ -61,37 +61,53 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
 	samplesPerQuarterNote = rate / quarterNotesPerSecond;
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
-	const auto samplesPer128thNote = (samplesPerQuarterNote / 12.84);
-	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
-	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
+
+	//const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
+	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor);
+	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision);
+
+	DBG("NOTE LENGTH IN SAMPLES INT:  " << NoteLengthInSamplesAsInt);
+
+	//const auto samplesPer128thNote = (samplesPerQuarterNote / 12.84);
+	//const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor) / 2;
+
+	//noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
+	noteLengthInSamples = NoteLengthInSamplesAsInt;
 	numberOfSamplesInBuffer = buffer.getNumSamples();
 	shiftFactor = noteShift->get();
 
-	noteDivisionLengthPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
-	noteLength = (noteDivisionLengthPPQ * *lengthFactor);
-	maxSwingPPQ = (noteDivisionLengthPPQ - noteLength) / (2 / noteDivisionFactor);
+	//noteDivisionLengthPPQ = (samplesPerNoteDivision / samplesPerQuarterNote);
+	//noteLength = (noteDivisionLengthPPQ * *lengthFactor);
+	//maxSwingPPQ = (noteDivisionLengthPPQ - noteLength) / (2 / noteDivisionFactor);
 
 	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
 
-	const auto OddNoteOffset = noteDivisionLengthPPQ / (2 / noteDivisionFactor);
-	const auto SwingOffset = maxSwingPPQ * *swingFactor;
-	const auto TotalOddNoteOffset = OddNoteOffset + SwingOffset;
+	//const auto OddNoteOffset = noteDivisionLengthPPQ / (2 / noteDivisionFactor);
+	//const auto OddNoteOffset = noteDivisionLengthPPQ * 2;
+
+	//const auto SwingOffset = maxSwingPPQ * *swingFactor;
+	//const auto TotalOddNoteOffset = OddNoteOffset + SwingOffset;
 
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
-	const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - TotalOddNoteOffset;
+	//const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor) - TotalOddNoteOffset;
+	//const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
+
+	//const double OddNoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor * 2) - TotalOddNoteOffset;
 	const double NoteDivisionStartPosition = (partsPerQuarterNoteStartPosition * noteDivisionFactor);
 
 	// end position of the current buffer in ticks with respect to host timeline
-	const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
+	//const double OddNoteDivisionEndPosition = OddNoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 	const double NoteDivisionEndPosition = NoteDivisionStartPosition + (numberOfSamplesInBuffer / samplesPerNoteDivision);
 
 	// trick to calculate when a new note should occur..everytime start position rounded up = end position rounded down
-	const int OddNoteDivisionStartPositionAsInt = std::ceil(OddNoteDivisionStartPosition);
-	const int OddNoteDivisionEndPositionAsInt = std::floor(OddNoteDivisionEndPosition);
+	//const int OddNoteDivisionStartPositionAsInt = std::ceil(OddNoteDivisionStartPosition);
+	//const int OddNoteDivisionEndPositionAsInt = std::floor(OddNoteDivisionEndPosition);
 
 	const int NoteDivisionStartPositionAsInt = std::ceil(NoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(NoteDivisionEndPosition);
+
+	DBG("EVEN START:  " << NoteDivisionStartPosition << "   EVEN END:  " << NoteDivisionEndPosition << "   ESINT:  " << NoteDivisionStartPositionAsInt << "   EEINT:  " << NoteDivisionEndPositionAsInt);
 
 	SetNoteRecieveMode();
 
@@ -125,11 +141,11 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, NoteDivisionStartPosition);
 			AddNotes(midiMessages);
 		}
-		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
-		{
-			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
-			AddNotes(midiMessages);
-		}
+		//if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
+		//{
+		//	noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
+		//	AddNotes(midiMessages);
+		//}
 
 		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
@@ -140,6 +156,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 			noteOffOccursInSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
 			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+
+			DBG("NOTE-OFF WITH OFFSET:  " << offsetForNoteOff);
 		}
 	}
 
@@ -165,6 +183,8 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 		UpdateNoteValue();
 		AddNoteOnToBuffer(midiMessages, noteOnOffset);
 		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
+
+		DBG("NOTE-ON WITH OFFSET:  " << noteOnOffset);
 	}
 
 	if (ShouldAddNoteOff())
@@ -172,6 +192,8 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 		noteOffOccursInSameBufferAsLastNoteOn = true;
 		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+
+		DBG("NOTE-OFF WITH OFFSET:  " << offsetForNoteOff);
 	}
 }
 
