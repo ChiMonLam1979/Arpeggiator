@@ -1,33 +1,6 @@
 #pragma once
-#define NOTE_DIVISION_ID "noteDivisions"
-#define NOTE_DIVISION_NAME "Note Division"
-#define ARP_PLAYMODE_ID "arpPlayMode"
-#define ARP_PLAYMODE_NAME "Play Mode"
-#define PLAYMODE_UP "Up"
-#define PLAYMODE_DOWN "Down"
-#define PLAYMODE_RANDOM "Random"
-#define PLAYMODE_PLAYED "Played"
-#define NOTE_LENGTH_ID "noteLength"
-#define NOTE_LENGTH_NAME "Note Length"
-#define QUARTER_NOTE_DIVISION "1/4 Note"
-#define EIGHTH_NOTE_DIVISION "1/8 Note"
-#define EIGHTH_NOTE_TRIPLET_DIVISION "1/8 Note Triplet"
-#define SIXTEENTH_NOTE_DIVISION "1/16 Note"
-#define SIXTEENTH_NOTE_TRIPLET_DIVISION "1/16 Note Triplet"
-#define THIRTY_SECOND_NOTE_DIVISION "1/32 Note"
-#define THIRTY_SECOND_NOTE_TRIPLET_DIVISION "1/32 Note Triplet"
-#define LATCH_MODE_ID "latchMode"
-#define LATCH_MODE_NAME "Latch Mode"
-#define LATCH_MODE_OFF "Latch Off"
-#define LATCH_MODE_ON "Latch On"
-#define LATCH_LOCK_ID "latchLock"
-#define LATCH_LOCK_NAME "Latch Lock"
-#define LATCH_LOCK_OFF "Latch Lock Off"
-#define LATCH_LOCK_ON "Latch Lock On"
-#define NOTE_SHIFT_ID "noteShift"
-#define NOTE_SHIFT_NAME "Note Shift"
-#define SWING_PERCENTAGE_ID "swingAmount"
-#define SWING_PERCENTAGE_NAME "Swing Amount"
+#include "Parameters.h"
+#include "NoteDivisionHandler.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -60,94 +33,69 @@ public:
 	void setStateInformation(const void* data, int sizeInBytes) override;
 
 private:
-
-	AudioParameterChoice* noteDivision = new AudioParameterChoice
-	{
-		NOTE_DIVISION_ID, NOTE_DIVISION_NAME,
-		{ 
-			QUARTER_NOTE_DIVISION,
-			EIGHTH_NOTE_DIVISION,
-			EIGHTH_NOTE_TRIPLET_DIVISION,
-			SIXTEENTH_NOTE_DIVISION,
-			SIXTEENTH_NOTE_TRIPLET_DIVISION,
-			THIRTY_SECOND_NOTE_DIVISION,
-			THIRTY_SECOND_NOTE_TRIPLET_DIVISION
-		},
-		0
-	};
-
-	AudioParameterChoice* arpPlayMode = new AudioParameterChoice
-	{ 
-		ARP_PLAYMODE_ID,
-		ARP_PLAYMODE_NAME,
+	
+		AudioParameterChoice* arpPlayMode = new AudioParameterChoice
 		{
-			PLAYMODE_UP,
-			PLAYMODE_DOWN,
-			PLAYMODE_RANDOM,
-			PLAYMODE_PLAYED 
-		},
-		0
-	};
-
-	AudioParameterChoice* arpLatchMode = new AudioParameterChoice
-	{
-		LATCH_MODE_ID,
-		LATCH_MODE_NAME,
+			IDs::arpPlayModeId,
+			ParameterNames::arpPlayModeName,
+			{
+				ParamterChoices::playModeUp,
+				ParamterChoices::playModeDown,
+				ParamterChoices::playModeRandom,
+				ParamterChoices::playModePlayed
+			},
+			0
+		};
+	
+		AudioParameterChoice* arpLatchMode = new AudioParameterChoice
 		{
-			LATCH_MODE_OFF,
-			LATCH_MODE_ON,
-		},
-		0
-	};
-
-	AudioParameterChoice* arpLatchLock = new AudioParameterChoice
-	{
-		LATCH_LOCK_ID,
-		LATCH_LOCK_NAME,
+			IDs::latchModeId,
+			ParameterNames::latchModeName,
+			{
+				ParamterChoices::latchModeOff,
+				ParamterChoices::latchModeOn,
+			},
+			0
+		};
+	
+		AudioParameterChoice* arpLatchLock = new AudioParameterChoice
 		{
-			LATCH_LOCK_OFF,
-			LATCH_LOCK_ON
-		},
-		0
-	};
+			IDs::latchLockId,
+			ParameterNames::latchLockName,
+			{
+				ParamterChoices::latchLockOff,
+				ParamterChoices::latchLockOn
+			},
+			0
+		};
+	
+		AudioParameterFloat* lengthFactor = new AudioParameterFloat
+		{
+			IDs::noteLengthId,
+			ParameterNames::noteLengthName,
+			0.1f,
+			1.0f,
+			0.5f
+		};
+	
+		AudioParameterFloat* swingFactor = new AudioParameterFloat
+		{
+			IDs::swingPercentageId,
+			ParameterNames::swingPercentageName,
+			0.0f,
+			1.0f,
+			0.0f
+		};
+	
+		AudioParameterInt* noteShift = new AudioParameterInt
+		{
+			IDs::noteShiftId,
+			ParameterNames::noteShiftName,
+			-32,
+			32,
+			0
+		};
 
-	AudioParameterFloat* lengthFactor = new AudioParameterFloat
-	{ 
-		NOTE_LENGTH_ID,
-		NOTE_LENGTH_NAME,
-		0.1f,
-		1.0f,
-		0.5f 
-	};
-
-	AudioParameterFloat* swingFactor = new AudioParameterFloat
-	{
-		SWING_PERCENTAGE_ID,
-		SWING_PERCENTAGE_NAME,
-		0.0f,
-		1.0f,
-		0.0f
-	};
-
-	AudioParameterInt* noteShift = new AudioParameterInt
-	{
-		NOTE_SHIFT_ID,
-		NOTE_SHIFT_NAME,
-		-32,
-		32,
-		0
-	};
-
-	std::map<juce::String, float> noteDivisionDictionary =
-	{
-		{ QUARTER_NOTE_DIVISION, 1.0f },
-		{ EIGHTH_NOTE_DIVISION, 2.0f },
-		{ EIGHTH_NOTE_TRIPLET_DIVISION, 3.0f },
-		{ SIXTEENTH_NOTE_DIVISION, 4.0f },
-		{ SIXTEENTH_NOTE_TRIPLET_DIVISION, 6.0f },
-		{ THIRTY_SECOND_NOTE_DIVISION, 8.0f },
-		{ THIRTY_SECOND_NOTE_TRIPLET_DIVISION, 12.0f }
-	};
 
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
@@ -159,8 +107,6 @@ private:
 	latchMode currentLatchMode;
 	latchMode selectedLatchMode;
 	latchLock latchLockState;
-	float noteDivisionFactor;
-	bool noteDivisionFactorChanged;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
@@ -184,7 +130,6 @@ private:
 	int noteOnOffset;
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
-	void UpdateNoteDivision();
 	void SortNotesToPlay();
 	void SetPlayMode();
 	void SetLatchMode();
@@ -204,6 +149,8 @@ private:
 	void SetNoteRecieveMode();
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 	void AddNotes(MidiBuffer& midiMessages);
+
+	NoteDivionHandler noteDivisionHandler;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

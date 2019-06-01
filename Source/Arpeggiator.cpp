@@ -4,7 +4,7 @@
 
 Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
-	addParameter(noteDivision);
+	addParameter(noteDivisionHandler.GetNoteDivisionParameter());
 	addParameter(arpPlayMode);
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
@@ -31,8 +31,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	selectedPlayMode = playMode::up;
 	currentPlayMode = playMode::up;
 	playModeHasChanged = false;
-	noteDivisionFactor = 1;
-	noteDivisionFactorChanged = false;
 	currentLatchMode = latchMode::off;
 	selectedLatchMode = latchMode::off;
 	latchModeHasChanged = false;
@@ -56,8 +54,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	AudioPlayHead::CurrentPositionInfo positionInfo{};
 	playHead->getCurrentPosition(positionInfo);
 
-	UpdateNoteDivision();
-
+	noteDivisionHandler.UpdateNoteDivision();
+	const auto noteDivisionFactor = noteDivisionHandler.noteDivisionFactor;
+	const auto noteDivisionFactorChanged = noteDivisionHandler.noteDivisionChanged;
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
@@ -147,7 +146,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
-		UpdateNoteDivision();
+		noteDivisionHandler.UpdateNoteDivision();
 	}
 
 	if (!positionInfo.isPlaying)
@@ -179,17 +178,6 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 		noteOffOccursInSameBufferAsLastNoteOn = true;
 		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-	}
-}
-
-void Arpeggiator::UpdateNoteDivision()
-{
-	const auto currentNoteDivisionFactor = noteDivisionDictionary[noteDivision->getCurrentChoiceName()];
-
-	noteDivisionFactorChanged = noteDivisionFactor != currentNoteDivisionFactor;
-	if (noteDivisionFactorChanged)
-	{
-		noteDivisionFactor = currentNoteDivisionFactor;
 	}
 }
 
@@ -347,7 +335,7 @@ bool Arpeggiator::IsTransposeEnabled() const
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
-	MemoryOutputStream(destData, true).writeFloat(*noteDivision);
+	MemoryOutputStream(destData, true).writeFloat(*noteDivisionHandler.GetNoteDivisionParameter());
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
@@ -358,7 +346,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
-	noteDivision->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	noteDivisionHandler.GetNoteDivisionParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpPlayMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());

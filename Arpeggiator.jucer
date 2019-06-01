@@ -9,6 +9,11 @@
       <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
       <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
       <FILE id="THPtuo" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="CKCLoR" name="NoteDivisionHandler.cpp" compile="1" resource="0"
+            file="Source/NoteDivisionHandler.cpp"/>
+      <FILE id="mrBepc" name="NoteDivisionHandler.h" compile="0" resource="0"
+            file="Source/NoteDivisionHandler.h"/>
+      <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
