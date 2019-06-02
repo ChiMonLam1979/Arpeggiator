@@ -2,6 +2,7 @@
 #include "Parameters.h"
 #include "NoteDivisionHandler.h"
 #include "LatchModeHandler.h"
+#include "ArpPlayModeHandler.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -34,19 +35,6 @@ public:
 	void setStateInformation(const void* data, int sizeInBytes) override;
 
 private:
-	
-		AudioParameterChoice* arpPlayMode = new AudioParameterChoice
-		{
-			IDs::arpPlayModeId,
-			ParameterNames::arpPlayModeName,
-			{
-				ParamterChoices::playModeUp,
-				ParamterChoices::playModeDown,
-				ParamterChoices::playModeRandom,
-				ParamterChoices::playModePlayed
-			},
-			0
-		};
 	
 		AudioParameterChoice* arpLatchLock = new AudioParameterChoice
 		{
@@ -89,15 +77,11 @@ private:
 
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
-	enum playMode { up, down, random, played };
 	enum latchLock {unlocked, locked };
-	playMode selectedPlayMode;
-	playMode currentPlayMode;
 	latchLock latchLockState;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
-	bool playModeHasChanged;
 	bool latchIsLocked;
 	bool transposeIsEnabled;
 	int currentNoteIndex;
@@ -136,6 +120,7 @@ private:
 
 	NoteDivionHandler noteDivisionHandler;
 	LatchModeHandler latchModeHandler;
+	ArpPlayModeHandler arpPlayModeHandler;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

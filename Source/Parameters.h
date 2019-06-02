@@ -47,4 +47,5 @@ namespace ParamterChoices
 namespace Enums
 {
 	enum latchMode { off, on };
+	enum playMode { up, down, random, played };
 }

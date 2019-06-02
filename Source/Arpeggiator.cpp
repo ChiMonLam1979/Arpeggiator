@@ -5,7 +5,7 @@
 Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
 	addParameter(noteDivisionHandler.GetNoteDivisionParameter());
-	addParameter(arpPlayMode);
+	addParameter(arpPlayModeHandler.GetArpPlayModeParameter());
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
 	addParameter(latchModeHandler.GetArpLatchModeParameter());
@@ -28,9 +28,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	notesToPlay.reserve(100);
 	notesToPlayLatchMode.reserve(200);
 	numberOfNotesToPlay = 0;
-	selectedPlayMode = playMode::up;
-	currentPlayMode = playMode::up;
-	playModeHasChanged = false;
 	latchLockState = latchLock::unlocked;
 	transposeIsEnabled = false;
 	shiftFactor = 0;
@@ -118,7 +115,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	midiMessages.clear();
 
-	SetPlayMode();
+	arpPlayModeHandler.SetPlayMode();
 
 	if (positionInfo.isPlaying)
 	{
@@ -196,24 +193,17 @@ void Arpeggiator::UpdateNotesToPlay()
 
 void Arpeggiator::SetPlayMode()
 {
-	selectedPlayMode = static_cast<playMode>(arpPlayMode->getIndex());
+	arpPlayModeHandler.SetPlayMode();
 
-	numberOfNotesToPlay = GetNumberOfNotesToPlay();
-
-	SortNotesToPlay();
-
-	playModeHasChanged = currentPlayMode != selectedPlayMode;
-	if (playModeHasChanged || !AnyNotesToPlay())
+	if (arpPlayModeHandler.playModeHasChanged || !AnyNotesToPlay())
 	{
-		currentPlayMode = selectedPlayMode;
-
 		InitializeNoteIndex();
 	}
 }
 
 void Arpeggiator::SortNotesToPlay()
 {
-	if (currentPlayMode != playMode::played)
+	if (arpPlayModeHandler.currentPlayMode != Enums::playMode::played)
 	{
 		std::sort(notesToPlay.begin(), notesToPlay.end());
 
@@ -225,30 +215,30 @@ void Arpeggiator::InitializeNoteIndex()
 {
 	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
 
-	switch (currentPlayMode)
+	switch (arpPlayModeHandler.currentPlayMode)
 	{
-	case playMode::up: currentNoteIndex = -1;
+	case Enums::playMode::up: currentNoteIndex = -1;
 		break;
-	case playMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
+	case Enums::playMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
 		break;
-	case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+	case Enums::playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
 		break;
-	case playMode::played: currentNoteIndex = -1;
+	case Enums::playMode::played: currentNoteIndex = -1;
 		break;
 	}
 }
 
 void Arpeggiator::UpdateNoteValue()
 {
-	switch (currentPlayMode)
+	switch (arpPlayModeHandler.currentPlayMode)
 	{
-	case playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+	case Enums::playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
 		break;
-	case playMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
+	case Enums::playMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
 		break;
-	case playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+	case Enums::playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
 		break;
-	case playMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+	case Enums::playMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
 		break;
 	}
 
@@ -319,7 +309,7 @@ bool Arpeggiator::IsTransposeEnabled() const
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeFloat(*noteDivisionHandler.GetNoteDivisionParameter());
-	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
+	MemoryOutputStream(destData, true).writeInt(*arpPlayModeHandler.GetArpPlayModeParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchModeHandler.GetArpLatchModeParameter());
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
@@ -330,7 +320,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
 	noteDivisionHandler.GetNoteDivisionParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	arpPlayMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	arpPlayModeHandler.GetArpPlayModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchModeHandler.GetArpLatchModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());

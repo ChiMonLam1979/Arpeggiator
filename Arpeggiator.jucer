@@ -7,6 +7,10 @@
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
       <FILE id="MEH8DO" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
       <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
+      <FILE id="KsnAcn" name="ArpPlayModeHandler.cpp" compile="1" resource="0"
+            file="Source/ArpPlayModeHandler.cpp"/>
+      <FILE id="ezLUlI" name="ArpPlayModeHandler.h" compile="0" resource="0"
+            file="Source/ArpPlayModeHandler.h"/>
       <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
       <FILE id="tItjXO" name="LatchModeHandler.cpp" compile="1" resource="0"
             file="Source/LatchModeHandler.cpp"/>
