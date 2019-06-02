@@ -126,7 +126,7 @@ void Notes::UpdateNoteValue()
 	lastNoteValue = SetLastNoteValue();
 }
 
-void Notes::AddNotes(MidiBuffer& midiMessages, int numberOfSamplesInBuffer, int noteOnOffset)
+void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
 {
 	if (ShouldAddNoteOn())
 	{
@@ -139,9 +139,16 @@ void Notes::AddNotes(MidiBuffer& midiMessages, int numberOfSamplesInBuffer, int 
 	if (ShouldAddNoteOff())
 	{
 		noteOffOccursInSameBufferAsLastNoteOn = true;
-		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset, numberOfSamplesInBuffer);
+		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 	}
+}
+
+void Notes::AddNoteOff(MidiBuffer& midiMessages)
+{
+	noteOffOccursInSameBufferAsLastNoteOn = false;
+	const auto offsetForNoteOff = CalculateOffsetForNoteOff();
+	AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 }
 
 void Notes::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
@@ -156,7 +163,7 @@ void Notes::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
 	lastNoteWasNoteOn = false;
 }
 
-int Notes::CalculateOffsetForNoteOff(int numberOfSamplesInBuffer, int noteOnOffset) const
+int Notes::CalculateOffsetForNoteOff(int noteOnOffset) const
 {
 	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
 	int offset;

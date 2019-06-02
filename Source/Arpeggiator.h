@@ -65,11 +65,6 @@ private:
 			0
 		};
 
-	//bool lastNoteWasNoteOn;
-	//bool noteOffRequiredThisBuffer;
-	//bool noteOffOccursInSameBufferAsLastNoteOn;
-	//bool latchIsLocked;
-	//int currentNoteIndex;
 	int noteLengthInSamples;
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;

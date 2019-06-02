@@ -82,7 +82,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	notes.currentPlayMode = playMode.currentState;
 	notes.noteLengthInSamples = noteLengthInSamples;
-
+	notes.numberOfSamplesInBuffer = numberOfSamplesInBuffer;
 	notes.ProcessBuffer(midiMessages);
 
 	midiMessages.clear();
@@ -93,21 +93,19 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		if (notes.ShouldAddNoteOff() || (noteDivisionFactorChanged && notes.lastNoteWasNoteOn))
 		{
-			notes.noteOffOccursInSameBufferAsLastNoteOn = false;
-			const auto offsetForNoteOff = notes.CalculateOffsetForNoteOff(numberOfSamplesInBuffer);
-			notes.AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+			notes.AddNoteOff(midiMessages);
 		}
 
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, EvenNoteDivisionStartPosition);
-			notes.AddNotes(midiMessages, numberOfSamplesInBuffer, noteOnOffset);
+			notes.AddNotes(midiMessages, noteOnOffset);
 		}
 
 		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
-			notes.AddNotes(midiMessages, numberOfSamplesInBuffer, noteOnOffset);
+			notes.AddNotes(midiMessages, noteOnOffset);
 		}
 
 		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
@@ -129,7 +127,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 {
-	return (int)(samplesPerNoteDivisionHalved * (beatPos - notePos));
+	return static_cast<int>(samplesPerNoteDivisionHalved * (beatPos - notePos));
 }
 
 void Arpeggiator::SetPlayMode()
