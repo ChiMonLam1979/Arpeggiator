@@ -1,14 +1,14 @@
 #include "Notes.h"
 #include "Extensions.h"
 
-Notes::Notes(LatchMode& latchMode, LatchLock& latchLock) :
-currentNoteIndex(-1), numberOfNotesToPlay(0), lastNoteValue(0), lastNoteWasNoteOn(false), currentPlayMode(Enums::playMode::up), samplesFromLastNoteOnUntilBufferEnds(0),
-noteLengthInSamples(0), noteOffOccursInSameBufferAsLastNoteOn(false), latchMode(latchMode), latchLock(latchLock), latchIsEnabled(false)
+Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playmode) :
+currentPlayMode(Enums::playMode::up), lastNoteWasNoteOn(false), noteLengthInSamples(0), samplesFromLastNoteOnUntilBufferEnds(0), latchMode(latchMode), latchLock(latchLock),
+playMode(playmode), latchIsEnabled(false), currentNoteIndex(-1), numberOfNotesToPlay(0), lastNoteValue(0), noteOffOccursInSameBufferAsLastNoteOn(false)
 {
-	toPlay.clear();
-	toPlay.reserve(100);
-	toPlayLatchMode.clear();
-	toPlayLatchMode.reserve(200);
+	notes.clear();
+	notes.reserve(100);
+	notesLatched.clear();
+	notesLatched.reserve(200);
 }
 
 Notes::~Notes()
@@ -17,9 +17,7 @@ Notes::~Notes()
 
 void Notes::ProcessBuffer(MidiBuffer& midiMessages)
 {
-	latchMode.Set();
-	latchLock.Set();
-	UpdateNotesToPlay();
+	PrepareToProcess();
 
 	MidiMessage message;
 	int ignore;
@@ -28,69 +26,67 @@ void Notes::ProcessBuffer(MidiBuffer& midiMessages)
 	{
 		if (message.isNoteOn())
 		{
-			toPlay.push_back(message.getNoteNumber());
+			notes.push_back(message.getNoteNumber());
 
-			TransposeIsEnabled() ? transposeNotes(toPlayLatchMode, message.getNoteNumber()) : toPlayLatchMode.push_back(message.getNoteNumber());
+			TransposeIsEnabled() ? transposeNotes(notesLatched, message.getNoteNumber()) : notesLatched.push_back(message.getNoteNumber());
 		}
 		else if (message.isNoteOff())
 		{
-			erase(toPlay, message.getNoteNumber());
+			erase(notes, message.getNoteNumber());
 		}
+	}
+}
+
+void Notes::PrepareToProcess()
+{
+	latchMode.Set();
+	latchLock.Set();
+	playMode.Set();
+	currentPlayMode = playMode.currentState;
+	AssignLatchedNotes();
+	SortNotes();
+
+	if (playMode.stateHasChanged || !AnyNotesToPlay())
+	{
+		InitializeNoteIndex();
 	}
 }
 
 bool Notes::TransposeIsEnabled() const
 {
-	return (latchMode.IsEnabled() && latchLock.state == Enums::latchLock::locked && !toPlayLatchMode.empty());
+	return (latchMode.IsEnabled() && latchLock.state == Enums::latchLock::locked && !notesLatched.empty());
 }
 
-void Notes::UpdateNotesToPlay()
+void Notes::AssignLatchedNotes()
 {
-	const auto latchModeStateHasChanged = latchMode.stateHasChanged;
-	toPlayLatchMode = latchModeStateHasChanged ? toPlay : toPlayLatchMode;
+	notesLatched = latchMode.stateHasChanged ? notes : notesLatched;
 }
 
-void Notes::SortNotesToPlay()
+void Notes::SortNotes()
 {
 	if (currentPlayMode != Enums::playMode::played)
 	{
-		std::sort(toPlay.begin(), toPlay.end());
+		std::sort(notes.begin(), notes.end());
 
-		std::sort(toPlayLatchMode.begin(), toPlayLatchMode.end());
+		std::sort(notesLatched.begin(), notesLatched.end());
 	}
 }
 
-int Notes::SetLastNoteValue()
+void Notes::GetNumberOfNotes()
 {
 	latchIsEnabled = latchMode.IsEnabled();
-	return latchIsEnabled ? toPlayLatchMode[currentNoteIndex] : toPlay[currentNoteIndex];
-}
-
-void Notes::GetNumberOfNotesToPlay()
-{
-	latchIsEnabled = latchMode.IsEnabled();
-	numberOfNotesToPlay = latchIsEnabled ? toPlayLatchMode.size() : toPlay.size();
+	numberOfNotesToPlay = latchIsEnabled ? notesLatched.size() : notes.size();
 }
 
 bool Notes::AnyNotesToPlay()
 {
 	latchIsEnabled = latchMode.IsEnabled();
-	return latchIsEnabled ? !toPlayLatchMode.empty() : !toPlay.empty();
-}
-
-bool Notes::ShouldAddNoteOn()
-{
-	return AnyNotesToPlay() && !lastNoteWasNoteOn;
-}
-
-bool Notes::ShouldAddNoteOff() const
-{
-	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
+	return latchIsEnabled ? !notesLatched.empty() : !notes.empty();
 }
 
 void Notes::InitializeNoteIndex()
 {
-	GetNumberOfNotesToPlay();
+	GetNumberOfNotes();
 
 	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
 
@@ -109,7 +105,7 @@ void Notes::InitializeNoteIndex()
 
 void Notes::UpdateNoteValue()
 {
-	GetNumberOfNotesToPlay();
+	GetNumberOfNotes();
 
 	switch (currentPlayMode)
 	{
@@ -124,6 +120,12 @@ void Notes::UpdateNoteValue()
 	}
 
 	lastNoteValue = SetLastNoteValue();
+}
+
+int Notes::SetLastNoteValue()
+{
+	latchIsEnabled = latchMode.IsEnabled();
+	return latchIsEnabled ? notesLatched[currentNoteIndex] : notes[currentNoteIndex];
 }
 
 void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
@@ -142,6 +144,16 @@ void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
 		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
 		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 	}
+}
+
+bool Notes::ShouldAddNoteOn()
+{
+	return AnyNotesToPlay() && !lastNoteWasNoteOn;
+}
+
+bool Notes::ShouldAddNoteOff() const
+{
+	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
 }
 
 void Notes::AddNoteOff(MidiBuffer& midiMessages)
@@ -178,4 +190,13 @@ int Notes::CalculateOffsetForNoteOff(int noteOnOffset) const
 	}
 
 	return jmin(offset, lastSampleInCurrentBuffer);
+}
+
+void Notes::Reset()
+{
+	notes.clear();
+
+	notesLatched.clear();
+
+	InitializeNoteIndex();
 }

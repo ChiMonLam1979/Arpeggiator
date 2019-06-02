@@ -5,11 +5,11 @@
 Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
 {
 	addParameter(noteDivision.GetParameter());
+	addParameter(latchMode.GetParameter());
+	addParameter(latchLock.GetParameter());
 	addParameter(playMode.GetParameter());
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
-	addParameter(latchMode.GetParameter());
-	addParameter(latchLock.GetParameter());
 	addParameter(noteShift);
 }
 
@@ -80,14 +80,12 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const int NoteDivisionStartPositionAsInt = std::ceil(EvenNoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(EvenNoteDivisionEndPosition);
 
-	notes.currentPlayMode = playMode.currentState;
 	notes.noteLengthInSamples = noteLengthInSamples;
 	notes.numberOfSamplesInBuffer = numberOfSamplesInBuffer;
+
 	notes.ProcessBuffer(midiMessages);
 
 	midiMessages.clear();
-
-	SetPlayMode();
 
 	if (positionInfo.isPlaying)
 	{
@@ -117,11 +115,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	{
 		midiMessages.clear();
 
-		notes.toPlay.clear();
-
-		notes.toPlayLatchMode.clear();
-
-		notes.InitializeNoteIndex();
+		notes.Reset();
 	}
 }
 
@@ -130,26 +124,12 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 	return static_cast<int>(samplesPerNoteDivisionHalved * (beatPos - notePos));
 }
 
-void Arpeggiator::SetPlayMode()
-{
-	playMode.Set();
-
-	notes.currentPlayMode = playMode.currentState;
-
-	notes.SortNotesToPlay();
-
-	if (playMode.stateHasChanged || !notes.AnyNotesToPlay())
-	{
-		notes.InitializeNoteIndex();
-	}
-}
-
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeFloat(*noteDivision.GetParameter());
-	MemoryOutputStream(destData, true).writeInt(*playMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchLock.GetParameter());
+	MemoryOutputStream(destData, true).writeInt(*playMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
@@ -158,10 +138,10 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
 	noteDivision.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	playMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchLock.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	playMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }

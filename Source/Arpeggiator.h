@@ -78,14 +78,13 @@ private:
 	int noteOnOffset;
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
-	void SetPlayMode();
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 
 	NoteDivision noteDivision;
 	LatchMode latchMode;
 	ArpPlayMode playMode;
 	LatchLock latchLock;
-	Notes notes{ latchMode, latchLock};
+	Notes notes{ latchMode, latchLock, playMode};
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

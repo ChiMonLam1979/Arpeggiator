@@ -2,47 +2,53 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LatchMode.h"
 #include "LatchLock.h"
+#include "ArpPlayMode.h"
 
 class Notes
 {
 public:
 
-	Notes(LatchMode& latchMode, LatchLock& latchLock);
+	Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playMode);
 
 	~Notes();
 
 	void ProcessBuffer(MidiBuffer& midiMessages);
-	void UpdateNotesToPlay();
-	void SortNotesToPlay();
-	int SetLastNoteValue();
-	void GetNumberOfNotesToPlay();
-	void UpdateNoteValue();
-	void InitializeNoteIndex();
-	bool AnyNotesToPlay();
 	bool ShouldAddNoteOn();
 	bool ShouldAddNoteOff() const;
-	bool TransposeIsEnabled() const;
 	void AddNotes(MidiBuffer& midiMessages, int noteOnOffset);
-	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
-	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
-	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
 	void AddNoteOff(MidiBuffer& midiMessages);
+	void Reset();
 
-	std::vector<int> toPlay;
-	std::vector<int> toPlayLatchMode;
-	int currentNoteIndex;
-	int numberOfNotesToPlay;
-	int lastNoteValue;
-	bool lastNoteWasNoteOn;
+	std::vector<int> notes;
+	std::vector<int> notesLatched;
 	Enums::playMode currentPlayMode;
-	int samplesFromLastNoteOnUntilBufferEnds;
+
+	bool lastNoteWasNoteOn;
 	int noteLengthInSamples;
-	bool noteOffOccursInSameBufferAsLastNoteOn;
 	int numberOfSamplesInBuffer;
+	int samplesFromLastNoteOnUntilBufferEnds;
 
 private:
 
+	void AssignLatchedNotes();
+	void SortNotes();
+	int SetLastNoteValue();
+	void GetNumberOfNotes();
+	void InitializeNoteIndex();
+	void UpdateNoteValue();
+	bool AnyNotesToPlay();
+	bool TransposeIsEnabled() const;
+	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
+	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
+	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
+	void PrepareToProcess();
+
 	LatchMode latchMode;
 	LatchLock latchLock;
+	ArpPlayMode playMode;
 	bool latchIsEnabled;
+	int currentNoteIndex;
+	int numberOfNotesToPlay;
+	int lastNoteValue;
+	bool noteOffOccursInSameBufferAsLastNoteOn;
 };
