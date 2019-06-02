@@ -65,12 +65,11 @@ private:
 			0
 		};
 
-	bool lastNoteWasNoteOn;
-	bool noteOffRequiredThisBuffer;
-	bool noteOffOccursInSameBufferAsLastNoteOn;
-	bool latchIsLocked;
-	bool transposeIsEnabled;
-	int currentNoteIndex;
+	//bool lastNoteWasNoteOn;
+	//bool noteOffRequiredThisBuffer;
+	//bool noteOffOccursInSameBufferAsLastNoteOn;
+	//bool latchIsLocked;
+	//int currentNoteIndex;
 	int noteLengthInSamples;
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;
@@ -85,19 +84,13 @@ private:
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
 	void SetPlayMode();
-	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
-	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
-	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
-	bool IsTransposeEnabled() const;
-	void SetNoteRecieveMode();
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
-	void AddNotes(MidiBuffer& midiMessages);
 
 	NoteDivision noteDivision;
 	LatchMode latchMode;
 	ArpPlayMode playMode;
 	LatchLock latchLock;
-	Notes notes;
+	Notes notes{ latchMode, latchLock};
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

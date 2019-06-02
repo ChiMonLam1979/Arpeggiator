@@ -16,13 +16,8 @@ Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input",
 void Arpeggiator::prepareToPlay(double sampleRate, int)
 {
 	rate = sampleRate;
-	currentNoteIndex = -1;
-	lastNoteWasNoteOn = false;
-	samplesFromLastNoteOnUntilBufferEnds = 0;
 	noteLengthInSamples = 0;
 	numberOfSamplesInBuffer = 0;
-	noteOffRequiredThisBuffer = false;
-	transposeIsEnabled = false;
 	shiftFactor = 0;
 	samplesPerQuarterNote = 0.0;
 	samplesPerNoteDivision = 0.0;
@@ -85,14 +80,10 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	const int NoteDivisionStartPositionAsInt = std::ceil(EvenNoteDivisionStartPosition);
 	const int NoteDivisionEndPositionAsInt = std::floor(EvenNoteDivisionEndPosition);
 
-	SetNoteRecieveMode();
-
-	notes.latchIsDisabled = latchMode.IsLatchDisabled();
 	notes.currentPlayMode = playMode.currentState;
+	notes.noteLengthInSamples = noteLengthInSamples;
 
-	notes.ProcessBuffer(midiMessages, transposeIsEnabled);
-
-	notes.GetNumberOfNotesToPlay();
+	notes.ProcessBuffer(midiMessages);
 
 	midiMessages.clear();
 
@@ -100,26 +91,26 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		if (notes.ShouldAddNoteOff(samplesFromLastNoteOnUntilBufferEnds, noteLengthInSamples) || (noteDivisionFactorChanged && notes.lastNoteWasNoteOn))
+		if (notes.ShouldAddNoteOff() || (noteDivisionFactorChanged && notes.lastNoteWasNoteOn))
 		{
-			noteOffOccursInSameBufferAsLastNoteOn = false;
-			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
-			AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+			notes.noteOffOccursInSameBufferAsLastNoteOn = false;
+			const auto offsetForNoteOff = notes.CalculateOffsetForNoteOff(numberOfSamplesInBuffer);
+			notes.AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
 		}
 
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(NoteDivisionStartPositionAsInt, EvenNoteDivisionStartPosition);
-			AddNotes(midiMessages);
+			notes.AddNotes(midiMessages, numberOfSamplesInBuffer, noteOnOffset);
 		}
 
 		if(OddNoteDivisionStartPositionAsInt <= OddNoteDivisionEndPositionAsInt)
 		{
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
-			AddNotes(midiMessages);
+			notes.AddNotes(midiMessages, numberOfSamplesInBuffer, noteOnOffset);
 		}
 
-		samplesFromLastNoteOnUntilBufferEnds = (samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
+		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
 		noteDivision.Set();
 	}
@@ -132,8 +123,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		notes.toPlayLatchMode.clear();
 
-		notes.GetNumberOfNotesToPlay();
-
 		notes.InitializeNoteIndex();
 	}
 }
@@ -143,39 +132,8 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 	return (int)(samplesPerNoteDivisionHalved * (beatPos - notePos));
 }
 
-void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
-{
-	if (notes.ShouldAddNoteOn())
-	{
-		notes.UpdateNoteValue();
-
-		AddNoteOnToBuffer(midiMessages, noteOnOffset);
-		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
-	}
-
-	if (notes.ShouldAddNoteOff(samplesFromLastNoteOnUntilBufferEnds, noteLengthInSamples))
-	{
-		noteOffOccursInSameBufferAsLastNoteOn = true;
-		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
-		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
-	}
-}
-
-void Arpeggiator::SetNoteRecieveMode()
-{
-	latchMode.Set();
-
-	latchLock.Set();
-
-	transposeIsEnabled = IsTransposeEnabled();
-
-	notes.UpdateNotesToPlay(latchMode.stateHasChanged);
-}
-
 void Arpeggiator::SetPlayMode()
 {
-	notes.GetNumberOfNotesToPlay();
-
 	playMode.Set();
 
 	notes.currentPlayMode = playMode.currentState;
@@ -186,42 +144,6 @@ void Arpeggiator::SetPlayMode()
 	{
 		notes.InitializeNoteIndex();
 	}
-}
-
-void Arpeggiator::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
-{
-	midiMessages.addEvent(MidiMessage::noteOff(1, notes.lastNoteValue), offset);
-	notes.lastNoteWasNoteOn = false;
-}
-
-void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
-{
-	midiMessages.addEvent(MidiMessage::noteOn(1, notes.lastNoteValue, (uint8)127), offset);
-	notes.lastNoteWasNoteOn = true;
-}
-
-int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
-{
-	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
-	int offset;
-
-	if (noteOffOccursInSameBufferAsLastNoteOn)
-	{
-		offset = noteOnOffset + noteLengthInSamples;
-	}
-	else
-	{
-		offset = numberOfSamplesInBuffer - (samplesFromLastNoteOnUntilBufferEnds - noteLengthInSamples);
-	}
-
-	return jmin(offset, lastSampleInCurrentBuffer);
-}
-
-bool Arpeggiator::IsTransposeEnabled() const
-{
-	return (latchMode.currentState == Enums::latchMode::on
-		&& latchLock.state == Enums::latchLock::locked
-		&& !notes.toPlayLatchMode.empty());
 }
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)

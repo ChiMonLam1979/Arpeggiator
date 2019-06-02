@@ -12,7 +12,7 @@ public:
 	AudioParameterChoice* GetParameter() const;
 
 	void Set();
-	bool IsLatchDisabled() const;
+	bool IsEnabled() const;
 
 	bool stateHasChanged;
 	Enums::latchMode currentState;

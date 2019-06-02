@@ -22,7 +22,7 @@ void LatchMode::Set()
 	currentState = stateHasChanged ? selectedState : currentState;
 }
 
-bool LatchMode::IsLatchDisabled() const
+bool LatchMode::IsEnabled() const
 {
-	return currentState == Enums::latchMode::off;
+	return currentState == Enums::latchMode::on;
 }

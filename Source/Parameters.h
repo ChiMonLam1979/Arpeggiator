@@ -38,8 +38,8 @@ namespace ParamterChoices
 	static String ThirtySecondNoteDivision{ "1/32 Note" };
 	static String ThirtySecondNoteTripletDivision{ "1/32 Note Triplet" };
 
-	static String Off{ "Latch Off" };
-	static String On{ "Latch On" };
+	static String Off{ "Off" };
+	static String On{ "On" };
 }
 
 namespace Enums

@@ -1,7 +1,9 @@
 #include "Notes.h"
 #include "Extensions.h"
 
-Notes::Notes():numberOfNotesToPlay(0), lastNoteValue(0), lastNoteWasNoteOn(false), latchIsDisabled(false)
+Notes::Notes(LatchMode& latchMode, LatchLock& latchLock) :
+currentNoteIndex(-1), numberOfNotesToPlay(0), lastNoteValue(0), lastNoteWasNoteOn(false), currentPlayMode(Enums::playMode::up), samplesFromLastNoteOnUntilBufferEnds(0),
+noteLengthInSamples(0), noteOffOccursInSameBufferAsLastNoteOn(false), latchMode(latchMode), latchLock(latchLock), latchIsEnabled(false)
 {
 	toPlay.clear();
 	toPlay.reserve(100);
@@ -13,8 +15,12 @@ Notes::~Notes()
 {
 }
 
-void Notes::ProcessBuffer(MidiBuffer& midiMessages, bool transposeIsEnabled)
+void Notes::ProcessBuffer(MidiBuffer& midiMessages)
 {
+	latchMode.Set();
+	latchLock.Set();
+	UpdateNotesToPlay();
+
 	MidiMessage message;
 	int ignore;
 
@@ -24,7 +30,7 @@ void Notes::ProcessBuffer(MidiBuffer& midiMessages, bool transposeIsEnabled)
 		{
 			toPlay.push_back(message.getNoteNumber());
 
-			transposeIsEnabled ? transposeNotes(toPlayLatchMode, message.getNoteNumber()) : toPlayLatchMode.push_back(message.getNoteNumber());
+			TransposeIsEnabled() ? transposeNotes(toPlayLatchMode, message.getNoteNumber()) : toPlayLatchMode.push_back(message.getNoteNumber());
 		}
 		else if (message.isNoteOff())
 		{
@@ -33,8 +39,14 @@ void Notes::ProcessBuffer(MidiBuffer& midiMessages, bool transposeIsEnabled)
 	}
 }
 
-void Notes::UpdateNotesToPlay(bool latchModeStateHasChanged)
+bool Notes::TransposeIsEnabled() const
 {
+	return (latchMode.IsEnabled() && latchLock.state == Enums::latchLock::locked && !toPlayLatchMode.empty());
+}
+
+void Notes::UpdateNotesToPlay()
+{
+	const auto latchModeStateHasChanged = latchMode.stateHasChanged;
 	toPlayLatchMode = latchModeStateHasChanged ? toPlay : toPlayLatchMode;
 }
 
@@ -50,31 +62,36 @@ void Notes::SortNotesToPlay()
 
 int Notes::SetLastNoteValue()
 {
-	return latchIsDisabled ? toPlay[currentNoteIndex] : toPlayLatchMode[currentNoteIndex];
+	latchIsEnabled = latchMode.IsEnabled();
+	return latchIsEnabled ? toPlayLatchMode[currentNoteIndex] : toPlay[currentNoteIndex];
 }
 
 void Notes::GetNumberOfNotesToPlay()
 {
-	numberOfNotesToPlay = latchIsDisabled ? toPlay.size() : toPlayLatchMode.size();
+	latchIsEnabled = latchMode.IsEnabled();
+	numberOfNotesToPlay = latchIsEnabled ? toPlayLatchMode.size() : toPlay.size();
 }
 
-bool Notes::AnyNotesToPlay() const
+bool Notes::AnyNotesToPlay()
 {
-	return latchIsDisabled ? !toPlay.empty() : !toPlayLatchMode.empty();
+	latchIsEnabled = latchMode.IsEnabled();
+	return latchIsEnabled ? !toPlayLatchMode.empty() : !toPlay.empty();
 }
 
-bool Notes::ShouldAddNoteOn() const
+bool Notes::ShouldAddNoteOn()
 {
 	return AnyNotesToPlay() && !lastNoteWasNoteOn;
 }
 
-bool Notes::ShouldAddNoteOff(int samplesFromLastNoteOnUntilBufferEnds, int noteLengthInSamples) const
+bool Notes::ShouldAddNoteOff() const
 {
 	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
 }
 
 void Notes::InitializeNoteIndex()
 {
+	GetNumberOfNotesToPlay();
+
 	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
 
 	switch (currentPlayMode)
@@ -92,6 +109,8 @@ void Notes::InitializeNoteIndex()
 
 void Notes::UpdateNoteValue()
 {
+	GetNumberOfNotesToPlay();
+
 	switch (currentPlayMode)
 	{
 	case Enums::playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
@@ -105,4 +124,51 @@ void Notes::UpdateNoteValue()
 	}
 
 	lastNoteValue = SetLastNoteValue();
+}
+
+void Notes::AddNotes(MidiBuffer& midiMessages, int numberOfSamplesInBuffer, int noteOnOffset)
+{
+	if (ShouldAddNoteOn())
+	{
+		UpdateNoteValue();
+
+		AddNoteOnToBuffer(midiMessages, noteOnOffset);
+		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
+	}
+
+	if (ShouldAddNoteOff())
+	{
+		noteOffOccursInSameBufferAsLastNoteOn = true;
+		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset, numberOfSamplesInBuffer);
+		AddNoteOffToBuffer(midiMessages, offsetForNoteOff);
+	}
+}
+
+void Notes::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
+{
+	midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
+	lastNoteWasNoteOn = true;
+}
+
+void Notes::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
+{
+	midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
+	lastNoteWasNoteOn = false;
+}
+
+int Notes::CalculateOffsetForNoteOff(int numberOfSamplesInBuffer, int noteOnOffset) const
+{
+	const auto lastSampleInCurrentBuffer = numberOfSamplesInBuffer - 1;
+	int offset;
+
+	if (noteOffOccursInSameBufferAsLastNoteOn)
+	{
+		offset = noteOnOffset + noteLengthInSamples;
+	}
+	else
+	{
+		offset = numberOfSamplesInBuffer - (samplesFromLastNoteOnUntilBufferEnds - noteLengthInSamples);
+	}
+
+	return jmin(offset, lastSampleInCurrentBuffer);
 }
