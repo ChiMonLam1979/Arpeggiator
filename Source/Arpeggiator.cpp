@@ -15,19 +15,13 @@ Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input",
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
 {
-	notesToPlay.clear();
-	notesToPlayLatchMode.clear();
 	rate = sampleRate;
 	currentNoteIndex = -1;
-	lastNoteValue = 0;
 	lastNoteWasNoteOn = false;
 	samplesFromLastNoteOnUntilBufferEnds = 0;
 	noteLengthInSamples = 0;
 	numberOfSamplesInBuffer = 0;
 	noteOffRequiredThisBuffer = false;
-	notesToPlay.reserve(100);
-	notesToPlayLatchMode.reserve(200);
-	numberOfNotesToPlay = 0;
 	transposeIsEnabled = false;
 	shiftFactor = 0;
 	samplesPerQuarterNote = 0.0;
@@ -93,24 +87,12 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	SetNoteRecieveMode();
 
-	MidiMessage message;
-	int ignore;
+	notes.latchIsDisabled = latchMode.IsLatchDisabled();
+	notes.currentPlayMode = playMode.currentState;
 
-	for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(message, ignore);)
-	{
-		if (message.isNoteOn())
-		{
-			notesToPlay.push_back(message.getNoteNumber());
+	notes.ProcessBuffer(midiMessages, transposeIsEnabled);
 
-			transposeIsEnabled ? transposeNotes(notesToPlayLatchMode, message.getNoteNumber()) : notesToPlayLatchMode.push_back(message.getNoteNumber());
-		}
-		else if (message.isNoteOff())
-		{
-			erase(notesToPlay, message.getNoteNumber());
-		}
-	}
-
-	numberOfNotesToPlay = GetNumberOfNotesToPlay();
+	notes.GetNumberOfNotesToPlay();
 
 	midiMessages.clear();
 
@@ -118,7 +100,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		if (ShouldAddNoteOff() || (noteDivisionFactorChanged && lastNoteWasNoteOn))
+		if (notes.ShouldAddNoteOff(samplesFromLastNoteOnUntilBufferEnds, noteLengthInSamples) || (noteDivisionFactorChanged && notes.lastNoteWasNoteOn))
 		{
 			noteOffOccursInSameBufferAsLastNoteOn = false;
 			const auto offsetForNoteOff = CalculateOffsetForNoteOff();
@@ -145,10 +127,14 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	if (!positionInfo.isPlaying)
 	{
 		midiMessages.clear();
-		notesToPlay.clear();
-		notesToPlayLatchMode.clear();
-		numberOfNotesToPlay = GetNumberOfNotesToPlay();
-		InitializeNoteIndex();
+
+		notes.toPlay.clear();
+
+		notes.toPlayLatchMode.clear();
+
+		notes.GetNumberOfNotesToPlay();
+
+		notes.InitializeNoteIndex();
 	}
 }
 
@@ -159,14 +145,15 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 
 void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 {
-	if (ShouldAddNoteOn())
+	if (notes.ShouldAddNoteOn())
 	{
-		UpdateNoteValue();
+		notes.UpdateNoteValue();
+
 		AddNoteOnToBuffer(midiMessages, noteOnOffset);
 		samplesFromLastNoteOnUntilBufferEnds = numberOfSamplesInBuffer - noteOnOffset;
 	}
 
-	if (ShouldAddNoteOff())
+	if (notes.ShouldAddNoteOff(samplesFromLastNoteOnUntilBufferEnds, noteLengthInSamples))
 	{
 		noteOffOccursInSameBufferAsLastNoteOn = true;
 		const auto offsetForNoteOff = CalculateOffsetForNoteOff(noteOnOffset);
@@ -182,97 +169,35 @@ void Arpeggiator::SetNoteRecieveMode()
 
 	transposeIsEnabled = IsTransposeEnabled();
 
-	UpdateNotesToPlay();
-}
-
-void Arpeggiator::UpdateNotesToPlay()
-{
-	notesToPlayLatchMode = latchMode.stateHasChanged ? notesToPlay : notesToPlayLatchMode;
+	notes.UpdateNotesToPlay(latchMode.stateHasChanged);
 }
 
 void Arpeggiator::SetPlayMode()
 {
-	numberOfNotesToPlay = GetNumberOfNotesToPlay();
+	notes.GetNumberOfNotesToPlay();
 
 	playMode.Set();
 
-	SortNotesToPlay();
+	notes.currentPlayMode = playMode.currentState;
 
-	if (playMode.stateHasChanged || !AnyNotesToPlay())
+	notes.SortNotesToPlay();
+
+	if (playMode.stateHasChanged || !notes.AnyNotesToPlay())
 	{
-		InitializeNoteIndex();
+		notes.InitializeNoteIndex();
 	}
-}
-
-void Arpeggiator::SortNotesToPlay()
-{
-	if (playMode.currentState != Enums::playMode::played)
-	{
-		std::sort(notesToPlay.begin(), notesToPlay.end());
-
-		std::sort(notesToPlayLatchMode.begin(), notesToPlayLatchMode.end());
-	}
-}
-
-void Arpeggiator::InitializeNoteIndex()
-{
-	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
-
-	switch (playMode.currentState)
-	{
-	case Enums::playMode::up: currentNoteIndex = -1;
-		break;
-	case Enums::playMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
-		break;
-	case Enums::playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-		break;
-	case Enums::playMode::played: currentNoteIndex = -1;
-		break;
-	}
-}
-
-void Arpeggiator::UpdateNoteValue()
-{
-	switch (playMode.currentState)
-	{
-	case Enums::playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-		break;
-	case Enums::playMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
-		break;
-	case Enums::playMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-		break;
-	case Enums::playMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-		break;
-	}
-
-	lastNoteValue = SetLastNoteValue();
-}
-
-int Arpeggiator::SetLastNoteValue()
-{
-	return latchMode.IsLatchDisabled() ? notesToPlay[currentNoteIndex] : notesToPlayLatchMode[currentNoteIndex];
 }
 
 void Arpeggiator::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
 {
-	midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
-	lastNoteWasNoteOn = false;
+	midiMessages.addEvent(MidiMessage::noteOff(1, notes.lastNoteValue), offset);
+	notes.lastNoteWasNoteOn = false;
 }
 
 void Arpeggiator::AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset)
 {
-	midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
-	lastNoteWasNoteOn = true;
-}
-
-bool Arpeggiator::ShouldAddNoteOn() const
-{
-	return (AnyNotesToPlay() && !lastNoteWasNoteOn);
-}
-
-bool Arpeggiator::ShouldAddNoteOff() const
-{
-	return (samplesFromLastNoteOnUntilBufferEnds >= noteLengthInSamples && lastNoteWasNoteOn);
+	midiMessages.addEvent(MidiMessage::noteOn(1, notes.lastNoteValue, (uint8)127), offset);
+	notes.lastNoteWasNoteOn = true;
 }
 
 int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
@@ -292,21 +217,11 @@ int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 	return jmin(offset, lastSampleInCurrentBuffer);
 }
 
-bool Arpeggiator::AnyNotesToPlay() const
-{
-	return latchMode.IsLatchDisabled() ? !notesToPlay.empty() : !notesToPlayLatchMode.empty();
-}
-
-int Arpeggiator::GetNumberOfNotesToPlay() const
-{
-	return latchMode.IsLatchDisabled() ? notesToPlay.size() : notesToPlayLatchMode.size();
-}
-
 bool Arpeggiator::IsTransposeEnabled() const
 {
 	return (latchMode.currentState == Enums::latchMode::on
 		&& latchLock.state == Enums::latchLock::locked
-		&& !notesToPlayLatchMode.empty());
+		&& !notes.toPlayLatchMode.empty());
 }
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)

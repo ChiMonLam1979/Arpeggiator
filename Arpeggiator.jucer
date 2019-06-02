@@ -18,6 +18,8 @@
       <FILE id="CKCLoR" name="NoteDivision.cpp" compile="1" resource="0"
             file="Source/NoteDivision.cpp"/>
       <FILE id="mrBepc" name="NoteDivision.h" compile="0" resource="0" file="Source/NoteDivision.h"/>
+      <FILE id="OcUy1x" name="Notes.cpp" compile="1" resource="0" file="Source/Notes.cpp"/>
+      <FILE id="Rninv1" name="Notes.h" compile="0" resource="0" file="Source/Notes.h"/>
       <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
     </GROUP>
   </MAINGROUP>

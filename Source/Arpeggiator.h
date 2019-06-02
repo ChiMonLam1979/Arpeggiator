@@ -4,6 +4,7 @@
 #include "LatchMode.h"
 #include "NoteDivision.h"
 #include "LatchLock.h"
+#include "Notes.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -64,20 +65,15 @@ private:
 			0
 		};
 
-
-	std::vector<int> notesToPlay;
-	std::vector<int> notesToPlayLatchMode;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
 	bool latchIsLocked;
 	bool transposeIsEnabled;
 	int currentNoteIndex;
-	int lastNoteValue;
 	int noteLengthInSamples;
 	int samplesFromLastNoteOnUntilBufferEnds;
 	int numberOfSamplesInBuffer;
-	int numberOfNotesToPlay;
 	int shiftFactor;
 	double rate;
 	const double PPQ128th = 0.03125;
@@ -88,19 +84,10 @@ private:
 	int noteOnOffset;
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
-	void SortNotesToPlay();
 	void SetPlayMode();
-	void InitializeNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
-	void UpdateNoteValue();
-	bool AnyNotesToPlay() const;
-	bool ShouldAddNoteOff() const;
-	bool ShouldAddNoteOn() const;
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
-	int GetNumberOfNotesToPlay() const;
-	int SetLastNoteValue();
-	void UpdateNotesToPlay();
 	bool IsTransposeEnabled() const;
 	void SetNoteRecieveMode();
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
@@ -110,6 +97,7 @@ private:
 	LatchMode latchMode;
 	ArpPlayMode playMode;
 	LatchLock latchLock;
+	Notes notes;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
