@@ -114,7 +114,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	midiMessages.clear();
 
-	playMode.Set();
+	SetPlayMode();
 
 	if (positionInfo.isPlaying)
 	{
@@ -192,7 +192,11 @@ void Arpeggiator::UpdateNotesToPlay()
 
 void Arpeggiator::SetPlayMode()
 {
+	numberOfNotesToPlay = GetNumberOfNotesToPlay();
+
 	playMode.Set();
+
+	SortNotesToPlay();
 
 	if (playMode.stateHasChanged || !AnyNotesToPlay())
 	{

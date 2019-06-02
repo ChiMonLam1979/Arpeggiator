@@ -39,8 +39,8 @@ private:
 	
 		AudioParameterFloat* lengthFactor = new AudioParameterFloat
 		{
-			IDs::noteLengthId,
-			ParameterNames::noteLengthName,
+			IDs::NoteLengthId,
+			ParameterNames::NoteLengthName,
 			0.1f,
 			1.0f,
 			0.5f
@@ -48,8 +48,8 @@ private:
 	
 		AudioParameterFloat* swingFactor = new AudioParameterFloat
 		{
-			IDs::swingPercentageId,
-			ParameterNames::swingPercentageName,
+			IDs::SwingPercentageId,
+			ParameterNames::SwingPercentageName,
 			0.0f,
 			1.0f,
 			0.0f
@@ -57,8 +57,8 @@ private:
 	
 		AudioParameterInt* noteShift = new AudioParameterInt
 		{
-			IDs::noteShiftId,
-			ParameterNames::noteShiftName,
+			IDs::NoteShiftId,
+			ParameterNames::NoteShiftName,
 			-32,
 			32,
 			0

@@ -19,11 +19,11 @@ private:
 
 	AudioParameterChoice* lockModes = new AudioParameterChoice
 	{
-		IDs::latchLockId,
-		ParameterNames::latchLockName,
+		IDs::LatchLockId,
+		ParameterNames::LatchLockName,
 		{
-			ParamterChoices::latchLockOff,
-			ParamterChoices::latchLockOn
+			ParamterChoices::Off,
+			ParamterChoices::On
 		},
 		0
 	};

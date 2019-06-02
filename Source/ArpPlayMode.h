@@ -21,13 +21,13 @@ private:
 
 	AudioParameterChoice* playModes = new AudioParameterChoice
 	{
-		IDs::arpPlayModeId,
-		ParameterNames::arpPlayModeName,
+		IDs::ArpPlayModeId,
+		ParameterNames::ArpPlayModeName,
 		{
-			ParamterChoices::playModeUp,
-			ParamterChoices::playModeDown,
-			ParamterChoices::playModeRandom,
-			ParamterChoices::playModePlayed
+			ParamterChoices::Up,
+			ParamterChoices::Down,
+			ParamterChoices::Random,
+			ParamterChoices::Played
 		},
 		0
 	};

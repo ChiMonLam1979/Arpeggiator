@@ -22,11 +22,11 @@ private:
 
 	AudioParameterChoice* latchModes = new AudioParameterChoice
 	{
-		IDs::latchModeId,
-		ParameterNames::latchModeName,
+		IDs::LatchModeId,
+		ParameterNames::LatchModeName,
 		{
-			ParamterChoices::latchModeOff,
-			ParamterChoices::latchModeOn,
+			ParamterChoices::Off,
+			ParamterChoices::On,
 		},
 		0
 	};

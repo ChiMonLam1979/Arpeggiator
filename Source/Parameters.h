@@ -3,45 +3,43 @@
 
 namespace IDs
 {
-	static String noteDivisionId{ "noteDivision" };
-	static String arpPlayModeId{ "arpPlayMode" };
-	static String noteLengthId{ "noteLength" };
-	static String latchModeId{ "latchMode" };
-	static String latchLockId{ "latchLock" };
-	static String noteShiftId{ "noteShift" };
-	static String swingPercentageId{ "swingAmount" };
+	static String NoteDivisionId{ "noteDivision" };
+	static String ArpPlayModeId{ "arpPlayMode" };
+	static String NoteLengthId{ "noteLength" };
+	static String LatchModeId{ "latchMode" };
+	static String LatchLockId{ "latchLock" };
+	static String NoteShiftId{ "noteShift" };
+	static String SwingPercentageId{ "swingAmount" };
 }
 
 namespace ParameterNames
 {
-	static String noteDivisionName{ "Note Division" };
-	static String arpPlayModeName{ "Play Mode" };
-	static String noteLengthName{ "Note Length" };
-	static String latchModeName{ "Latch Mode" };
-	static String latchLockName{ "Latch Lock" };
-	static String noteShiftName{ "Note Shift" };
-	static String swingPercentageName{ "Swing Amount" };
+	static String NoteDivisionName{ "Note Division" };
+	static String ArpPlayModeName{ "Play Mode" };
+	static String NoteLengthName{ "Note Length" };
+	static String LatchModeName{ "Latch Mode" };
+	static String LatchLockName{ "Latch Lock" };
+	static String NoteShiftName{ "Note Shift" };
+	static String SwingPercentageName{ "Swing Amount" };
 }
 
 namespace ParamterChoices
 {
-	static String playModeUp{ "Up" };
-	static String playModeDown{ "Down" };
-	static String playModeRandom{ "Random" };
-	static String playModePlayed{ "Played" };
+	static String Up{ "Up" };
+	static String Down{ "Down" };
+	static String Random{ "Random" };
+	static String Played{ "Played" };
 
-	static String quarterNoteDivision{ "1/4 Note" };
-	static String eighthNoteDivision{ "1/8 Note" };
-	static String eighthNoteTripletDivision{ "1/8 Note Triplet" };
-	static String sixteenthNoteDivision{ "1/16 Note" };
-	static String sixteenthNoteTripletDivision{ "1/16 Note Triplet" };
-	static String thirtySecondNoteDivision{ "1/32 Note" };
-	static String thirtySecondNoteTripletDivision{ "1/32 Note Triplet" };
+	static String QuarterNoteDivision{ "1/4 Note" };
+	static String EighthNoteDivision{ "1/8 Note" };
+	static String EighthNoteTripletDivision{ "1/8 Note Triplet" };
+	static String SixteenthNoteDivision{ "1/16 Note" };
+	static String SixteenthNoteTripletDivision{ "1/16 Note Triplet" };
+	static String ThirtySecondNoteDivision{ "1/32 Note" };
+	static String ThirtySecondNoteTripletDivision{ "1/32 Note Triplet" };
 
-	static String latchModeOff{ "Latch Off" };
-	static String latchModeOn{ "Latch On" };
-	static String latchLockOff{ "Latch Lock Off" };
-	static String latchLockOn{ "Latch Lock On" };
+	static String Off{ "Latch Off" };
+	static String On{ "Latch On" };
 }
 
 namespace Enums
