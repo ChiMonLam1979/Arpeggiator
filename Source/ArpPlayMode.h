@@ -2,24 +2,24 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class ArpPlayModeHandler
+class ArpPlayMode
 {
 public:
 
-	ArpPlayModeHandler();
-	~ArpPlayModeHandler();
+	ArpPlayMode();
+	~ArpPlayMode();
 
-	AudioParameterChoice* GetArpPlayModeParameter() const;
+	AudioParameterChoice* GetParameter() const;
 
-	void SetPlayMode();
+	void Set();
 
-	Enums::playMode selectedPlayMode;
-	Enums::playMode currentPlayMode;
-	bool playModeHasChanged;
+	Enums::playMode selectedState;
+	Enums::playMode currentState;
+	bool stateHasChanged;
 
 private:
 
-	AudioParameterChoice* arpPlayMode = new AudioParameterChoice
+	AudioParameterChoice* playModes = new AudioParameterChoice
 	{
 		IDs::arpPlayModeId,
 		ParameterNames::arpPlayModeName,

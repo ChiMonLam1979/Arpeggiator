@@ -1,8 +1,9 @@
 #pragma once
 #include "Parameters.h"
-#include "NoteDivisionHandler.h"
-#include "LatchModeHandler.h"
-#include "ArpPlayModeHandler.h"
+#include "ArpPlayMode.h"
+#include "LatchMode.h"
+#include "NoteDivision.h"
+#include "LatchLock.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -105,10 +106,10 @@ private:
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 	void AddNotes(MidiBuffer& midiMessages);
 
-	NoteDivionHandler noteDivisionHandler;
-	LatchModeHandler latchModeHandler;
-	ArpPlayModeHandler arpPlayModeHandler;
-	LatchModeHandler latchLockHandler;
+	NoteDivision noteDivision;
+	LatchMode latchMode;
+	ArpPlayMode playMode;
+	LatchLock latchLock;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

@@ -2,22 +2,22 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class LatchLockHandler
+class LatchLock
 {
 public:
 
-	LatchLockHandler();
-	~LatchLockHandler();
+	LatchLock();
+	~LatchLock();
 
-	AudioParameterChoice* GetLatchLockParameter() const;
+	AudioParameterChoice* GetParameter() const;
 
-	void SetLatchLockMode();
+	void Set();
 
-	Enums::latchLock latchLockState;
+	Enums::latchLock state;
 
 private:
 
-	AudioParameterChoice* arpLatchLock = new AudioParameterChoice
+	AudioParameterChoice* lockModes = new AudioParameterChoice
 	{
 		IDs::latchLockId,
 		ParameterNames::latchLockName,

@@ -2,23 +2,23 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class NoteDivionHandler
+class NoteDivision
 {
 public:
 
-	NoteDivionHandler();
-	~NoteDivionHandler();
+	NoteDivision();
+	~NoteDivision();
 
-	AudioParameterChoice* GetNoteDivisionParameter() const;
+	AudioParameterChoice* GetParameter() const;
 
-	void UpdateNoteDivision();
+	void Set();
 
-	float noteDivisionFactor = 1.0f;
-	bool noteDivisionChanged;
+	float currentFactor;
+	bool stateChanged;
 
 private:
 
-	AudioParameterChoice* noteDivision = new AudioParameterChoice
+	AudioParameterChoice* noteDivisions = new AudioParameterChoice
 	{
 		IDs::noteDivisionId, ParameterNames::noteDivisionName,
 		{

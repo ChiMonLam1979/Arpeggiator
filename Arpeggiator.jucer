@@ -7,24 +7,17 @@
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
       <FILE id="MEH8DO" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
       <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
-      <FILE id="KsnAcn" name="ArpPlayModeHandler.cpp" compile="1" resource="0"
-            file="Source/ArpPlayModeHandler.cpp"/>
-      <FILE id="ezLUlI" name="ArpPlayModeHandler.h" compile="0" resource="0"
-            file="Source/ArpPlayModeHandler.h"/>
+      <FILE id="KsnAcn" name="ArpPlayMode.cpp" compile="1" resource="0" file="Source/ArpPlayMode.cpp"/>
+      <FILE id="ezLUlI" name="ArpPlayMode.h" compile="0" resource="0" file="Source/ArpPlayMode.h"/>
       <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
-      <FILE id="muMgCR" name="LatchLockHandler.cpp" compile="1" resource="0"
-            file="Source/LatchLockHandler.cpp"/>
-      <FILE id="dnS4gS" name="LatchLockHandler.h" compile="0" resource="0"
-            file="Source/LatchLockHandler.h"/>
-      <FILE id="tItjXO" name="LatchModeHandler.cpp" compile="1" resource="0"
-            file="Source/LatchModeHandler.cpp"/>
-      <FILE id="HeL0iH" name="LatchModeHandler.h" compile="0" resource="0"
-            file="Source/LatchModeHandler.h"/>
+      <FILE id="muMgCR" name="LatchLock.cpp" compile="1" resource="0" file="Source/LatchLock.cpp"/>
+      <FILE id="dnS4gS" name="LatchLock.h" compile="0" resource="0" file="Source/LatchLock.h"/>
+      <FILE id="tItjXO" name="LatchMode.cpp" compile="1" resource="0" file="Source/LatchMode.cpp"/>
+      <FILE id="HeL0iH" name="LatchMode.h" compile="0" resource="0" file="Source/LatchMode.h"/>
       <FILE id="THPtuo" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="CKCLoR" name="NoteDivisionHandler.cpp" compile="1" resource="0"
-            file="Source/NoteDivisionHandler.cpp"/>
-      <FILE id="mrBepc" name="NoteDivisionHandler.h" compile="0" resource="0"
-            file="Source/NoteDivisionHandler.h"/>
+      <FILE id="CKCLoR" name="NoteDivision.cpp" compile="1" resource="0"
+            file="Source/NoteDivision.cpp"/>
+      <FILE id="mrBepc" name="NoteDivision.h" compile="0" resource="0" file="Source/NoteDivision.h"/>
       <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
     </GROUP>
   </MAINGROUP>
