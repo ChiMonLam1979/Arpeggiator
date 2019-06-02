@@ -1,6 +1,7 @@
 #pragma once
 #include "Parameters.h"
 #include "NoteDivisionHandler.h"
+#include "LatchModeHandler.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -47,17 +48,6 @@ private:
 			0
 		};
 	
-		AudioParameterChoice* arpLatchMode = new AudioParameterChoice
-		{
-			IDs::latchModeId,
-			ParameterNames::latchModeName,
-			{
-				ParamterChoices::latchModeOff,
-				ParamterChoices::latchModeOn,
-			},
-			0
-		};
-	
 		AudioParameterChoice* arpLatchLock = new AudioParameterChoice
 		{
 			IDs::latchLockId,
@@ -100,18 +90,14 @@ private:
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
 	enum playMode { up, down, random, played };
-	enum latchMode { off, on };
 	enum latchLock {unlocked, locked };
 	playMode selectedPlayMode;
 	playMode currentPlayMode;
-	latchMode currentLatchMode;
-	latchMode selectedLatchMode;
 	latchLock latchLockState;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
 	bool playModeHasChanged;
-	bool latchModeHasChanged;
 	bool latchIsLocked;
 	bool transposeIsEnabled;
 	int currentNoteIndex;
@@ -132,7 +118,6 @@ private:
 	double samplesPerNoteDivisionHalved;
 	void SortNotesToPlay();
 	void SetPlayMode();
-	void SetLatchMode();
 	void InitializeNoteIndex();
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
@@ -141,7 +126,6 @@ private:
 	bool ShouldAddNoteOff() const;
 	bool ShouldAddNoteOn() const;
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
-	bool IsLatchModeOff() const;
 	int GetNumberOfNotesToPlay() const;
 	int SetLastNoteValue();
 	void UpdateNotesToPlay();
@@ -151,6 +135,7 @@ private:
 	void AddNotes(MidiBuffer& midiMessages);
 
 	NoteDivionHandler noteDivisionHandler;
+	LatchModeHandler latchModeHandler;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

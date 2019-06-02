@@ -1,6 +1,6 @@
 #include "NoteDivisionHandler.h"
 
-NoteDivionHandler::NoteDivionHandler()
+NoteDivionHandler::NoteDivionHandler() : noteDivisionChanged(false)
 {
 }
 

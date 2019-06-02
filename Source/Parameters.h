@@ -43,3 +43,8 @@ namespace ParamterChoices
 	static String latchLockOff{ "Latch Lock Off" };
 	static String latchLockOn{ "Latch Lock On" };
 }
+
+namespace Enums
+{
+	enum latchMode { off, on };
+}

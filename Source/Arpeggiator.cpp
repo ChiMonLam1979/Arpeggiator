@@ -8,7 +8,7 @@ Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input",
 	addParameter(arpPlayMode);
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
-	addParameter(arpLatchMode);
+	addParameter(latchModeHandler.GetArpLatchModeParameter());
 	addParameter(arpLatchLock);
 	addParameter(noteShift);
 }
@@ -31,9 +31,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	selectedPlayMode = playMode::up;
 	currentPlayMode = playMode::up;
 	playModeHasChanged = false;
-	currentLatchMode = latchMode::off;
-	selectedLatchMode = latchMode::off;
-	latchModeHasChanged = false;
 	latchLockState = latchLock::unlocked;
 	transposeIsEnabled = false;
 	shiftFactor = 0;
@@ -183,7 +180,7 @@ void Arpeggiator::AddNotes(MidiBuffer& midiMessages)
 
 void Arpeggiator::SetNoteRecieveMode()
 {
-	SetLatchMode();
+	latchModeHandler.SetLatchMode();
 
 	latchLockState = static_cast<latchLock>(arpLatchLock->getIndex());
 
@@ -192,18 +189,9 @@ void Arpeggiator::SetNoteRecieveMode()
 	UpdateNotesToPlay();
 }
 
-void Arpeggiator::SetLatchMode()
-{
-	selectedLatchMode = static_cast<latchMode>(arpLatchMode->getIndex());
-
-	latchModeHasChanged = currentLatchMode != selectedLatchMode;
-
-	currentLatchMode = latchModeHasChanged ? selectedLatchMode : currentLatchMode;
-}
-
 void Arpeggiator::UpdateNotesToPlay()
 {
-	notesToPlayLatchMode = latchModeHasChanged ? notesToPlay : notesToPlayLatchMode;
+	notesToPlayLatchMode = latchModeHandler.latchModeHasChanged ? notesToPlay : notesToPlayLatchMode;
 }
 
 void Arpeggiator::SetPlayMode()
@@ -269,7 +257,7 @@ void Arpeggiator::UpdateNoteValue()
 
 int Arpeggiator::SetLastNoteValue()
 {
-	return IsLatchModeOff() ? notesToPlay[currentNoteIndex] : notesToPlayLatchMode[currentNoteIndex];
+	return latchModeHandler.IsLatchModeOff() ? notesToPlay[currentNoteIndex] : notesToPlayLatchMode[currentNoteIndex];
 }
 
 void Arpeggiator::AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset)
@@ -313,22 +301,17 @@ int Arpeggiator::CalculateOffsetForNoteOff(int noteOnOffset) const
 
 bool Arpeggiator::AnyNotesToPlay() const
 {
-	return IsLatchModeOff() ? !notesToPlay.empty() : !notesToPlayLatchMode.empty();
+	return latchModeHandler.IsLatchModeOff() ? !notesToPlay.empty() : !notesToPlayLatchMode.empty();
 }
 
 int Arpeggiator::GetNumberOfNotesToPlay() const
 {
-	return IsLatchModeOff() ? notesToPlay.size() : notesToPlayLatchMode.size();
-}
-
-bool Arpeggiator::IsLatchModeOff() const
-{
-	return currentLatchMode == latchMode::off;
+	return latchModeHandler.IsLatchModeOff() ? notesToPlay.size() : notesToPlayLatchMode.size();
 }
 
 bool Arpeggiator::IsTransposeEnabled() const
 {
-	return (currentLatchMode == latchMode::on
+	return (latchModeHandler.currentLatchMode == Enums::latchMode::on
 		&& latchLockState == latchLock::locked
 		&& !notesToPlayLatchMode.empty());
 }
@@ -337,7 +320,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeFloat(*noteDivisionHandler.GetNoteDivisionParameter());
 	MemoryOutputStream(destData, true).writeInt(*arpPlayMode);
-	MemoryOutputStream(destData, true).writeInt(*arpLatchMode);
+	MemoryOutputStream(destData, true).writeInt(*latchModeHandler.GetArpLatchModeParameter());
 	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
@@ -349,7 +332,7 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	noteDivisionHandler.GetNoteDivisionParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpPlayMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	arpLatchMode->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	latchModeHandler.GetArpLatchModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
