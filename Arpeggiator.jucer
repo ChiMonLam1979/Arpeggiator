@@ -12,6 +12,10 @@
       <FILE id="ezLUlI" name="ArpPlayModeHandler.h" compile="0" resource="0"
             file="Source/ArpPlayModeHandler.h"/>
       <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
+      <FILE id="muMgCR" name="LatchLockHandler.cpp" compile="1" resource="0"
+            file="Source/LatchLockHandler.cpp"/>
+      <FILE id="dnS4gS" name="LatchLockHandler.h" compile="0" resource="0"
+            file="Source/LatchLockHandler.h"/>
       <FILE id="tItjXO" name="LatchModeHandler.cpp" compile="1" resource="0"
             file="Source/LatchModeHandler.cpp"/>
       <FILE id="HeL0iH" name="LatchModeHandler.h" compile="0" resource="0"

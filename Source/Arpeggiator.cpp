@@ -9,7 +9,7 @@ Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input",
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
 	addParameter(latchModeHandler.GetArpLatchModeParameter());
-	addParameter(arpLatchLock);
+	addParameter(latchLockHandler.GetArpLatchModeParameter());
 	addParameter(noteShift);
 }
 
@@ -28,7 +28,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	notesToPlay.reserve(100);
 	notesToPlayLatchMode.reserve(200);
 	numberOfNotesToPlay = 0;
-	latchLockState = latchLock::unlocked;
 	transposeIsEnabled = false;
 	shiftFactor = 0;
 	samplesPerQuarterNote = 0.0;
@@ -179,7 +178,7 @@ void Arpeggiator::SetNoteRecieveMode()
 {
 	latchModeHandler.SetLatchMode();
 
-	latchLockState = static_cast<latchLock>(arpLatchLock->getIndex());
+	latchLockHandler.SetLatchMode();
 
 	transposeIsEnabled = IsTransposeEnabled();
 
@@ -302,7 +301,7 @@ int Arpeggiator::GetNumberOfNotesToPlay() const
 bool Arpeggiator::IsTransposeEnabled() const
 {
 	return (latchModeHandler.currentLatchMode == Enums::latchMode::on
-		&& latchLockState == latchLock::locked
+		&& latchLockHandler.currentLatchMode == Enums::latchLock::locked
 		&& !notesToPlayLatchMode.empty());
 }
 
@@ -311,7 +310,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 	MemoryOutputStream(destData, true).writeFloat(*noteDivisionHandler.GetNoteDivisionParameter());
 	MemoryOutputStream(destData, true).writeInt(*arpPlayModeHandler.GetArpPlayModeParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchModeHandler.GetArpLatchModeParameter());
-	MemoryOutputStream(destData, true).writeInt(*arpLatchLock);
+	MemoryOutputStream(destData, true).writeInt(*latchLockHandler.GetArpLatchModeParameter());
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
@@ -323,7 +322,7 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 	arpPlayModeHandler.GetArpPlayModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchModeHandler.GetArpLatchModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	arpLatchLock->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	latchLockHandler.GetArpLatchModeParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }

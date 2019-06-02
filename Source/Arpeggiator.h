@@ -36,17 +36,6 @@ public:
 
 private:
 	
-		AudioParameterChoice* arpLatchLock = new AudioParameterChoice
-		{
-			IDs::latchLockId,
-			ParameterNames::latchLockName,
-			{
-				ParamterChoices::latchLockOff,
-				ParamterChoices::latchLockOn
-			},
-			0
-		};
-	
 		AudioParameterFloat* lengthFactor = new AudioParameterFloat
 		{
 			IDs::noteLengthId,
@@ -77,8 +66,6 @@ private:
 
 	std::vector<int> notesToPlay;
 	std::vector<int> notesToPlayLatchMode;
-	enum latchLock {unlocked, locked };
-	latchLock latchLockState;
 	bool lastNoteWasNoteOn;
 	bool noteOffRequiredThisBuffer;
 	bool noteOffOccursInSameBufferAsLastNoteOn;
@@ -121,6 +108,7 @@ private:
 	NoteDivionHandler noteDivisionHandler;
 	LatchModeHandler latchModeHandler;
 	ArpPlayModeHandler arpPlayModeHandler;
+	LatchModeHandler latchLockHandler;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };
