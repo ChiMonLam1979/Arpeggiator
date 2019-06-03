@@ -56,6 +56,7 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteOnOffset = 0;
 	noteDivisionFactorHalved = 0;
 	samplesPerNoteDivisionHalved = 0;
+	noteDivisionFactor = 1.0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -71,14 +72,17 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	//const auto noteDivisionFactorChanged = noteDivision.stateChanged;
 
 	auto noteDivisionFactorChanged = false;
-	const auto choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
-	auto noteDivisionFactor = 1.0f;
-	const auto selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
+	auto choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
+	auto selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
 
 	if(selectedFactor != noteDivisionFactor)
 	{
 		noteDivisionFactorChanged = true;
 		noteDivisionFactor = selectedFactor;
+	}
+	else
+	{
+		noteDivisionFactorChanged = false;
 	}
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
@@ -149,7 +153,21 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
-		noteDivision.Set();
+		choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
+		noteDivisionFactor = 1.0f;
+		selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
+
+		if (selectedFactor != noteDivisionFactor)
+		{
+			noteDivisionFactorChanged = true;
+			noteDivisionFactor = selectedFactor;
+		}
+		else
+		{
+			noteDivisionFactorChanged = false;
+		}
+
+		//noteDivision.Set();
 	}
 
 	if (!positionInfo.isPlaying)
