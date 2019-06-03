@@ -18,7 +18,7 @@ public:
 	void processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 	bool isMidiEffect() const override { return true; }
 
-	AudioProcessorEditor*  createEditor() override { return new GenericAudioProcessorEditor(this); }
+	AudioProcessorEditor*  createEditor() override; // { return new GenericAudioProcessorEditor(this); }
 	bool hasEditor() const override { return true; }
 
 	const String getName() const override { return "Arpeggiator"; }
@@ -35,6 +35,12 @@ public:
 
 	void getStateInformation(MemoryBlock& destData) override;
 	void setStateInformation(const void* data, int sizeInBytes) override;
+
+	AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+	AudioProcessorValueTreeState treeState;
+
+	NoteDivision noteDivision;
 
 private:
 	
@@ -80,7 +86,7 @@ private:
 	double samplesPerNoteDivisionHalved;
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 
-	NoteDivision noteDivision;
+	//NoteDivision noteDivision;
 	LatchMode latchMode;
 	ArpPlayMode playMode;
 	LatchLock latchLock;

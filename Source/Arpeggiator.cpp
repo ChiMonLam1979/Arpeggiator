@@ -1,16 +1,46 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Arpeggiator.h"
-#include "Extensions.h"
+#include "ArpeggiatorEditor.h"
 
-Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true))
+Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true)),
+treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-	addParameter(noteDivision.GetParameter());
+	treeState.state = ValueTree(IDs::NoteDivisionId);
+
+	//addParameter(noteDivision.GetParameter());
 	addParameter(latchMode.GetParameter());
 	addParameter(latchLock.GetParameter());
 	addParameter(playMode.GetParameter());
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
 	addParameter(noteShift);
+}
+
+AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()
+{
+	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+
+	const StringArray choices
+	{
+		ParamterChoices::QuarterNoteDivision,
+		ParamterChoices::EighthNoteDivision,
+		ParamterChoices::EighthNoteTripletDivision,
+		ParamterChoices::SixteenthNoteDivision,
+		ParamterChoices::SixteenthNoteTripletDivision,
+		ParamterChoices::ThirtySecondNoteDivision,
+		ParamterChoices::ThirtySecondNoteTripletDivision
+	};
+
+	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, choices, 0);
+
+	parameters.push_back(std::move(noteDivionParameter));
+
+	return { parameters.begin(), parameters.end() };
+}
+
+AudioProcessorEditor* Arpeggiator::createEditor()
+{
+	return new ArpeggiatorEditor(*this);
 }
 
 void Arpeggiator::prepareToPlay(double sampleRate, int)
@@ -36,9 +66,20 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	AudioPlayHead::CurrentPositionInfo positionInfo{};
 	playHead->getCurrentPosition(positionInfo);
 
-	noteDivision.Set();
-	const auto noteDivisionFactor = noteDivision.currentFactor;
-	const auto noteDivisionFactorChanged = noteDivision.stateChanged;
+	//noteDivision.Set();
+	//const auto noteDivisionFactor = noteDivision.currentFactor;
+	//const auto noteDivisionFactorChanged = noteDivision.stateChanged;
+
+	auto noteDivisionFactorChanged = false;
+	const auto choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
+	auto noteDivisionFactor = 1.0f;
+	const auto selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
+
+	if(selectedFactor != noteDivisionFactor)
+	{
+		noteDivisionFactorChanged = true;
+		noteDivisionFactor = selectedFactor;
+	}
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
@@ -126,7 +167,7 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
-	MemoryOutputStream(destData, true).writeFloat(*noteDivision.GetParameter());
+	//MemoryOutputStream(destData, true).writeFloat(*noteDivision.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchLock.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*playMode.GetParameter());
@@ -137,7 +178,7 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
-	noteDivision.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
+	//noteDivision.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchLock.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	playMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
