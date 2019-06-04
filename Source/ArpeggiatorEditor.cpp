@@ -7,18 +7,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 
 	comboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::NoteDivisionId, comboBox);
 
-	const StringArray choices
-	{
-		ParamterChoices::QuarterNoteDivision,
-		ParamterChoices::EighthNoteDivision,
-		ParamterChoices::EighthNoteTripletDivision,
-		ParamterChoices::SixteenthNoteDivision,
-		ParamterChoices::SixteenthNoteTripletDivision,
-		ParamterChoices::ThirtySecondNoteDivision,
-		ParamterChoices::ThirtySecondNoteTripletDivision
-	};
-
-	comboBox.addItemList(choices, 1);
+	comboBox.addItemList(ParamterChoices::noteDivisionChoices, 1);
 
 	addAndMakeVisible(comboBox);
 }

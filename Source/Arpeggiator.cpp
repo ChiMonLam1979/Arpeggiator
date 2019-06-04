@@ -6,6 +6,7 @@ Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input",
 treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
 	treeState.state = ValueTree(IDs::NoteDivisionId);
+	treeState.addParameterListener(IDs::NoteDivisionId, &noteDivision);
 
 	//addParameter(noteDivision.GetParameter());
 	addParameter(latchMode.GetParameter());
@@ -20,18 +21,7 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 {
 	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
 
-	const StringArray choices
-	{
-		ParamterChoices::QuarterNoteDivision,
-		ParamterChoices::EighthNoteDivision,
-		ParamterChoices::EighthNoteTripletDivision,
-		ParamterChoices::SixteenthNoteDivision,
-		ParamterChoices::SixteenthNoteTripletDivision,
-		ParamterChoices::ThirtySecondNoteDivision,
-		ParamterChoices::ThirtySecondNoteTripletDivision
-	};
-
-	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, choices, 0);
+	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParamterChoices::noteDivisionChoices, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
 
@@ -67,23 +57,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	AudioPlayHead::CurrentPositionInfo positionInfo{};
 	playHead->getCurrentPosition(positionInfo);
 
-	//noteDivision.Set();
-	//const auto noteDivisionFactor = noteDivision.currentFactor;
-	//const auto noteDivisionFactorChanged = noteDivision.stateChanged;
-
-	auto noteDivisionFactorChanged = false;
-	auto choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
-	auto selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
-
-	if(selectedFactor != noteDivisionFactor)
-	{
-		noteDivisionFactorChanged = true;
-		noteDivisionFactor = selectedFactor;
-	}
-	else
-	{
-		noteDivisionFactorChanged = false;
-	}
+	noteDivision.Set();
+	noteDivisionFactor = noteDivision.currentFactor;
+	const auto noteDivisionFactorChanged = noteDivision.stateChanged;
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
@@ -153,21 +129,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 
-		choice = (dynamic_cast<AudioParameterChoice*>(treeState.getParameter(IDs::NoteDivisionId)));
-		noteDivisionFactor = 1.0f;
-		selectedFactor = noteDivision.noteDivisionDictionary[choice->getCurrentChoiceName()];
-
-		if (selectedFactor != noteDivisionFactor)
-		{
-			noteDivisionFactorChanged = true;
-			noteDivisionFactor = selectedFactor;
-		}
-		else
-		{
-			noteDivisionFactorChanged = false;
-		}
-
-		//noteDivision.Set();
+		noteDivision.Set();
 	}
 
 	if (!positionInfo.isPlaying)

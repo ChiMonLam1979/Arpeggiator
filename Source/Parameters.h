@@ -40,6 +40,17 @@ namespace ParamterChoices
 
 	static String Off{ "Off" };
 	static String On{ "On" };
+
+	const StringArray noteDivisionChoices
+	{
+		QuarterNoteDivision,
+		EighthNoteDivision,
+		EighthNoteTripletDivision,
+		SixteenthNoteDivision,
+		SixteenthNoteTripletDivision,
+		ThirtySecondNoteDivision,
+		ThirtySecondNoteTripletDivision
+	};
 }
 
 namespace Enums

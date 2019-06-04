@@ -1,6 +1,6 @@
 #include "NoteDivision.h"
 
-NoteDivision::NoteDivision() :currentFactor(1.0f), stateChanged(false)
+NoteDivision::NoteDivision() : currentFactor(1.0f), selectedFactor(1.0f), stateChanged(false)
 {
 }
 
@@ -10,8 +10,6 @@ NoteDivision::~NoteDivision()
 
 void NoteDivision::Set()
 {
-	const auto selectedFactor = noteDivisionDictionary[noteDivisions->getCurrentChoiceName()];
-
 	stateChanged = currentFactor != selectedFactor;
 	if (stateChanged)
 	{
@@ -19,9 +17,9 @@ void NoteDivision::Set()
 	}
 }
 
-
-AudioParameterChoice* NoteDivision::GetParameter() const
+void NoteDivision::parameterChanged(const String& parameterID, float newValue)
 {
-	return noteDivisions;
-}
+	const auto choice = ParamterChoices::noteDivisionChoices[newValue];
 
+	selectedFactor = noteDivisionDictionary[choice];
+}
