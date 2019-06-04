@@ -8,7 +8,6 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.state = ValueTree(IDs::NoteDivisionId);
 	treeState.addParameterListener(IDs::NoteDivisionId, &noteDivision);
 
-	//addParameter(noteDivision.GetParameter());
 	addParameter(latchMode.GetParameter());
 	addParameter(latchLock.GetParameter());
 	addParameter(playMode.GetParameter());
@@ -147,7 +146,6 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
-	//MemoryOutputStream(destData, true).writeFloat(*noteDivision.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchLock.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*playMode.GetParameter());
@@ -158,7 +156,6 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
-	//noteDivision.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchLock.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	playMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());

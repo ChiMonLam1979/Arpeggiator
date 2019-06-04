@@ -14,9 +14,9 @@ public:
 	void Set();
 	bool IsEnabled() const;
 
-	bool stateHasChanged;
-	Enums::latchMode currentState;
-	Enums::latchMode selectedState;
+	bool stateHasChanged { false };
+	Enums::latchMode currentState { Enums::latchMode::off };
+	Enums::latchMode selectedState { Enums::latchMode::off };
 
 private:
 

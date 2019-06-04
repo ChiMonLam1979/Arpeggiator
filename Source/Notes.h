@@ -21,12 +21,12 @@ public:
 
 	std::vector<int> notes;
 	std::vector<int> notesLatched;
-	Enums::playMode currentPlayMode;
+	Enums::playMode currentPlayMode { Enums::playMode::up };
 
-	bool lastNoteWasNoteOn;
-	int noteLengthInSamples;
-	int numberOfSamplesInBuffer;
-	int samplesFromLastNoteOnUntilBufferEnds;
+	bool lastNoteWasNoteOn { false };
+	int noteLengthInSamples { 0 };
+	int numberOfSamplesInBuffer { 0 };
+	int samplesFromLastNoteOnUntilBufferEnds { 0 };
 
 private:
 
@@ -46,9 +46,9 @@ private:
 	LatchMode latchMode;
 	LatchLock latchLock;
 	ArpPlayMode playMode;
-	bool latchIsEnabled;
-	int currentNoteIndex;
-	int numberOfNotesToPlay;
-	int lastNoteValue;
-	bool noteOffOccursInSameBufferAsLastNoteOn;
+	bool latchIsEnabled { false };
+	int currentNoteIndex { -1 };
+	int numberOfNotesToPlay { 0 };
+	int lastNoteValue { 0 };
+	bool noteOffOccursInSameBufferAsLastNoteOn { false };
 };

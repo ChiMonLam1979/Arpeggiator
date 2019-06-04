@@ -13,9 +13,9 @@ public:
 
 	void Set();
 
-	Enums::playMode selectedState;
-	Enums::playMode currentState;
-	bool stateHasChanged;
+	Enums::playMode selectedState { Enums::playMode::up };
+	Enums::playMode currentState { Enums::playMode::up };
+	bool stateHasChanged { false };
 
 private:
 

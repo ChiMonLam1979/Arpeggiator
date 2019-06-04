@@ -1,6 +1,6 @@
 #include "LatchMode.h"
 
-LatchMode::LatchMode() : stateHasChanged(false), currentState(Enums::latchMode::off), selectedState(Enums::latchMode::off)
+LatchMode::LatchMode()
 {
 }
 

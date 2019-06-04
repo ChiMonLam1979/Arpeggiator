@@ -1,6 +1,6 @@
 #include "NoteDivision.h"
 
-NoteDivision::NoteDivision() : currentFactor(1.0f), selectedFactor(1.0f), stateChanged(false)
+NoteDivision::NoteDivision()
 {
 }
 

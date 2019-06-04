@@ -1,9 +1,7 @@
 #include "Notes.h"
 #include "Extensions.h"
 
-Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playmode) :
-currentPlayMode(Enums::playMode::up), lastNoteWasNoteOn(false), noteLengthInSamples(0), samplesFromLastNoteOnUntilBufferEnds(0), latchMode(latchMode), latchLock(latchLock),
-playMode(playmode), latchIsEnabled(false), currentNoteIndex(-1), numberOfNotesToPlay(0), lastNoteValue(0), noteOffOccursInSameBufferAsLastNoteOn(false)
+Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playmode) : latchMode(latchMode), latchLock(latchLock)
 {
 	notes.clear();
 	notes.reserve(100);

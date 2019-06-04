@@ -1,7 +1,7 @@
 #include "ArpPlayMode.h"
 #include "LatchMode.h"
 
-ArpPlayMode::ArpPlayMode() : selectedState(Enums::playMode::up), currentState(Enums::playMode::up), stateHasChanged(false)
+ArpPlayMode::ArpPlayMode()
 {
 }
 

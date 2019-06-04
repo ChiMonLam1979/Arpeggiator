@@ -1,6 +1,6 @@
 #include "LatchLock.h"
 
-LatchLock::LatchLock() : state(Enums::latchLock::unlocked)
+LatchLock::LatchLock()
 {
 }
 

@@ -13,7 +13,7 @@ public:
 
 	void Set();
 
-	Enums::latchLock state;
+	Enums::latchLock state { Enums::latchLock::unlocked };
 
 private:
 
