@@ -21,5 +21,5 @@ void NoteDivision::parameterChanged(const String& parameterID, float newValue)
 {
 	const auto choice = ParamterChoices::noteDivisionChoices[newValue];
 
-	selectedFactor = noteDivisionDictionary[choice];
+	selectedFactor = ParamterChoices::noteDivisionDictionary[choice];
 }

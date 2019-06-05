@@ -23,12 +23,7 @@ private:
 	{
 		IDs::ArpPlayModeId,
 		ParameterNames::ArpPlayModeName,
-		{
-			ParamterChoices::Up,
-			ParamterChoices::Down,
-			ParamterChoices::Random,
-			ParamterChoices::Played
-		},
+		ParamterChoices::playModeChoices,
 		0
 	};
 };

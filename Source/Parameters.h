@@ -52,6 +52,25 @@ namespace ParamterChoices
 		ThirtySecondNoteDivision,
 		ThirtySecondNoteTripletDivision
 	};
+
+	static std::map<juce::String, float> noteDivisionDictionary
+	{
+		{ QuarterNoteDivision, 1.0f },
+		{ EighthNoteDivision, 2.0f },
+		{ EighthNoteTripletDivision, 3.0f },
+		{ SixteenthNoteDivision, 4.0f },
+		{ SixteenthNoteTripletDivision, 6.0f },
+		{ ThirtySecondNoteDivision, 8.0f },
+		{ ThirtySecondNoteTripletDivision, 12.0f }
+	};
+
+	const StringArray playModeChoices
+	{
+		Up,
+		Down,
+		Random,
+		Played,
+	};
 }
 
 namespace Enums
