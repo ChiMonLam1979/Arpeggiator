@@ -45,7 +45,7 @@ private:
 
 	LatchMode latchMode;
 	LatchLock latchLock;
-	ArpPlayMode playMode;
+	ArpPlayMode& playMode;
 	bool latchIsEnabled { false };
 	int currentNoteIndex { -1 };
 	int numberOfNotesToPlay { 0 };

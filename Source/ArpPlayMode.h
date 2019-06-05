@@ -2,14 +2,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class ArpPlayMode
+class ArpPlayMode : public AudioProcessorValueTreeState::Listener
 {
 public:
 
 	ArpPlayMode();
 	~ArpPlayMode();
-
-	AudioParameterChoice* GetParameter() const;
 
 	void Set();
 
@@ -19,11 +17,5 @@ public:
 
 private:
 
-	AudioParameterChoice* playModes = new AudioParameterChoice
-	{
-		IDs::ArpPlayModeId,
-		ParameterNames::ArpPlayModeName,
-		ParamterChoices::playModeChoices,
-		0
-	};
+	void parameterChanged(const String& parameterID, float newValue) override;
 };

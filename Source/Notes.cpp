@@ -1,7 +1,7 @@
 #include "Notes.h"
 #include "Extensions.h"
 
-Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playmode) : latchMode(latchMode), latchLock(latchLock)
+Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playmode) : latchMode(latchMode), latchLock(latchLock), playMode(playmode)
 {
 	notes.clear();
 	notes.reserve(100);

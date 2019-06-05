@@ -7,10 +7,10 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
 	treeState.state = ValueTree(IDs::TreeStateId);
 	treeState.addParameterListener(IDs::NoteDivisionId, &noteDivision);
+	treeState.addParameterListener(IDs::ArpPlayModeId, &playMode);
 
 	addParameter(latchMode.GetParameter());
 	addParameter(latchLock.GetParameter());
-	addParameter(playMode.GetParameter());
 	addParameter(lengthFactor);
 	addParameter(swingFactor);
 	addParameter(noteShift);
@@ -21,8 +21,10 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
 
 	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParamterChoices::noteDivisionChoices, 0);
+	auto playModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpPlayModeId, ParameterNames::ArpPlayModeName, ParamterChoices::playModeChoices, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
+	parameters.push_back(std::move(playModeParameter));
 
 	return { parameters.begin(), parameters.end() };
 }
@@ -148,7 +150,6 @@ void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*latchMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*latchLock.GetParameter());
-	MemoryOutputStream(destData, true).writeInt(*playMode.GetParameter());
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
 	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
@@ -158,7 +159,6 @@ void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
 	latchMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	latchLock.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
-	playMode.GetParameter()->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());

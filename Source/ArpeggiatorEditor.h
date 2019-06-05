@@ -16,11 +16,13 @@ private:
 
 	Arpeggiator& processor;
 
-	ComboBox comboBox;
+	ComboBox noteDiviosnComboBox;
+	ComboBox playModeComboBox;
 
 public:
 
-	std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> comboBoxAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> noteDivisionComboBoxAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> playModeComboBoxAttachment;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };

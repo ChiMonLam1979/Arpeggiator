@@ -5,11 +5,14 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	setResizable(true, false);
 	setSize(200, 200);
 
-	comboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::NoteDivisionId, comboBox);
+	noteDivisionComboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::NoteDivisionId, noteDiviosnComboBox);
+	playModeComboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::ArpPlayModeId, playModeComboBox);
 
-	comboBox.addItemList(ParamterChoices::noteDivisionChoices, 1);
+	noteDiviosnComboBox.addItemList(ParamterChoices::noteDivisionChoices, 1);
+	playModeComboBox.addItemList(ParamterChoices::playModeChoices, 1);
 
-	addAndMakeVisible(comboBox);
+	addAndMakeVisible(noteDiviosnComboBox);
+	addAndMakeVisible(playModeComboBox);
 }
 
 ArpeggiatorEditor::~ArpeggiatorEditor()
@@ -23,5 +26,7 @@ void ArpeggiatorEditor::paint(Graphics& g)
 
 void ArpeggiatorEditor::resized()
 {
-	comboBox.setBounds(getLocalBounds());
+	auto localBounds = getLocalBounds();
+	noteDiviosnComboBox.setBounds(localBounds.removeFromBottom(100));
+	playModeComboBox.setBounds(localBounds);
 }
