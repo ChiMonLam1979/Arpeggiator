@@ -5,7 +5,7 @@
 Arpeggiator::Arpeggiator() : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::stereo(), true)),
 treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-	treeState.state = ValueTree(IDs::NoteDivisionId);
+	treeState.state = ValueTree(IDs::TreeStateId);
 	treeState.addParameterListener(IDs::NoteDivisionId, &noteDivision);
 
 	addParameter(latchMode.GetParameter());

@@ -10,6 +10,7 @@ namespace IDs
 	static String LatchLockId{ "latchLock" };
 	static String NoteShiftId{ "noteShift" };
 	static String SwingPercentageId{ "swingAmount" };
+	static String TreeStateId{ "treeState" };
 }
 
 namespace ParameterNames

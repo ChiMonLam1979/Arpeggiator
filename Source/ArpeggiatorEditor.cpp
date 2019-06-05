@@ -14,7 +14,6 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 
 ArpeggiatorEditor::~ArpeggiatorEditor()
 {
-	
 }
 
 void ArpeggiatorEditor::paint(Graphics& g)
