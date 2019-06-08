@@ -9,10 +9,14 @@ public:
 	NoteDivision();
 	~NoteDivision();
 
+	bool StateChanged();
+
 	float factor  { 1.0f };
-	bool stateHasChanged    { false };
 
 private:
+
+	float lastFactor{ 1.0f };
+	bool stateHasChanged{ false };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

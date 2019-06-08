@@ -13,6 +13,13 @@ void NoteDivision::parameterChanged(const String& parameterID, float newValue)
 	const auto choice = ParamterChoices::noteDivisionChoices[newValue];
 
 	factor = ParamterChoices::noteDivisionDictionary[choice];
+}
 
-	stateHasChanged = true;
+bool NoteDivision::StateChanged()
+{
+	stateHasChanged = lastFactor != factor;
+
+	lastFactor = stateHasChanged ? factor : lastFactor;
+
+	return  stateHasChanged;
 }

@@ -9,10 +9,14 @@ public:
 	ArpPlayMode();
 	~ArpPlayMode();
 
+	bool StateChanged();
+
 	Enums::playMode state { Enums::playMode::up };
-	bool stateHasChanged { false };
 
 private:
+
+	bool stateHasChanged{ false };
+	Enums::playMode previousState{ Enums::playMode::up };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

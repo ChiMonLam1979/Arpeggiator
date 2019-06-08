@@ -112,10 +112,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		if (notes.ShouldAddNoteOff() || (noteDivision.stateHasChanged && notes.lastNoteWasNoteOn))
+		if (notes.ShouldAddNoteOff() || (noteDivision.StateChanged() && notes.lastNoteWasNoteOn))
 		{
 			notes.AddNoteOff(midiMessages);
-			noteDivision.stateHasChanged = false;
 		}
 
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)

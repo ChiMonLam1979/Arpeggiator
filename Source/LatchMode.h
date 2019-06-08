@@ -10,12 +10,13 @@ public:
 	~LatchMode();
 
 	bool IsEnabled() const;
-
-	bool stateHasChanged { false };
+	bool StateChanged();
 
 private:
 
+	bool stateHasChanged{ false };
 	Enums::latchMode state{ Enums::latchMode::off };
+	Enums::latchMode previousState{ Enums::latchMode::off };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

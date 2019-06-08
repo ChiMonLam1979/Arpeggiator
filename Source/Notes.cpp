@@ -40,11 +40,9 @@ void Notes::PrepareToProcess()
 	AssignLatchedNotes();
 	SortNotes();
 
-	if (playMode.stateHasChanged || !AnyNotesToPlay())
+	if (playMode.StateChanged() || !AnyNotesToPlay())
 	{
 		InitializeNoteIndex();
-
-		playMode.stateHasChanged = false;
 	}
 }
 
@@ -55,9 +53,7 @@ bool Notes::TransposeIsEnabled() const
 
 void Notes::AssignLatchedNotes()
 {
-	notesLatched = latchMode.stateHasChanged ? notes : notesLatched;
-
-	latchMode.stateHasChanged = false;
+	notesLatched = latchMode.StateChanged() ? notes : notesLatched;
 }
 
 void Notes::SortNotes()

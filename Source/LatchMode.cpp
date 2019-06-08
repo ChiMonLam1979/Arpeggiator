@@ -13,8 +13,15 @@ void LatchMode::parameterChanged(const String& parameterID, float newValue)
 	auto choice = static_cast<int>(newValue);
 
 	state = static_cast<Enums::latchMode>(choice);
+}
 
-	stateHasChanged = true;
+bool LatchMode::StateChanged()
+{
+	stateHasChanged = previousState != state;
+
+	previousState = stateHasChanged ? state : previousState;
+
+	return  stateHasChanged;
 }
 
 bool LatchMode::IsEnabled() const
