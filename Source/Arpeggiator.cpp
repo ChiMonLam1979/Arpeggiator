@@ -11,7 +11,6 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::LatchModeId, &latchMode);
 	treeState.addParameterListener(IDs::LatchLockId, &latchLock);
 
-	addParameter(lengthFactor);
 	addParameter(swingFactor);
 	addParameter(noteShift);
 }
@@ -24,7 +23,7 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto playModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpPlayModeId, ParameterNames::ArpPlayModeName, ParamterChoices::PlayModeChoices, 0);
 	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParamterChoices::LatchModeChoices, 0);
 	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::LatchLockChoices, 0);
-	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0);
+	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0.5f);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(playModeParameter));
@@ -73,8 +72,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	samplesPerNoteDivision = samplesPerQuarterNote / noteDivisionFactor;
 	samplesPerNoteDivisionHalved = samplesPerQuarterNote / noteDivisionFactorHalved;
 
-	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
+	lengthFactor = treeState.getRawParameterValue(IDs::NoteLengthId);
 	const auto NoteLengthInSamplesAsInt = std::ceil(samplesPerNoteDivision * *lengthFactor);
+	const auto samplesPer128thNote = (samplesPerQuarterNote / 32);
 	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
 
 	numberOfSamplesInBuffer = buffer.getNumSamples();

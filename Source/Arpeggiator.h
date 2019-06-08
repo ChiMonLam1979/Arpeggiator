@@ -42,14 +42,6 @@ public:
 
 private:
 	
-		AudioParameterFloat* lengthFactor = new AudioParameterFloat
-		{
-			IDs::NoteLengthId,
-			ParameterNames::NoteLengthName,
-			ParameterRanges::NoteLengthRange,
-			0.5f
-		};
-	
 		AudioParameterFloat* swingFactor = new AudioParameterFloat
 		{
 			IDs::SwingFactorId,
@@ -80,6 +72,8 @@ private:
 	int noteOnOffset;
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
+	float *lengthFactor;
+
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 
 	NoteDivision noteDivision;

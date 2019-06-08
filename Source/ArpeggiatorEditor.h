@@ -21,6 +21,7 @@ private:
 	ComboBox latchModeComboBox;
 	ComboBox latchLockComboBox;
 	Slider noteLengthSlider;
+	Slider noteLengthButtonsSlider;
 
 public:
 
@@ -29,6 +30,7 @@ public:
 	std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> latchModeComboBoxAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> latchLockComboBoxAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteLengthSliderAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteLengthSliderButtonsAttachment;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };
