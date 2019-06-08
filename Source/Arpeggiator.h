@@ -46,17 +46,15 @@ private:
 		{
 			IDs::NoteLengthId,
 			ParameterNames::NoteLengthName,
-			0.1f,
-			1.0f,
+			ParameterRanges::NoteLengthRange,
 			0.5f
 		};
 	
 		AudioParameterFloat* swingFactor = new AudioParameterFloat
 		{
-			IDs::SwingPercentageId,
-			ParameterNames::SwingPercentageName,
-			0.0f,
-			1.0f,
+			IDs::SwingFactorId,
+			ParameterNames::SwingFactorName,
+			ParameterRanges::SwingFactorRange,
 			0.0f
 		};
 	

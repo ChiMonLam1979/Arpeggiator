@@ -9,7 +9,7 @@ namespace IDs
 	static String LatchModeId{ "latchMode" };
 	static String LatchLockId{ "latchLock" };
 	static String NoteShiftId{ "noteShift" };
-	static String SwingPercentageId{ "swingAmount" };
+	static String SwingFactorId{ "swingAmount" };
 	static String TreeStateId{ "treeState" };
 }
 
@@ -21,7 +21,7 @@ namespace ParameterNames
 	static String LatchModeName{ "Latch Mode" };
 	static String LatchLockName{ "Latch Lock" };
 	static String NoteShiftName{ "Note Shift" };
-	static String SwingPercentageName{ "Swing Amount" };
+	static String SwingFactorName{ "Swing Amount" };
 }
 
 namespace ParamterChoices
@@ -42,7 +42,7 @@ namespace ParamterChoices
 	static String Off{ "Off" };
 	static String On{ "On" };
 
-	const StringArray noteDivisionChoices
+	const StringArray NoteDivisionChoices
 	{
 		QuarterNoteDivision,
 		EighthNoteDivision,
@@ -53,7 +53,7 @@ namespace ParamterChoices
 		ThirtySecondNoteTripletDivision
 	};
 
-	static std::map<juce::String, float> noteDivisionDictionary
+	static std::map<juce::String, float> NoteDivisionDictionary
 	{
 		{ QuarterNoteDivision, 1.0f },
 		{ EighthNoteDivision, 2.0f },
@@ -64,7 +64,7 @@ namespace ParamterChoices
 		{ ThirtySecondNoteTripletDivision, 12.0f }
 	};
 
-	const StringArray playModeChoices
+	const StringArray PlayModeChoices
 	{
 		Up,
 		Down,
@@ -72,16 +72,32 @@ namespace ParamterChoices
 		Played,
 	};
 
-	const StringArray latchLockChoices
+	const StringArray LatchLockChoices
 	{
 		Off,
 		On
 	};
 
-	const StringArray latchModeChoices
+	const StringArray LatchModeChoices
 	{
 		Off,
 		On
+	};
+}
+
+namespace ParameterRanges
+{
+
+	const NormalisableRange<float> NoteLengthRange
+	{
+		0.0f,
+		1.0f
+	};
+
+	const NormalisableRange<float> SwingFactorRange
+	{
+		0.0f,
+		1.0f
 	};
 }
 

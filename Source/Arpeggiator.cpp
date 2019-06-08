@@ -20,15 +20,17 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 {
 	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
 
-	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParamterChoices::noteDivisionChoices, 0);
-	auto playModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpPlayModeId, ParameterNames::ArpPlayModeName, ParamterChoices::playModeChoices, 0);
-	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParamterChoices::latchModeChoices, 0);
-	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::latchLockChoices, 0);
+	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParamterChoices::NoteDivisionChoices, 0);
+	auto playModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpPlayModeId, ParameterNames::ArpPlayModeName, ParamterChoices::PlayModeChoices, 0);
+	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParamterChoices::LatchModeChoices, 0);
+	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::LatchLockChoices, 0);
+	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(playModeParameter));
 	parameters.push_back(std::move(latchModeParameter));
 	parameters.push_back(std::move(latchLockParameter));
+	parameters.push_back(std::move(noteLengthParameter));
 
 	return { parameters.begin(), parameters.end() };
 }
@@ -148,13 +150,11 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
-	MemoryOutputStream(destData, true).writeFloat(*lengthFactor);
 	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
 }
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
-	lengthFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }
