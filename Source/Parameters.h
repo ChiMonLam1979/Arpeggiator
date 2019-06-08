@@ -71,6 +71,18 @@ namespace ParamterChoices
 		Random,
 		Played,
 	};
+
+	const StringArray latchLockChoices
+	{
+		Off,
+		On
+	};
+
+	const StringArray latchModeChoices
+	{
+		Off,
+		On
+	};
 }
 
 namespace Enums

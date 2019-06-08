@@ -8,12 +8,15 @@ LatchLock::~LatchLock()
 {
 }
 
-AudioParameterChoice* LatchLock::GetParameter() const
+//void LatchLock::Set()
+//{
+//	state = static_cast<Enums::latchLock>(lockModes->getIndex());
+//}
+
+void LatchLock::parameterChanged(const String& parameterID, float newValue)
 {
-	return lockModes;
+	auto choice = static_cast<int>(newValue);
+
+	state = static_cast<Enums::latchLock>(choice);
 }
 
-void LatchLock::Set()
-{
-	state = static_cast<Enums::latchLock>(lockModes->getIndex());
-}

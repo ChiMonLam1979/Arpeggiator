@@ -2,14 +2,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class LatchMode
+class LatchMode : public AudioProcessorValueTreeState::Listener
 {
 public:
 
 	LatchMode();
 	~LatchMode();
-
-	AudioParameterChoice* GetParameter() const;
 
 	void Set();
 	bool IsEnabled() const;
@@ -20,14 +18,5 @@ public:
 
 private:
 
-	AudioParameterChoice* latchModes = new AudioParameterChoice
-	{
-		IDs::LatchModeId,
-		ParameterNames::LatchModeName,
-		{
-			ParamterChoices::Off,
-			ParamterChoices::On,
-		},
-		0
-	};
+	void parameterChanged(const String& parameterID, float newValue) override;
 };

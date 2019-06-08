@@ -38,7 +38,6 @@ void Notes::ProcessBuffer(MidiBuffer& midiMessages)
 void Notes::PrepareToProcess()
 {
 	latchMode.Set();
-	latchLock.Set();
 	playMode.Set();
 	currentPlayMode = playMode.currentState;
 	AssignLatchedNotes();
@@ -47,6 +46,7 @@ void Notes::PrepareToProcess()
 	if (playMode.stateHasChanged || !AnyNotesToPlay())
 	{
 		InitializeNoteIndex();
+		playMode.stateHasChanged = false;
 	}
 }
 

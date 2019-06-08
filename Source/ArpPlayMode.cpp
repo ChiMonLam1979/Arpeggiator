@@ -12,10 +12,8 @@ ArpPlayMode::~ArpPlayMode()
 void ArpPlayMode::Set()
 {
 	stateHasChanged = currentState != selectedState;
-	if (stateHasChanged)
-	{
-		currentState = selectedState;
-	}
+
+	currentState = stateHasChanged ? selectedState : currentState;
 }
 
 void ArpPlayMode::parameterChanged(const String& parameterID, float newValue)

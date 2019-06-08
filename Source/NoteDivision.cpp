@@ -10,11 +10,9 @@ NoteDivision::~NoteDivision()
 
 void NoteDivision::Set()
 {
-	stateChanged = currentFactor != selectedFactor;
-	if (stateChanged)
-	{
-		currentFactor = selectedFactor;
-	}
+	stateHasChanged = currentFactor != selectedFactor;
+
+	currentFactor = stateHasChanged ? selectedFactor : currentFactor;
 }
 
 void NoteDivision::parameterChanged(const String& parameterID, float newValue)

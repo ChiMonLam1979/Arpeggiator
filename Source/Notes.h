@@ -43,8 +43,8 @@ private:
 	int CalculateOffsetForNoteOff(int noteOnOffset = 0) const;
 	void PrepareToProcess();
 
-	LatchMode latchMode;
-	LatchLock latchLock;
+	LatchMode& latchMode;
+	LatchLock& latchLock;
 	ArpPlayMode& playMode;
 	bool latchIsEnabled { false };
 	int currentNoteIndex { -1 };

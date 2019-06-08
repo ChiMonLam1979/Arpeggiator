@@ -13,7 +13,7 @@ public:
 
 	float currentFactor  { 1.0f };
 	float selectedFactor { 1.0f };
-	bool stateChanged    { false };
+	bool stateHasChanged    { false };
 
 private:
 

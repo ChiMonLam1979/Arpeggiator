@@ -2,29 +2,18 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class LatchLock
+class LatchLock : public AudioProcessorValueTreeState::Listener
 {
 public:
 
 	LatchLock();
 	~LatchLock();
 
-	AudioParameterChoice* GetParameter() const;
-
-	void Set();
+	//void Set();
 
 	Enums::latchLock state { Enums::latchLock::unlocked };
 
 private:
 
-	AudioParameterChoice* lockModes = new AudioParameterChoice
-	{
-		IDs::LatchLockId,
-		ParameterNames::LatchLockName,
-		{
-			ParamterChoices::Off,
-			ParamterChoices::On
-		},
-		0
-	};
+	void parameterChanged(const String& parameterID, float newValue) override;
 };

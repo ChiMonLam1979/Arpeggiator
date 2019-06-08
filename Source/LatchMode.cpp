@@ -8,18 +8,18 @@ LatchMode::~LatchMode()
 {
 }
 
-AudioParameterChoice* LatchMode::GetParameter() const
-{
-	return latchModes;
-}
-
 void LatchMode::Set()
 {
-	selectedState = static_cast<Enums::latchMode>(latchModes->getIndex());
-
 	stateHasChanged = selectedState != currentState;
 
 	currentState = stateHasChanged ? selectedState : currentState;
+}
+
+void LatchMode::parameterChanged(const String& parameterID, float newValue)
+{
+	auto choice = static_cast<int>(newValue);
+
+	selectedState = static_cast<Enums::latchMode>(choice);
 }
 
 bool LatchMode::IsEnabled() const
