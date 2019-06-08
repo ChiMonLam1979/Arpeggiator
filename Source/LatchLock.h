@@ -9,11 +9,11 @@ public:
 	LatchLock();
 	~LatchLock();
 
-	//void Set();
-
-	Enums::latchLock state { Enums::latchLock::unlocked };
+	bool IsEnabled() const;
 
 private:
+
+	Enums::latchLock state{ Enums::latchLock::unlocked };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

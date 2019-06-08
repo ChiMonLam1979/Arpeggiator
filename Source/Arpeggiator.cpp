@@ -51,7 +51,6 @@ void Arpeggiator::prepareToPlay(double sampleRate, int)
 	noteOnOffset = 0;
 	noteDivisionFactorHalved = 0;
 	samplesPerNoteDivisionHalved = 0;
-	noteDivisionFactor = 1.0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -62,9 +61,7 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	AudioPlayHead::CurrentPositionInfo positionInfo{};
 	playHead->getCurrentPosition(positionInfo);
 
-	noteDivision.Set();
-	noteDivisionFactor = noteDivision.currentFactor;
-	const auto noteDivisionFactorChanged = noteDivision.stateHasChanged;
+	const auto noteDivisionFactor = noteDivision.factor;
 
 	const auto quarterNotesPerMinute = positionInfo.bpm;
 	const auto quarterNotesPerSecond = quarterNotesPerMinute / 60;
@@ -115,9 +112,10 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
-		if (notes.ShouldAddNoteOff() || (noteDivisionFactorChanged && notes.lastNoteWasNoteOn))
+		if (notes.ShouldAddNoteOff() || (noteDivision.stateHasChanged && notes.lastNoteWasNoteOn))
 		{
 			notes.AddNoteOff(midiMessages);
+			noteDivision.stateHasChanged = false;
 		}
 
 		if(NoteDivisionStartPositionAsInt <= NoteDivisionEndPositionAsInt)
@@ -133,8 +131,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 		}
 
 		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
-
-		noteDivision.Set();
 	}
 
 	if (!positionInfo.isPlaying)

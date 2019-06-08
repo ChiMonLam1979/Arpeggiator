@@ -37,32 +37,32 @@ void Notes::ProcessBuffer(MidiBuffer& midiMessages)
 
 void Notes::PrepareToProcess()
 {
-	latchMode.Set();
-	playMode.Set();
-	currentPlayMode = playMode.currentState;
 	AssignLatchedNotes();
 	SortNotes();
 
 	if (playMode.stateHasChanged || !AnyNotesToPlay())
 	{
 		InitializeNoteIndex();
+
 		playMode.stateHasChanged = false;
 	}
 }
 
 bool Notes::TransposeIsEnabled() const
 {
-	return (latchMode.IsEnabled() && latchLock.state == Enums::latchLock::locked && !notesLatched.empty());
+	return (latchMode.IsEnabled() && latchLock.IsEnabled() && !notesLatched.empty());
 }
 
 void Notes::AssignLatchedNotes()
 {
 	notesLatched = latchMode.stateHasChanged ? notes : notesLatched;
+
+	latchMode.stateHasChanged = false;
 }
 
 void Notes::SortNotes()
 {
-	if (currentPlayMode != Enums::playMode::played)
+	if (playMode.state != Enums::playMode::played)
 	{
 		std::sort(notes.begin(), notes.end());
 
@@ -72,14 +72,12 @@ void Notes::SortNotes()
 
 void Notes::GetNumberOfNotes()
 {
-	latchIsEnabled = latchMode.IsEnabled();
-	numberOfNotesToPlay = latchIsEnabled ? notesLatched.size() : notes.size();
+	numberOfNotesToPlay = latchMode.IsEnabled() ? notesLatched.size() : notes.size();
 }
 
-bool Notes::AnyNotesToPlay()
+bool Notes::AnyNotesToPlay() const
 {
-	latchIsEnabled = latchMode.IsEnabled();
-	return latchIsEnabled ? !notesLatched.empty() : !notes.empty();
+	return latchMode.IsEnabled() ? !notesLatched.empty() : !notes.empty();
 }
 
 void Notes::InitializeNoteIndex()
@@ -88,7 +86,7 @@ void Notes::InitializeNoteIndex()
 
 	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
 
-	switch (currentPlayMode)
+	switch (playMode.state)
 	{
 	case Enums::playMode::up: currentNoteIndex = -1;
 		break;
@@ -105,7 +103,7 @@ void Notes::UpdateNoteValue()
 {
 	GetNumberOfNotes();
 
-	switch (currentPlayMode)
+	switch (playMode.state)
 	{
 	case Enums::playMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
 		break;
@@ -122,8 +120,7 @@ void Notes::UpdateNoteValue()
 
 int Notes::SetLastNoteValue()
 {
-	latchIsEnabled = latchMode.IsEnabled();
-	return latchIsEnabled ? notesLatched[currentNoteIndex] : notes[currentNoteIndex];
+	return latchMode.IsEnabled() ? notesLatched[currentNoteIndex] : notes[currentNoteIndex];
 }
 
 void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
@@ -144,7 +141,7 @@ void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
 	}
 }
 
-bool Notes::ShouldAddNoteOn()
+bool Notes::ShouldAddNoteOn() const
 {
 	return AnyNotesToPlay() && !lastNoteWasNoteOn;
 }

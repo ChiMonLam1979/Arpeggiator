@@ -9,10 +9,7 @@ public:
 	ArpPlayMode();
 	~ArpPlayMode();
 
-	void Set();
-
-	Enums::playMode selectedState { Enums::playMode::up };
-	Enums::playMode currentState { Enums::playMode::up };
+	Enums::playMode state { Enums::playMode::up };
 	bool stateHasChanged { false };
 
 private:

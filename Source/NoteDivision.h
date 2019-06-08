@@ -9,10 +9,7 @@ public:
 	NoteDivision();
 	~NoteDivision();
 
-	void Set();
-
-	float currentFactor  { 1.0f };
-	float selectedFactor { 1.0f };
+	float factor  { 1.0f };
 	bool stateHasChanged    { false };
 
 private:

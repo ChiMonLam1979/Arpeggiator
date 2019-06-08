@@ -82,7 +82,6 @@ private:
 	int noteOnOffset;
 	float noteDivisionFactorHalved;
 	double samplesPerNoteDivisionHalved;
-	float noteDivisionFactor;
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 
 	NoteDivision noteDivision;

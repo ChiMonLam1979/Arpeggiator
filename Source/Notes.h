@@ -13,7 +13,7 @@ public:
 	~Notes();
 
 	void ProcessBuffer(MidiBuffer& midiMessages);
-	bool ShouldAddNoteOn();
+	bool ShouldAddNoteOn() const;
 	bool ShouldAddNoteOff() const;
 	void AddNotes(MidiBuffer& midiMessages, int noteOnOffset);
 	void AddNoteOff(MidiBuffer& midiMessages);
@@ -21,7 +21,6 @@ public:
 
 	std::vector<int> notes;
 	std::vector<int> notesLatched;
-	Enums::playMode currentPlayMode { Enums::playMode::up };
 
 	bool lastNoteWasNoteOn { false };
 	int noteLengthInSamples { 0 };
@@ -36,7 +35,7 @@ private:
 	void GetNumberOfNotes();
 	void InitializeNoteIndex();
 	void UpdateNoteValue();
-	bool AnyNotesToPlay();
+	bool AnyNotesToPlay() const;
 	bool TransposeIsEnabled() const;
 	void AddNoteOnToBuffer(MidiBuffer& midiMessages, const int offset);
 	void AddNoteOffToBuffer(MidiBuffer& midiMessages, const int offset);
@@ -46,7 +45,6 @@ private:
 	LatchMode& latchMode;
 	LatchLock& latchLock;
 	ArpPlayMode& playMode;
-	bool latchIsEnabled { false };
 	int currentNoteIndex { -1 };
 	int numberOfNotesToPlay { 0 };
 	int lastNoteValue { 0 };
