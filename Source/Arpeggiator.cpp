@@ -11,7 +11,6 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::LatchModeId, &latchMode);
 	treeState.addParameterListener(IDs::LatchLockId, &latchLock);
 
-	addParameter(swingFactor);
 	addParameter(noteShift);
 }
 
@@ -24,12 +23,14 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParamterChoices::LatchModeChoices, 0);
 	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::LatchLockChoices, 0);
 	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0.5f);
+	auto swingFactorParameter = std::make_unique<AudioParameterFloat>(IDs::SwingFactorId, ParameterNames::SwingFactorName, ParameterRanges::SwingFactorRange, 0.0f);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(playModeParameter));
 	parameters.push_back(std::move(latchModeParameter));
 	parameters.push_back(std::move(latchLockParameter));
 	parameters.push_back(std::move(noteLengthParameter));
+	parameters.push_back(std::move(swingFactorParameter));
 
 	return { parameters.begin(), parameters.end() };
 }
@@ -86,8 +87,9 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	// start position of the current buffer in quarter note ticks with respect to host timeline
 	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
 
-	const auto oddNoteOffset = 0.5;
+	swingFactor = treeState.getRawParameterValue(IDs::SwingFactorId);
 	const auto SwingOffset = maxSwingPPQ * *swingFactor;
+	const auto oddNoteOffset = 0.5;
 	const auto TotalOddNoteOffset = oddNoteOffset + SwingOffset;
 
 	// start position of the current buffer in custom note-divisions ticks with respect to host timeline
@@ -150,11 +152,9 @@ int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 void Arpeggiator::getStateInformation(MemoryBlock& destData)
 {
 	MemoryOutputStream(destData, true).writeInt(*noteShift);
-	MemoryOutputStream(destData, true).writeFloat(*swingFactor);
 }
 
 void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
 {
-	swingFactor->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }
