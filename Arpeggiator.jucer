@@ -5,26 +5,32 @@
               pluginFormats="buildVST3">
   <MAINGROUP id="jeytrH" name="Arpeggiator">
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
-      <FILE id="MEH8DO" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
-      <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
-      <FILE id="IQq0zo" name="ArpeggiatorEditor.cpp" compile="1" resource="0"
-            file="Source/ArpeggiatorEditor.cpp"/>
-      <FILE id="zjCk7t" name="ArpeggiatorEditor.h" compile="0" resource="0"
-            file="Source/ArpeggiatorEditor.h"/>
-      <FILE id="KsnAcn" name="ArpPlayMode.cpp" compile="1" resource="0" file="Source/ArpPlayMode.cpp"/>
-      <FILE id="ezLUlI" name="ArpPlayMode.h" compile="0" resource="0" file="Source/ArpPlayMode.h"/>
-      <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
-      <FILE id="muMgCR" name="LatchLock.cpp" compile="1" resource="0" file="Source/LatchLock.cpp"/>
-      <FILE id="dnS4gS" name="LatchLock.h" compile="0" resource="0" file="Source/LatchLock.h"/>
-      <FILE id="tItjXO" name="LatchMode.cpp" compile="1" resource="0" file="Source/LatchMode.cpp"/>
-      <FILE id="HeL0iH" name="LatchMode.h" compile="0" resource="0" file="Source/LatchMode.h"/>
-      <FILE id="THPtuo" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="CKCLoR" name="NoteDivision.cpp" compile="1" resource="0"
-            file="Source/NoteDivision.cpp"/>
-      <FILE id="mrBepc" name="NoteDivision.h" compile="0" resource="0" file="Source/NoteDivision.h"/>
-      <FILE id="OcUy1x" name="Notes.cpp" compile="1" resource="0" file="Source/Notes.cpp"/>
-      <FILE id="Rninv1" name="Notes.h" compile="0" resource="0" file="Source/Notes.h"/>
-      <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
+      <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
+        <FILE id="zjCk7t" name="ArpeggiatorEditor.h" compile="0" resource="0"
+              file="Source/ArpeggiatorEditor.h"/>
+        <FILE id="IQq0zo" name="ArpeggiatorEditor.cpp" compile="1" resource="0"
+              file="Source/ArpeggiatorEditor.cpp"/>
+      </GROUP>
+      <GROUP id="{931D8CFA-39BA-37B6-6641-E3CD9F1ADB98}" name="Core">
+        <FILE id="dnS4gS" name="LatchLock.h" compile="0" resource="0" file="Source/LatchLock.h"/>
+        <FILE id="tItjXO" name="LatchMode.cpp" compile="1" resource="0" file="Source/LatchMode.cpp"/>
+        <FILE id="HeL0iH" name="LatchMode.h" compile="0" resource="0" file="Source/LatchMode.h"/>
+        <FILE id="muMgCR" name="LatchLock.cpp" compile="1" resource="0" file="Source/LatchLock.cpp"/>
+        <FILE id="THPtuo" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+        <FILE id="CKCLoR" name="NoteDivision.cpp" compile="1" resource="0"
+              file="Source/NoteDivision.cpp"/>
+        <FILE id="mrBepc" name="NoteDivision.h" compile="0" resource="0" file="Source/NoteDivision.h"/>
+        <FILE id="Rninv1" name="Notes.h" compile="0" resource="0" file="Source/Notes.h"/>
+        <FILE id="OcUy1x" name="Notes.cpp" compile="1" resource="0" file="Source/Notes.cpp"/>
+        <FILE id="ezLUlI" name="ArpPlayMode.h" compile="0" resource="0" file="Source/ArpPlayMode.h"/>
+        <FILE id="KsnAcn" name="ArpPlayMode.cpp" compile="1" resource="0" file="Source/ArpPlayMode.cpp"/>
+        <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
+        <FILE id="MEH8DO" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
+      </GROUP>
+      <GROUP id="{C4BC23AA-FF83-09CF-7B13-85A33BE8E7B2}" name="Common">
+        <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
+        <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
+      </GROUP>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
