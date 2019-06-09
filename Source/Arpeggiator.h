@@ -33,39 +33,31 @@ public:
 	const String getProgramName(int) override { return {}; }
 	void changeProgramName(int, const String&) override {}
 
-	void getStateInformation(MemoryBlock& destData) override;
-	void setStateInformation(const void* data, int sizeInBytes) override;
+	void getStateInformation(MemoryBlock& destData) override {};
+	void setStateInformation(const void* data, int sizeInBytes) override {};
 
 	AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 	AudioProcessorValueTreeState treeState;
 
 private:
-	
-		AudioParameterInt* noteShift = new AudioParameterInt
-		{
-			IDs::NoteShiftId,
-			ParameterNames::NoteShiftName,
-			-32,
-			32,
-			0
-		};
 
-	int noteLengthInSamples;
-	int samplesFromLastNoteOnUntilBufferEnds;
-	int numberOfSamplesInBuffer;
-	int shiftFactor;
-	double rate;
-	const double PPQ128th = 0.03125;
-	double samplesPerNoteDivision;
-	double samplesPerQuarterNote;
-	double noteLength;
-	double maxSwingPPQ;
-	int noteOnOffset;
-	float noteDivisionFactorHalved;
-	double samplesPerNoteDivisionHalved;
-	float *lengthFactor;
-	float *swingFactor;
+	int noteLengthInSamples { 0 };
+	int samplesFromLastNoteOnUntilBufferEnds { 0 };
+	int numberOfSamplesInBuffer { 0 };
+	double rate { 0 };
+	const double PPQ128th { 0.03125 };
+	double samplesPerNoteDivision { 0 };
+	double samplesPerQuarterNote { 0 };
+	double noteLength { 0 };
+	double maxSwingPPQ { 0 };
+	int noteOnOffset { 0 };
+	float noteDivisionFactorHalved { 0 };
+	double samplesPerNoteDivisionHalved { 0 };
+	float *lengthFactor = nullptr;
+	float *swingFactor = nullptr;
+	float *shiftFactor = nullptr;
+
 
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
 

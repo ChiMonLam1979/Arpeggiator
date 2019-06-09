@@ -14,9 +14,9 @@ public:
 
 private:
 
-	bool stateHasChanged{ false };
-	Enums::latchMode state{ Enums::latchMode::off };
-	Enums::latchMode previousState{ Enums::latchMode::off };
+	bool stateHasChanged { false };
+	Enums::latchMode state { Enums::latchMode::off };
+	Enums::latchMode previousState { Enums::latchMode::off };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

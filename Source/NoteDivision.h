@@ -11,12 +11,12 @@ public:
 
 	bool StateChanged();
 
-	float factor  { 1.0f };
+	float factor { 1.0f };
 
 private:
 
-	float lastFactor{ 1.0f };
-	bool stateHasChanged{ false };
+	float lastFactor { 1.0f };
+	bool stateHasChanged { false };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

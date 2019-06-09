@@ -15,8 +15,8 @@ public:
 
 private:
 
-	bool stateHasChanged{ false };
-	Enums::playMode previousState{ Enums::playMode::up };
+	bool stateHasChanged { false };
+	Enums::playMode previousState { Enums::playMode::up };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

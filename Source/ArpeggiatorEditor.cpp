@@ -3,7 +3,7 @@
 ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p), processor(p)
 {
 	setResizable(true, false);
-	setSize(350, 350);
+	setSize(400, 400);
 
 	noteDivisionComboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::NoteDivisionId, noteDiviosnComboBox);
 	playModeComboBoxAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.treeState, IDs::ArpPlayModeId, playModeComboBox);
@@ -12,6 +12,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	noteLengthSliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::NoteLengthId, noteLengthSlider);
 	noteLengthSliderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::NoteLengthId, noteLengthButtonsSlider);
 	swingFactorSliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::SwingFactorId, swingFactorSlider);
+	noteShiftSliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::NoteShiftId, noteShiftSlider);
 
 	noteDiviosnComboBox.addItemList(ParamterChoices::NoteDivisionChoices, 1);
 	playModeComboBox.addItemList(ParamterChoices::PlayModeChoices, 1);
@@ -35,6 +36,11 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	swingFactorSlider.setNumDecimalPlacesToDisplay(2);
 	swingFactorSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
+	noteShiftSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
+	noteShiftSlider.setRange(-32.0f, 32.0f, 0.5);
+	noteShiftSlider.setNumDecimalPlacesToDisplay(1);
+	noteShiftSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+
 	addAndMakeVisible(noteDiviosnComboBox);
 	addAndMakeVisible(playModeComboBox);
 	addAndMakeVisible(latchModeComboBox);
@@ -42,6 +48,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(noteLengthSlider);
 	addAndMakeVisible(noteLengthButtonsSlider);
 	addAndMakeVisible(swingFactorSlider);
+	addAndMakeVisible(noteShiftSlider);
 }
 
 ArpeggiatorEditor::~ArpeggiatorEditor()
@@ -62,5 +69,6 @@ void ArpeggiatorEditor::resized()
 	latchLockComboBox.setBounds(localBounds.removeFromBottom(50));
 	noteLengthSlider.setBounds(localBounds.removeFromBottom(50));
 	noteLengthButtonsSlider.setBounds(localBounds.removeFromBottom(50));
-	swingFactorSlider.setBounds(localBounds);
+	swingFactorSlider.setBounds(localBounds.removeFromBottom(50));
+	noteShiftSlider.setBounds(localBounds);
 }

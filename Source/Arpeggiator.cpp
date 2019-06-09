@@ -10,8 +10,6 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::ArpPlayModeId, &playMode);
 	treeState.addParameterListener(IDs::LatchModeId, &latchMode);
 	treeState.addParameterListener(IDs::LatchLockId, &latchLock);
-
-	addParameter(noteShift);
 }
 
 AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()
@@ -24,6 +22,7 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::LatchLockChoices, 0);
 	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0.5f);
 	auto swingFactorParameter = std::make_unique<AudioParameterFloat>(IDs::SwingFactorId, ParameterNames::SwingFactorName, ParameterRanges::SwingFactorRange, 0.0f);
+	auto noteShiftParamter = std::make_unique<AudioParameterFloat>(IDs::NoteShiftId, ParameterNames::NoteShiftName, -32.0, 32.0, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(playModeParameter));
@@ -31,6 +30,7 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	parameters.push_back(std::move(latchLockParameter));
 	parameters.push_back(std::move(noteLengthParameter));
 	parameters.push_back(std::move(swingFactorParameter));
+	parameters.push_back(std::move(noteShiftParamter));
 
 	return { parameters.begin(), parameters.end() };
 }
@@ -43,16 +43,6 @@ AudioProcessorEditor* Arpeggiator::createEditor()
 void Arpeggiator::prepareToPlay(double sampleRate, int)
 {
 	rate = sampleRate;
-	noteLengthInSamples = 0;
-	numberOfSamplesInBuffer = 0;
-	shiftFactor = 0;
-	samplesPerQuarterNote = 0.0;
-	samplesPerNoteDivision = 0.0;
-	noteLength = 0;
-	maxSwingPPQ = 0;
-	noteOnOffset = 0;
-	noteDivisionFactorHalved = 0;
-	samplesPerNoteDivisionHalved = 0;
 }
 
 void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
@@ -79,13 +69,13 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 	noteLengthInSamples = jmax(NoteLengthInSamplesAsInt, samplesPer128thNote);
 
 	numberOfSamplesInBuffer = buffer.getNumSamples();
-	shiftFactor = noteShift->get();
+	shiftFactor = treeState.getRawParameterValue(IDs::NoteShiftId);
 
 	noteLength = (0.5 * *lengthFactor);
 	maxSwingPPQ = (0.5 - noteLength);
 
 	// start position of the current buffer in quarter note ticks with respect to host timeline
-	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * shiftFactor);
+	const double partsPerQuarterNoteStartPosition = positionInfo.ppqPosition + (PPQ128th * *shiftFactor);
 
 	swingFactor = treeState.getRawParameterValue(IDs::SwingFactorId);
 	const auto SwingOffset = maxSwingPPQ * *swingFactor;
@@ -147,14 +137,4 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 int Arpeggiator::CalculateNoteOnOffset(int beatPos, double notePos) const
 {
 	return static_cast<int>(samplesPerNoteDivisionHalved * (beatPos - notePos));
-}
-
-void Arpeggiator::getStateInformation(MemoryBlock& destData)
-{
-	MemoryOutputStream(destData, true).writeInt(*noteShift);
-}
-
-void Arpeggiator::setStateInformation(const void* data, int sizeInBytes)
-{
-	noteShift->setValueNotifyingHost(MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat());
 }

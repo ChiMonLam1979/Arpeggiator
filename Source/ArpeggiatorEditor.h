@@ -23,6 +23,7 @@ private:
 	Slider noteLengthSlider;
 	Slider noteLengthButtonsSlider;
 	Slider swingFactorSlider;
+	Slider noteShiftSlider;
 
 public:
 
@@ -33,6 +34,7 @@ public:
 	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteLengthSliderAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteLengthSliderButtonsAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> swingFactorSliderAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteShiftSliderAttachment;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };

@@ -13,7 +13,7 @@ public:
 
 private:
 
-	Enums::latchLock state{ Enums::latchLock::unlocked };
+	Enums::latchLock state { Enums::latchLock::unlocked };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };
