@@ -31,16 +31,18 @@ namespace ParamterChoices
 	static String Random{ "Random" };
 	static String Played{ "Played" };
 
-	static String QuarterNoteDivision{ "1/4 Note" };
-	static String EighthNoteDivision{ "1/8 Note" };
-	static String EighthNoteTripletDivision{ "1/8 Note Triplet" };
-	static String SixteenthNoteDivision{ "1/16 Note" };
-	static String SixteenthNoteTripletDivision{ "1/16 Note Triplet" };
-	static String ThirtySecondNoteDivision{ "1/32 Note" };
-	static String ThirtySecondNoteTripletDivision{ "1/32 Note Triplet" };
+	static String QuarterNoteDivision{ "1/4" };
+	static String EighthNoteDivision{ "1/8" };
+	static String EighthNoteTripletDivision{ "1/8 Triplet" };
+	static String SixteenthNoteDivision{ "1/16" };
+	static String SixteenthNoteTripletDivision{ "1/16 Triplet" };
+	static String ThirtySecondNoteDivision{ "1/32" };
+	static String ThirtySecondNoteTripletDivision{ "1/32 Triplet" };
 
-	static String Off{ "Off" };
-	static String On{ "On" };
+	static String LatchOff{ "Latch Off" };
+	static String LatchOn{ "Latch On" };
+	static String LockOff{ "Lock Off" };
+	static String LockOn{ "Lock On" };
 
 	const StringArray NoteDivisionChoices
 	{
@@ -74,14 +76,14 @@ namespace ParamterChoices
 
 	const StringArray LatchLockChoices
 	{
-		Off,
-		On
+		LockOff,
+		LockOn
 	};
 
 	const StringArray LatchModeChoices
 	{
-		Off,
-		On
+		LatchOff,
+		LatchOn
 	};
 }
 
@@ -106,4 +108,5 @@ namespace Enums
 	enum latchMode { off, on };
 	enum playMode { up, down, random, played };
 	enum latchLock { unlocked, locked };
+	enum Orientation { horizontal, vertical };
 }

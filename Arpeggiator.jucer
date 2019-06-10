@@ -5,7 +5,17 @@
               pluginFormats="buildVST3">
   <MAINGROUP id="jeytrH" name="Arpeggiator">
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
+      <GROUP id="{87B0359F-55CB-5F8E-B6FF-2FFD109845D2}" name="APVTS Extensions">
+        <FILE id="XFQ2Gf" name="ChoiceParameterRadioGroup.cpp" compile="1"
+              resource="0" file="Source/ChoiceParameterRadioGroup.cpp"/>
+      </GROUP>
       <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
+        <GROUP id="{50C15424-81F7-72DF-FEAB-CA398831D6BB}" name="LookAndFeel">
+          <FILE id="v6MJwe" name="MyTextButtonLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/MyTextButtonLookAndFeel.cpp"/>
+          <FILE id="d47xha" name="MyTextButtonLookAndFeel.h" compile="0" resource="0"
+                file="Source/MyTextButtonLookAndFeel.h"/>
+        </GROUP>
         <FILE id="zjCk7t" name="ArpeggiatorEditor.h" compile="0" resource="0"
               file="Source/ArpeggiatorEditor.h"/>
         <FILE id="IQq0zo" name="ArpeggiatorEditor.cpp" compile="1" resource="0"
