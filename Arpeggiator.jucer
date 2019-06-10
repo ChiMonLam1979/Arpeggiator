@@ -11,6 +11,14 @@
       </GROUP>
       <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
         <GROUP id="{50C15424-81F7-72DF-FEAB-CA398831D6BB}" name="LookAndFeel">
+          <FILE id="dmwfSc" name="MyLabelLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/MyLabelLookAndFeel.cpp"/>
+          <FILE id="nnF6MJ" name="MyLabelLookAndFeel.h" compile="0" resource="0"
+                file="Source/MyLabelLookAndFeel.h"/>
+          <FILE id="e13njh" name="MySliderLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/MySliderLookAndFeel.cpp"/>
+          <FILE id="DNS0EN" name="MySliderLookAndFeel.h" compile="0" resource="0"
+                file="Source/MySliderLookAndFeel.h"/>
           <FILE id="v6MJwe" name="MyTextButtonLookAndFeel.cpp" compile="1" resource="0"
                 file="Source/MyTextButtonLookAndFeel.cpp"/>
           <FILE id="d47xha" name="MyTextButtonLookAndFeel.h" compile="0" resource="0"

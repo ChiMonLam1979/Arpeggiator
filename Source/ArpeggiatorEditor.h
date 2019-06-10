@@ -2,6 +2,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "ChoiceParameterRadioGroup.cpp"
 #include "Arpeggiator.h"
+#include "MyLabelLookAndFeel.h"
+#include "MySliderLookAndFeel.h"
 
 class ArpeggiatorEditor : public AudioProcessorEditor
 {
@@ -22,9 +24,21 @@ private:
 	Slider noteShiftSlider { ParameterNames::NoteShiftName };
 	Slider noteShiftButtonsSlider;
 
+	Label noteDivisionLabel{ ParameterNames::NoteDivisionName };
+	Label playModeLabel{ ParameterNames::ArpPlayModeName };
+	Label latchModeLabel{ ParameterNames::LatchModeName };
+	Label latchLockLabel{ ParameterNames::LatchLockName };
+	Label noteShiftLabel{ ParameterNames::NoteShiftName };
+	Label swingFactorLabel{ ParameterNames::SwingFactorName };
+	Label noteLengthLabel{ ParameterNames::NoteLengthName };
+
+	MyLabelLookAndFeel labelLookAndFeel;
+	MySliderLookAndFeel sliderLookAndFeel;
+
 	static FlexItem makeButtonBoxItem(Component& component);
 	static FlexItem makeSliderBoxItem(Component& component);
 	static FlexItem makeSliderButtonBoxItem(Component& component);
+	static FlexItem makeLabelBoxItem(Component& component);
 
 public:
 
