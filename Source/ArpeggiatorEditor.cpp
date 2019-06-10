@@ -13,7 +13,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	latchLockRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchLockId, ChoiceParameterRadioGroup::Orientation::horizontal);
 
 	setResizable(false, false);
-	setSize(700, 500);
+	setSize(500, 800);
 
 	noteLengthSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
 	noteLengthSlider.setRange(0.0, 1.0, 0.01);
