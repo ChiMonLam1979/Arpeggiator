@@ -37,11 +37,11 @@ void MyTextButtonLookAndFeel::drawButtonBackground(Graphics& g, Button& button, 
 void MyTextButtonLookAndFeel::drawButtonPressCircles(Graphics& g, Rectangle<float> buttonBounds, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
 
-	auto diameter = buttonBounds.getHeight() * 0.01f;
+	auto diameter = buttonBounds.getHeight() * 0.015f;
 	auto buttonCenter = buttonBounds.getCentreX();
 	auto distanceBetweenCircles = buttonBounds.getWidth() * 0.06f;
-	auto yPosOfTopCircles = buttonBounds.getY() + (buttonBounds.getHeight() * 0.85f);
-	auto yPosOfBottomCircles = buttonBounds.getY() + (buttonBounds.getHeight() * 0.90f);
+	auto yPosOfTopCircles = buttonBounds.getY() + (buttonBounds.getHeight() * 0.80f);
+	auto yPosOfBottomCircles = buttonBounds.getY() + (buttonBounds.getHeight() * 0.85f);
 
 	auto leftXPos = buttonCenter - distanceBetweenCircles - (diameter * 0.5f);
 	auto midXpos = buttonCenter - (diameter * 0.5f);
@@ -74,7 +74,7 @@ void MyTextButtonLookAndFeel::drawButtonPressCircles(Graphics& g, Rectangle<floa
 
 void MyTextButtonLookAndFeel::drawButtonText(Graphics& g, TextButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-	Font font(Font("Seven Segment", "Regular", button.getHeight() * 0.2f));
+	Font font(Font("Seven Segment", "Regular", button.getHeight() * 0.3f));
 	g.setFont(font);
 
 	auto baseTextColour = Colour(0xff2d91b9);

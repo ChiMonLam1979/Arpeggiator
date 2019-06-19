@@ -19,17 +19,20 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	noteLengthSlider.setRange(0.0, 1.0, 0.01);
 	noteLengthSlider.textFromValueFunction = nullptr;
 	noteLengthSlider.setNumDecimalPlacesToDisplay(2);
+	noteLengthSlider.setLookAndFeel(&sliderLookAndFeel);
 	noteLengthSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
 	swingFactorSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
 	swingFactorSlider.setRange(0.0, 1.0);
 	swingFactorSlider.textFromValueFunction = nullptr;
 	swingFactorSlider.setNumDecimalPlacesToDisplay(2);
+	swingFactorSlider.setLookAndFeel(&sliderLookAndFeel);
 	swingFactorSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
 	noteShiftSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
 	noteShiftSlider.setRange(-32.0f, 32.0f, 0.5);
 	noteShiftSlider.setNumDecimalPlacesToDisplay(1);
+	noteShiftSlider.setLookAndFeel(&sliderLookAndFeel);
 	noteShiftSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 	noteShiftSlider.onValueChange = [this] { noteShiftButtonsSlider.setValue(noteShiftSlider.getValue()); };
 
@@ -76,17 +79,6 @@ void ArpeggiatorEditor::paint(Graphics& g)
 
 void ArpeggiatorEditor::resized()
 {
-	//auto localBounds = getLocalBounds();
-
-	//noteDivisionRadioGroup->setBounds(localBounds.removeFromBottom(50));
-	//playModeRadioGroup->setBounds(localBounds.removeFromBottom(50));
-	//latchModeRadioGroup->setBounds(localBounds.removeFromBottom(50));
-	//latchLockRadioGroup->setBounds(localBounds.removeFromBottom(50));
-	//noteLengthSlider.setBounds(localBounds.removeFromBottom(50));
-	//noteShiftSlider.setBounds(localBounds.removeFromBottom(50));
-	//noteShiftButtonsSlider.setBounds(localBounds.removeFromBottom(50));
-	//swingFactorSlider.setBounds(localBounds);
-
 	auto window = getLocalBounds();
 
 	FlexBox noteDivisionLabelBox;
@@ -154,29 +146,29 @@ void ArpeggiatorEditor::resized()
 
 	masterBox.flexDirection = FlexBox::Direction::column;
 
-	masterBox.items.addArray({	FlexItem(noteDivisionLabelBox).withFlex(0.5),
+	masterBox.items.addArray({ FlexItem(noteDivisionLabelBox).withFlex(0.4),
 								FlexItem(noteDivionButtons).withFlex(1),
-								FlexItem(playModeLabelBox).withFlex(0.5),
+								FlexItem(playModeLabelBox).withFlex(0.4),
 								FlexItem(playModeButtonsBox).withFlex(1),
-								FlexItem(latchModeLabelBox).withFlex(0.5),
+								FlexItem(latchModeLabelBox).withFlex(0.4),
 								FlexItem(latchModeButtonsBox).withFlex(1),
-								FlexItem(latchLockLabelBox).withFlex(0.5),
+								FlexItem(latchLockLabelBox).withFlex(0.4),
 								FlexItem(latchLockButtonsBox).withFlex(1),
-								FlexItem(noteLengthLabelBox).withFlex(0.5),
+								FlexItem(noteLengthLabelBox).withFlex(0.4),
 								FlexItem(noteLengthSliderBox).withFlex(1),
-								FlexItem(noteShiftLabelBox).withFlex(0.5),
+								FlexItem(swingFactorLabelBox).withFlex(0.4),
+								FlexItem(swingFactorSliderBox).withFlex(1),
+								FlexItem(noteShiftLabelBox).withFlex(0.4),
 								FlexItem(noteShiftSliderBox).withFlex(1),
-								FlexItem(noteShiftSliderButtonsBox).withFlex(1),
-								FlexItem(swingFactorLabelBox).withFlex(0.5),
-								FlexItem(swingFactorSliderBox).withFlex(1) });
+								FlexItem(noteShiftSliderButtonsBox).withFlex(1) });
 
 	masterBox.performLayout(window);
 }
 
 static constexpr float buttonHeight = 100.0f;
 static constexpr float sliderHeight = 100.0f;
-static constexpr float sliderButtonHeight = 60.0f;
-static constexpr float labelHeight = 50.0f;
+static constexpr float sliderButtonHeight = 100.0f;
+static constexpr float labelHeight = 100.0f;
 
 
 FlexItem ArpeggiatorEditor::makeButtonBoxItem(Component& component)

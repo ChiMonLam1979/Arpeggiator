@@ -16,4 +16,6 @@ public:
 	Button* createSliderButton(Slider&, bool isIncrement) override;
 
 	MyTextButtonLookAndFeel buttonLookAndFeel;
+
+	bool isVertical { true };
 };

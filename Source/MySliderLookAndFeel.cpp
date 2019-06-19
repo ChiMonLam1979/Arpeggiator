@@ -14,6 +14,8 @@ void MySliderLookAndFeel::drawLinearSlider(
 {
 	if(slider.isVertical())
 	{
+		isVertical = true;
+
 		slider.setTextBoxStyle(Slider::TextBoxBelow, false, slider.getWidth() / 4, 15);
 
 		auto sliderWidth		= slider.getWidth() * 1.0f;
@@ -49,40 +51,109 @@ void MySliderLookAndFeel::drawLinearSlider(
 			g.fillRect(line);
 		}
 	}
+	else if(slider.isHorizontal())
+	{
+		isVertical = false;
+
+		slider.setTextBoxStyle(Slider::TextBoxBelow, false, slider.getWidth() / 4, 15);
+
+		auto sliderHeight			= slider.getHeight() * 1.0f;
+		auto outerBorderHeight		= sliderHeight * 0.54f;
+		auto innerBorderHeight		= outerBorderHeight * 0.98f;
+		auto sliderPathHeight		= innerBorderHeight * 0.40f;
+		auto thumbHeight			= innerBorderHeight * 1.0f;
+		auto sliderBottomPosition	= slider.getPositionOfValue(slider.getMinimum());
+
+		Rectangle<float> sliderOuterBorder{ sliderBottomPosition - (thumbHeight * 0.5f), (sliderHeight * 0.5f) - (outerBorderHeight * 0.5f), width + (thumbHeight), outerBorderHeight };
+		g.setColour(Colour(0xff78c1de));
+		g.drawRoundedRectangle(sliderOuterBorder, 3.0f, 2.0f);
+
+		Rectangle<float> sliderInnerBorder{ sliderBottomPosition - (thumbHeight * 0.5f), (sliderHeight * 0.5f) - (innerBorderHeight * 0.5f), width + (thumbHeight), innerBorderHeight };
+		g.setColour(Colour(0x402d91b9));
+		g.fillRoundedRectangle(sliderInnerBorder, 1.0f);
+
+		auto initialPathX = sliderPos > minSliderPos ? minSliderPos : sliderPos;
+		auto pathWidth = sliderPos > minSliderPos ? (sliderPos - minSliderPos) : (minSliderPos - sliderPos);
+
+		Rectangle<float> sliderPath{ initialPathX , (sliderHeight * 0.5f) - (sliderPathHeight * 0.5f), pathWidth, sliderPathHeight };
+		g.setColour(Colour(0x505ab9d8));
+		g.fillRoundedRectangle(sliderPath, 3.0f);
+
+		Rectangle<float> sliderThumb{ sliderPos - (thumbHeight / 2.0f), (sliderHeight * 0.5f) - (thumbHeight * 0.5f), thumbHeight, thumbHeight };
+		g.setColour(Colour(0x80cce8ff));
+		g.fillRoundedRectangle(sliderThumb, 5.0f);
+
+		for (int i = 1; i <= width * 0.25; i++)
+		{
+			auto number = i * 4;
+			g.setColour(Colour(0x60c8f0f9));
+			Rectangle<float> line{ sliderBottomPosition + number * 1.0f, sliderPath.getY(), 0.5f, sliderPathHeight };
+			g.fillRect(line);
+		}
+	}
 }
 
 Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 {
 	Slider::SliderLayout layout;
 
-	auto window = slider.getLocalBounds().reduced(slider.getHeight() * 0.06f);
+	if (slider.isVertical() || slider.getSliderStyle() == Slider::SliderStyle::IncDecButtons)
+	{
+		auto window = slider.getLocalBounds().reduced(slider.getHeight() * 0.06f);
 
-	layout.sliderBounds  = window.removeFromTop(window.getHeight() * 0.85f).reduced(window.getHeight() * 0.04);
-	layout.textBoxBounds = slider.getLocalBounds().removeFromBottom(window.getHeight() * 0.8);
-	return layout;
+		layout.sliderBounds = window.removeFromTop(window.getHeight() * 0.85f).reduced(window.getHeight() * 0.04);
+		layout.textBoxBounds = slider.getLocalBounds().removeFromBottom(window.getHeight() * 0.8);
+
+		return layout;
+	}
+	if (slider.isHorizontal())
+	{
+		auto window = slider.getLocalBounds().reduced(slider.getWidth() * 0.06f);
+
+		layout.sliderBounds = window.removeFromLeft(window.getWidth() * 0.85);
+		window.setPosition(window.getX() + window.getWidth() / 2.5, window.getY());
+		layout.textBoxBounds = window.expanded(0, window.getHeight() * 0.95).removeFromLeft(window.getWidth() * 0.9);
+
+		return layout;
+	}
 }
 
  void MySliderLookAndFeel::drawLabel(Graphics& g, Label& label)
  {
-	auto yPos			= label.getLocalBounds().getY() * 1.0f;
-	auto localWidth		= label.getLocalBounds().getWidth() * 1.0f;
-	auto localHeight	= label.getLocalBounds().getHeight() * 1.0f;
-	auto centre			= label.getLocalBounds().getCentreX();
-	auto xPos			= centre - (localWidth * 0.12f);
-	auto width			= localWidth * 0.24f;
+	 auto yPos		= static_cast<float>(label.getLocalBounds().getY());
+	 auto height	= static_cast<float>(label.getLocalBounds().getHeight());
+	 auto centre	= static_cast<float>(label.getLocalBounds().getCentreX());
+	 auto xPos		= static_cast<float>(label.getLocalBounds().getX());
+	 auto width		= static_cast<float>(label.getLocalBounds().getWidth());
 
-	Rectangle<float> labelRectangle{ xPos, yPos, width, localHeight };
+	if(isVertical)
+	{
+		auto xPosAdjusted	= static_cast<float>(centre - (width * 0.12));
+		auto widthAdjusted	= static_cast<float>(width * 0.24);
+		
+		Rectangle<float> labelRectangle{ xPosAdjusted, yPos, widthAdjusted, height };
+		
+		g.setColour(Colour(0xff78c1de));
+		g.setFont(Font("Seven Segment","Regular", height * 0.85f));
+		g.drawFittedText(label.getText(), xPosAdjusted, yPos, widthAdjusted, height, Justification::centred, 1, 0.0f);
+		g.setColour(Colour(0xff78c1de));
+		g.drawRoundedRectangle(labelRectangle, 5.0f, 2.0f);
+	}
+	if(!isVertical)
+	{
+		Rectangle<float> labelRectangle{ xPos, yPos, width, height };
 
-	g.setColour(Colour(0xff78c1de));
-	g.setFont(Font("Seven Segment","Regular", localHeight * 0.85f));
-	g.drawFittedText(label.getText(), xPos, yPos, width, localHeight, Justification::centred, 1, 0.0f);
-	g.setColour(Colour(0xff78c1de));
-	g.drawRoundedRectangle(labelRectangle, 5.0f, 2.0f);
+		g.setColour(Colour(0xff78c1de));
+		g.setFont(Font("Seven Segment", "Regular", label.getHeight() * 0.85f));
+		g.drawFittedText(label.getText(), xPos, yPos, width, height, Justification::centred, 1, 0.0f);
+		g.setColour(Colour(0xff78c1de));
+		g.drawRoundedRectangle(labelRectangle, 5.0f, 2.0f);
+	}
  }
 
  Button* MySliderLookAndFeel::createSliderButton(Slider&, bool isIncrement)
  {
-	auto button = new TextButton(isIncrement ? "+" : "-", String());
+	auto button = new TextButton(isIncrement ? "PLUS" : "MINUS", String());
 	button->setLookAndFeel(&buttonLookAndFeel);
 	return button;
  }

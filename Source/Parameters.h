@@ -33,11 +33,11 @@ namespace ParamterChoices
 
 	static String QuarterNoteDivision{ "1/4" };
 	static String EighthNoteDivision{ "1/8" };
-	static String EighthNoteTripletDivision{ "1/8 Triplet" };
+	static String EighthNoteTripletDivision{ "1/8 T" };
 	static String SixteenthNoteDivision{ "1/16" };
-	static String SixteenthNoteTripletDivision{ "1/16 Triplet" };
+	static String SixteenthNoteTripletDivision{ "1/16 T" };
 	static String ThirtySecondNoteDivision{ "1/32" };
-	static String ThirtySecondNoteTripletDivision{ "1/32 Triplet" };
+	static String ThirtySecondNoteTripletDivision{ "1/32 T" };
 
 	static String LatchOff{ "Latch Off" };
 	static String LatchOn{ "Latch On" };
