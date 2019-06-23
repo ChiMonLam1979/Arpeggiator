@@ -20,26 +20,41 @@ void MySliderLookAndFeel::drawLinearSlider(
 
 		auto sliderWidth		= slider.getWidth() * 1.0f;
 		auto sliderHeight		= slider.getHeight() * 1.0f;
-		auto outerBorderWidth	= sliderWidth * 0.24f;
-		auto innerBorderWidth	= outerBorderWidth * 0.98f;
-		auto sliderPathWidth	= innerBorderWidth * 0.40f;
-		auto thumbHeight		= sliderHeight * 0.10f;
-		auto thumbWidth			= innerBorderWidth * 1.0f;
-		auto sliderTopPosition = slider.getPositionOfValue(127);
+		auto sliderTopPosition	= slider.getPositionOfValue(127);
 
-		Rectangle<float> sliderOuterBorder{ (sliderWidth * 0.5f) - (outerBorderWidth * 0.5f), sliderTopPosition - (thumbHeight * 0.5f), outerBorderWidth, height + (thumbHeight) };
+		auto thumbWidth			= sliderWidth * 0.2352f;
+		auto thumbHeight		= sliderHeight * 0.10f;
+		auto thumbXPos			= (sliderWidth * 0.5f) - (thumbWidth * 0.5f);
+		auto thumbYPos			= sliderPos - (thumbHeight / 2.0f);
+
+		auto outerBorderWidth	= sliderWidth * 0.24f;
+		auto outerBorderHeight	= height + (thumbHeight);
+		auto outerBorderXPos	= (sliderWidth * 0.5f) - (outerBorderWidth * 0.5f);
+		auto outerBorderYPos	= sliderTopPosition - (thumbHeight * 0.5f);
+
+		auto innerBorderWidth	= outerBorderWidth * 0.98f;
+		auto innerBorderHeight	= height + (thumbHeight);
+		auto innerBorderXPos	= (sliderWidth * 0.5f) - (innerBorderWidth * 0.5f);
+		auto innerBorderYPos	= sliderTopPosition - (thumbHeight * 0.5f);
+
+		auto pathWidth			= innerBorderWidth * 0.40f;
+		auto pathHeight			= (minSliderPos - sliderPos);
+		auto pathXPos			= (sliderWidth * 0.5f) - (pathWidth * 0.5f);
+		auto pathYPos			= sliderPos;
+
+		Rectangle<float> sliderOuterBorder{ outerBorderXPos, outerBorderYPos, outerBorderWidth, outerBorderHeight };
 		g.setColour(Colour(0xff78c1de));
 		g.drawRoundedRectangle(sliderOuterBorder, 5.0f, 2.0f);
 
-		Rectangle<float> sliderInnerBorder{ (sliderWidth * 0.5f) - (innerBorderWidth * 0.5f), sliderTopPosition - (thumbHeight * 0.5f), innerBorderWidth, height + (thumbHeight) };
+		Rectangle<float> sliderInnerBorder{ innerBorderXPos, innerBorderYPos, innerBorderWidth, innerBorderHeight };
 		g.setColour(Colour(0x402d91b9));
 		g.fillRoundedRectangle(sliderInnerBorder, 1.0f);
 
-		Rectangle<float> sliderPath{ (sliderWidth * 0.5f) - (sliderPathWidth * 0.5f), sliderPos, sliderPathWidth, (minSliderPos - sliderPos) };
+		Rectangle<float> sliderPath{ pathXPos, pathYPos, pathWidth, pathHeight };
 		g.setColour(Colour(0x505ab9d8));
 		g.fillRoundedRectangle(sliderPath, 3.0f);
 
-		Rectangle<float> sliderThumb{ (sliderWidth * 0.5f) - (thumbWidth * 0.5f), sliderPos - (thumbHeight / 2.0f), thumbWidth, thumbHeight };
+		Rectangle<float> sliderThumb{ thumbXPos, thumbYPos, thumbWidth, thumbHeight };
 		g.setColour(Colour(0x80cce8ff));
 		g.fillRoundedRectangle(sliderThumb, 5.0f);
 
@@ -47,7 +62,7 @@ void MySliderLookAndFeel::drawLinearSlider(
 		{
 			auto number = i * 4;
 			g.setColour(Colour(0x60c8f0f9));
-			Rectangle<float> line{ (sliderWidth * 0.5f) - (sliderPathWidth * 0.5f * 0.4f), maxSliderPos - number * 1.0f, sliderPathWidth * 0.4f, 0.5f };
+			Rectangle<float> line{ (sliderWidth * 0.5f) - (pathWidth * 0.5f * 0.4f), maxSliderPos - number * 1.0f, pathWidth * 0.4f, 0.5f };
 			g.fillRect(line);
 		}
 	}
@@ -58,28 +73,41 @@ void MySliderLookAndFeel::drawLinearSlider(
 		slider.setTextBoxStyle(Slider::TextBoxBelow, false, slider.getWidth() / 4, 15);
 
 		auto sliderHeight			= slider.getHeight() * 1.0f;
-		auto outerBorderHeight		= sliderHeight * 0.54f;
-		auto innerBorderHeight		= outerBorderHeight * 0.98f;
-		auto sliderPathHeight		= innerBorderHeight * 0.40f;
-		auto thumbHeight			= innerBorderHeight * 1.0f;
 		auto sliderBottomPosition	= slider.getPositionOfValue(slider.getMinimum());
 
-		Rectangle<float> sliderOuterBorder{ sliderBottomPosition - (thumbHeight * 0.5f), (sliderHeight * 0.5f) - (outerBorderHeight * 0.5f), width + (thumbHeight), outerBorderHeight };
+		auto thumbWidth				= sliderHeight * 0.5292f;
+		auto thumbHeight			= thumbWidth;
+		auto thumbXPos				= sliderPos - (thumbHeight / 2.0f);
+		auto thumbYPos				= (sliderHeight * 0.5f) - (thumbHeight * 0.5f);
+
+		auto outerBorderWidth		= width + thumbHeight;
+		auto outerBorderHeight		= sliderHeight * 0.54f;
+		auto outerBorderXPos		= sliderBottomPosition - (thumbHeight * 0.5f);
+		auto outerBorderYPos		= (sliderHeight * 0.5f) - (outerBorderHeight * 0.5f);
+
+		auto innerBorderHeight		= outerBorderHeight * 0.98f;
+		auto innerBorderWidth		= width + thumbHeight;
+		auto innerBorderXPos		= sliderBottomPosition - (thumbHeight * 0.5f);
+		auto innerBorderYPos		= (sliderHeight * 0.5f) - (innerBorderHeight * 0.5f);
+
+		auto pathWidth				= sliderPos > minSliderPos ? (sliderPos - minSliderPos) : (minSliderPos - sliderPos);
+		auto pathHeight				= innerBorderHeight * 0.40f;
+		auto pathXPos				= sliderPos > minSliderPos ? minSliderPos : sliderPos;
+		auto pathYPos				= (sliderHeight * 0.5f) - (pathHeight * 0.5f);
+
+		Rectangle<float> sliderOuterBorder{ outerBorderXPos, outerBorderYPos, outerBorderWidth, outerBorderHeight };
 		g.setColour(Colour(0xff78c1de));
 		g.drawRoundedRectangle(sliderOuterBorder, 3.0f, 2.0f);
 
-		Rectangle<float> sliderInnerBorder{ sliderBottomPosition - (thumbHeight * 0.5f), (sliderHeight * 0.5f) - (innerBorderHeight * 0.5f), width + (thumbHeight), innerBorderHeight };
+		Rectangle<float> sliderInnerBorder{ innerBorderXPos, innerBorderYPos, innerBorderWidth, innerBorderHeight };
 		g.setColour(Colour(0x402d91b9));
 		g.fillRoundedRectangle(sliderInnerBorder, 1.0f);
 
-		auto initialPathX = sliderPos > minSliderPos ? minSliderPos : sliderPos;
-		auto pathWidth = sliderPos > minSliderPos ? (sliderPos - minSliderPos) : (minSliderPos - sliderPos);
-
-		Rectangle<float> sliderPath{ initialPathX , (sliderHeight * 0.5f) - (sliderPathHeight * 0.5f), pathWidth, sliderPathHeight };
+		Rectangle<float> sliderPath{ pathXPos , pathYPos, pathWidth, pathHeight };
 		g.setColour(Colour(0x505ab9d8));
 		g.fillRoundedRectangle(sliderPath, 3.0f);
 
-		Rectangle<float> sliderThumb{ sliderPos - (thumbHeight / 2.0f), (sliderHeight * 0.5f) - (thumbHeight * 0.5f), thumbHeight, thumbHeight };
+		Rectangle<float> sliderThumb{ thumbXPos, thumbYPos, thumbWidth, thumbHeight };
 		g.setColour(Colour(0x80cce8ff));
 		g.fillRoundedRectangle(sliderThumb, 5.0f);
 
@@ -87,7 +115,7 @@ void MySliderLookAndFeel::drawLinearSlider(
 		{
 			auto number = i * 4;
 			g.setColour(Colour(0x60c8f0f9));
-			Rectangle<float> line{ sliderBottomPosition + number * 1.0f, sliderPath.getY(), 0.5f, sliderPathHeight };
+			Rectangle<float> line{ sliderBottomPosition + number * 1.0f, sliderPath.getY(), 0.5f, pathHeight };
 			g.fillRect(line);
 		}
 	}
