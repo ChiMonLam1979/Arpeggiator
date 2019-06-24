@@ -6,13 +6,13 @@ class ChoiceParameterRadioGroup : public Component,
                                   private AudioProcessorValueTreeState::Listener
 {
 public:
-    enum Orientation
+    enum orientation
     {
         horizontal,
         vertical
     };
 
-    ChoiceParameterRadioGroup (AudioProcessorValueTreeState& s, const String& pID, Orientation o)
+    ChoiceParameterRadioGroup (AudioProcessorValueTreeState& s, const String& pID, orientation o)
     : state (s), orientation (o), parameterID (pID)
     {
         auto* choices = dynamic_cast<AudioParameterChoice*> (state.getParameter (parameterID));
@@ -95,7 +95,7 @@ public:
 private:
     AudioProcessorValueTreeState& state;
     std::vector<std::unique_ptr<Button>> buttons;
-    Orientation orientation;
+    orientation orientation;
     String parameterID;
     AudioParameterChoice* parameter = nullptr;
     bool updating = false;

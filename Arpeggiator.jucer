@@ -30,6 +30,8 @@
               file="Source/ArpeggiatorEditor.cpp"/>
       </GROUP>
       <GROUP id="{931D8CFA-39BA-37B6-6641-E3CD9F1ADB98}" name="Core">
+        <FILE id="mfYmdf" name="ArpSlot.cpp" compile="1" resource="0" file="Source/ArpSlot.cpp"/>
+        <FILE id="sXb5LD" name="ArpSlot.h" compile="0" resource="0" file="Source/ArpSlot.h"/>
         <FILE id="dnS4gS" name="LatchLock.h" compile="0" resource="0" file="Source/LatchLock.h"/>
         <FILE id="tItjXO" name="LatchMode.cpp" compile="1" resource="0" file="Source/LatchMode.cpp"/>
         <FILE id="HeL0iH" name="LatchMode.h" compile="0" resource="0" file="Source/LatchMode.h"/>
@@ -40,8 +42,8 @@
         <FILE id="mrBepc" name="NoteDivision.h" compile="0" resource="0" file="Source/NoteDivision.h"/>
         <FILE id="Rninv1" name="Notes.h" compile="0" resource="0" file="Source/Notes.h"/>
         <FILE id="OcUy1x" name="Notes.cpp" compile="1" resource="0" file="Source/Notes.cpp"/>
-        <FILE id="ezLUlI" name="ArpPlayMode.h" compile="0" resource="0" file="Source/ArpPlayMode.h"/>
-        <FILE id="KsnAcn" name="ArpPlayMode.cpp" compile="1" resource="0" file="Source/ArpPlayMode.cpp"/>
+        <FILE id="ezLUlI" name="ArpMode.h" compile="0" resource="0" file="Source/ArpMode.h"/>
+        <FILE id="KsnAcn" name="ArpMode.cpp" compile="1" resource="0" file="Source/ArpMode.cpp"/>
         <FILE id="Sw95xR" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
         <FILE id="MEH8DO" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
       </GROUP>

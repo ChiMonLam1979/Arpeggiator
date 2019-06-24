@@ -1,10 +1,11 @@
 #pragma once
 #include "Parameters.h"
-#include "ArpPlayMode.h"
+#include "ArpMode.h"
 #include "LatchMode.h"
 #include "NoteDivision.h"
 #include "LatchLock.h"
 #include "Notes.h"
+#include "ArpSlot.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -63,9 +64,10 @@ private:
 
 	NoteDivision noteDivision;
 	LatchMode latchMode;
-	ArpPlayMode playMode;
+	ArpMode arpMode;
 	LatchLock latchLock;
-	Notes notes{ latchMode, latchLock, playMode};
+	ArpSlot arpSlot;
+	Notes notes{ latchMode, latchLock, arpMode};
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

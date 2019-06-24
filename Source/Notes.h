@@ -2,13 +2,13 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LatchMode.h"
 #include "LatchLock.h"
-#include "ArpPlayMode.h"
+#include "ArpMode.h"
 
 class Notes
 {
 public:
 
-	Notes(LatchMode& latchMode, LatchLock& latchLock, ArpPlayMode& playMode);
+	Notes(LatchMode& latchMode, LatchLock& latchLock, ArpMode& arpMode);
 
 	~Notes();
 
@@ -44,7 +44,7 @@ private:
 
 	LatchMode& latchMode;
 	LatchLock& latchLock;
-	ArpPlayMode& playMode;
+	ArpMode& arpMode;
 	int currentNoteIndex { -1 };
 	int numberOfNotesToPlay { 0 };
 	int lastNoteValue { 0 };

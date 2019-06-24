@@ -2,21 +2,21 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Parameters.h"
 
-class ArpPlayMode : public AudioProcessorValueTreeState::Listener
+class ArpMode : public AudioProcessorValueTreeState::Listener
 {
 public:
 
-	ArpPlayMode();
-	~ArpPlayMode();
+	ArpMode();
+	~ArpMode();
 
 	bool StateChanged();
 
-	Enums::playMode state { Enums::playMode::up };
+	Enums::arpMode state { Enums::arpMode::up };
 
 private:
 
 	bool stateHasChanged { false };
-	Enums::playMode previousState { Enums::playMode::up };
+	Enums::arpMode previousState { Enums::arpMode::up };
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

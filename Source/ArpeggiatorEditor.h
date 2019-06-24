@@ -25,7 +25,7 @@ private:
 	Slider noteShiftButtonsSlider;
 
 	Label noteDivisionLabel{ ParameterNames::NoteDivisionName };
-	Label playModeLabel{ ParameterNames::ArpPlayModeName };
+	Label arpModeLabel{ ParameterNames::ArpModeName };
 	Label latchModeLabel{ ParameterNames::LatchModeName };
 	Label latchLockLabel{ ParameterNames::LatchLockName };
 	Label noteShiftLabel{ ParameterNames::NoteShiftName };
@@ -48,9 +48,10 @@ public:
 	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> noteShiftSliderButtonsAttachment;
 
 	std::unique_ptr<ChoiceParameterRadioGroup> noteDivisionRadioGroup;
-	std::unique_ptr<ChoiceParameterRadioGroup> playModeRadioGroup;
+	std::unique_ptr<ChoiceParameterRadioGroup> arpModeRadioGroup;
 	std::unique_ptr<ChoiceParameterRadioGroup> latchModeRadioGroup;
 	std::unique_ptr<ChoiceParameterRadioGroup> latchLockRadioGroup;
+	std::unique_ptr<ChoiceParameterRadioGroup> arpSlotRadioGroup;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };
