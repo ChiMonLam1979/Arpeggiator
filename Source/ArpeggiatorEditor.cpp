@@ -14,7 +14,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	arpSlotRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::ArpSlotId, ChoiceParameterRadioGroup::orientation::horizontal);
 
 	setResizable(false, false);
-	setSize(500, 800);
+	setSize(550, 800);
 
 	noteLengthSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
 	noteLengthSlider.setRange(0.0, 1.0, 0.01);
@@ -101,19 +101,17 @@ void ArpeggiatorEditor::resized()
 
 	FlexBox latchModeLabelBox;
 	latchModeLabelBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	latchModeLabelBox.items.addArray({ makeLabelBoxItem(latchModeLabel).withFlex(1) });
+	latchModeLabelBox.items.addArray({ 
+										makeLabelBoxItem(latchModeLabel).withFlex(1),
+										makeLabelBoxItem(latchLockLabel).withFlex(1)
+									});
 
 	FlexBox latchModeButtonsBox;
 	latchModeButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	latchModeButtonsBox.items.addArray({ makeButtonBoxItem(*latchModeRadioGroup).withFlex(1) });
-
-	FlexBox latchLockLabelBox;
-	latchLockLabelBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	latchLockLabelBox.items.addArray({ makeLabelBoxItem(latchLockLabel).withFlex(1) });
-
-	FlexBox latchLockButtonsBox;
-	latchLockButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	latchLockButtonsBox.items.addArray({ makeButtonBoxItem(*latchLockRadioGroup).withFlex(1) });
+	latchModeButtonsBox.items.addArray({ 
+										makeButtonBoxItem(*latchModeRadioGroup).withFlex(1),
+										makeButtonBoxItem(*latchLockRadioGroup).withFlex(1)
+									});
 
 	FlexBox noteLengthLabelBox;
 	noteLengthLabelBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
@@ -158,8 +156,6 @@ void ArpeggiatorEditor::resized()
 								FlexItem(arpModeButtonsBox).withFlex(1),
 								FlexItem(latchModeLabelBox).withFlex(0.4),
 								FlexItem(latchModeButtonsBox).withFlex(1),
-								FlexItem(latchLockLabelBox).withFlex(0.4),
-								FlexItem(latchLockButtonsBox).withFlex(1),
 								FlexItem(noteLengthLabelBox).withFlex(0.4),
 								FlexItem(noteLengthSliderBox).withFlex(1),
 								FlexItem(swingFactorLabelBox).withFlex(0.4),
