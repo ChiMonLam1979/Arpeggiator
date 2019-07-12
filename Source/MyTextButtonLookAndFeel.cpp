@@ -1,4 +1,5 @@
 #include "MyTextButtonLookAndFeel.h"
+#include "Fonts.h"
 
 void MyTextButtonLookAndFeel::drawButtonBackground(Graphics& g, Button& button, const Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
@@ -74,7 +75,7 @@ void MyTextButtonLookAndFeel::drawButtonPressCircles(Graphics& g, Rectangle<floa
 
 void MyTextButtonLookAndFeel::drawButtonText(Graphics& g, TextButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-	Font font(Font("Seven Segment", "Regular", button.getHeight() * 0.3f));
+	Font font = getSevenSegmentFont().withHeight(button.getHeight() * 0.3f);
 	g.setFont(font);
 
 	auto baseTextColour = Colour(0xff2d91b9);

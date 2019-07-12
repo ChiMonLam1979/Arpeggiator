@@ -1,4 +1,5 @@
 #include "MySliderLookAndFeel.h"
+#include "Fonts.h"
 
 void MySliderLookAndFeel::drawLinearSlider(
 	Graphics& g,
@@ -154,6 +155,8 @@ Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 	 auto xPos		= static_cast<float>(label.getLocalBounds().getX());
 	 auto width		= static_cast<float>(label.getLocalBounds().getWidth());
 
+	 auto font = getSevenSegmentFont().withHeight(height * 0.85);
+
 	if(isVertical)
 	{
 		auto xPosAdjusted	= static_cast<float>(centre - (width * 0.12));
@@ -162,7 +165,7 @@ Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 		Rectangle<float> labelRectangle{ xPosAdjusted, yPos, widthAdjusted, height };
 		
 		g.setColour(Colour(0xff78c1de));
-		g.setFont(Font("Seven Segment","Regular", height * 0.85f));
+		g.setFont(font);
 		g.drawFittedText(label.getText(), xPosAdjusted, yPos, widthAdjusted, height, Justification::centred, 1, 0.0f);
 		g.setColour(Colour(0xff78c1de));
 		g.drawRoundedRectangle(labelRectangle, 5.0f, 2.0f);
@@ -172,7 +175,7 @@ Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 		Rectangle<float> labelRectangle{ xPos, yPos, width, height };
 
 		g.setColour(Colour(0xff78c1de));
-		g.setFont(Font("Seven Segment", "Regular", label.getHeight() * 0.85f));
+		g.setFont(font);
 		g.drawFittedText(label.getText(), xPos, yPos, width, height, Justification::centred, 1, 0.0f);
 		g.setColour(Colour(0xff78c1de));
 		g.drawRoundedRectangle(labelRectangle, 5.0f, 2.0f);

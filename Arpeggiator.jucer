@@ -5,6 +5,7 @@
               pluginFormats="buildVST3">
   <MAINGROUP id="jeytrH" name="Arpeggiator">
     <GROUP id="{E38C0EEF-078D-A82B-2F20-6AF4E82F9436}" name="Source">
+      <FILE id="nYW5O7" name="7 Segment.ttf" compile="0" resource="1" file="../../../../../Windows/Fonts/7 Segment.ttf"/>
       <GROUP id="{87B0359F-55CB-5F8E-B6FF-2FFD109845D2}" name="APVTS Extensions">
         <FILE id="XFQ2Gf" name="ChoiceParameterRadioGroup.cpp" compile="1"
               resource="0" file="Source/ChoiceParameterRadioGroup.cpp"/>
@@ -49,6 +50,7 @@
       </GROUP>
       <GROUP id="{C4BC23AA-FF83-09CF-7B13-85A33BE8E7B2}" name="Common">
         <FILE id="KO0gxh" name="Extensions.h" compile="0" resource="0" file="Source/Extensions.h"/>
+        <FILE id="FeCJLk" name="Fonts.h" compile="0" resource="0" file="Source/Fonts.h"/>
         <FILE id="gnANQP" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
       </GROUP>
     </GROUP>

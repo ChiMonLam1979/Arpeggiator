@@ -7,7 +7,6 @@ public:
 
 	MyTextButtonLookAndFeel()
 	{
-		
 	}
 
 	void drawButtonBackground(Graphics&, Button&, const Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
