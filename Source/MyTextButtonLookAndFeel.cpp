@@ -3,41 +3,38 @@
 
 void MyTextButtonLookAndFeel::drawButtonBackground(Graphics& g, Button& button, const Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
+	auto cornerSize = 6.0f;
+	auto bounds = button.getLocalBounds().toFloat().reduced(2.5f, 2.5f);
+	auto innerbounds = bounds.reduced(4.0f, 4.0f);
+
+	auto baseButtonColour = Colour(0x402d91b9);
+
+	auto baseColour = baseButtonColour;
+
+	if (shouldDrawButtonAsHighlighted)
+		baseColour = Colour(0xaa237190);
+
+	if (button.getToggleState())
 	{
-		auto cornerSize = 6.0f;
-		auto bounds = button.getLocalBounds().toFloat().reduced(2.5f, 2.5f);
-		auto innerbounds = bounds.reduced(4.0f, 4.0f);
-
-		auto baseButtonColour = Colour(0x402d91b9);
-
-		auto baseColour = baseButtonColour;
-
-		if (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted)
-			baseColour = shouldDrawButtonAsDown ? Colour(0xff2d91b9) : Colour(0xaa237190);
-
-		if (button.getToggleState())
-		{
-			baseColour = Colour(0xff2d91b9);
-			buttonIsToggled = true;
-		}
-		else
-		{
-			buttonIsToggled = false;
-		}
-
-		g.setColour(baseColour);
-		g.fillRoundedRectangle(innerbounds, cornerSize);
-
-		g.setColour(Colour(0xff78c1de));
-		g.drawRoundedRectangle(bounds, cornerSize, 2.0f);
-
-		drawButtonPressCircles(g, bounds, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+		baseColour = Colour(0xff2d91b9);
+		buttonIsToggled = true;
 	}
+	else
+	{
+		buttonIsToggled = false;
+	}
+
+	g.setColour(baseColour);
+	g.fillRoundedRectangle(innerbounds, cornerSize);
+
+	g.setColour(Colour(0xff78c1de));
+	g.drawRoundedRectangle(bounds, cornerSize, 2.0f);
+
+	drawButtonPressCircles(g, bounds, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 }
 
 void MyTextButtonLookAndFeel::drawButtonPressCircles(Graphics& g, Rectangle<float> buttonBounds, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-
 	auto diameter = buttonBounds.getHeight() * 0.015f;
 	auto buttonCenter = buttonBounds.getCentreX();
 	auto distanceBetweenCircles = buttonBounds.getWidth() * 0.06f;

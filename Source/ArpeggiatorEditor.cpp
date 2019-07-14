@@ -11,7 +11,11 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	arpModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::ArpModeId, ChoiceParameterRadioGroup::orientation::horizontal);
 	latchModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchModeId, ChoiceParameterRadioGroup::orientation::horizontal);
 	latchLockRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchLockId, ChoiceParameterRadioGroup::orientation::horizontal);
-	arpSlotRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::ArpSlotId, ChoiceParameterRadioGroup::orientation::horizontal);
+
+	slot1ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot1Id, slot1Button);
+	slot2ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot2Id, slot2Button);
+	slot3ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot3Id, slot3Button);
+	slot4ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot4Id, slot4Button);
 
 	setResizable(false, false);
 	setSize(550, 800);
@@ -52,6 +56,15 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	swingFactorLabel.setLookAndFeel(&labelLookAndFeel);
 	noteLengthLabel.setLookAndFeel(&labelLookAndFeel);
 
+	slot1Button.setClickingTogglesState(true);
+	slot1Button.setLookAndFeel(&slotButtonLookAndFeel);
+	slot2Button.setClickingTogglesState(true);
+	slot2Button.setLookAndFeel(&slotButtonLookAndFeel);
+	slot3Button.setClickingTogglesState(true);
+	slot3Button.setLookAndFeel(&slotButtonLookAndFeel);
+	slot4Button.setClickingTogglesState(true);
+	slot4Button.setLookAndFeel(&slotButtonLookAndFeel);
+
 	addAndMakeVisible(noteLengthSlider);
 	addAndMakeVisible(swingFactorSlider);
 	addAndMakeVisible(noteShiftSlider);
@@ -60,7 +73,6 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(arpModeRadioGroup.get());
 	addAndMakeVisible(latchModeRadioGroup.get());
 	addAndMakeVisible(latchLockRadioGroup.get());
-	addAndMakeVisible(arpSlotRadioGroup.get());
 	addAndMakeVisible(noteDivisionLabel);
 	addAndMakeVisible(arpModeLabel);
 	addAndMakeVisible(latchModeLabel);
@@ -68,6 +80,10 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(noteShiftLabel);
 	addAndMakeVisible(swingFactorLabel);
 	addAndMakeVisible(noteLengthLabel);
+	addAndMakeVisible(slot1Button);
+	addAndMakeVisible(slot2Button);
+	addAndMakeVisible(slot3Button);
+	addAndMakeVisible(slot4Button);
 }
 
 ArpeggiatorEditor::~ArpeggiatorEditor()
@@ -141,9 +157,13 @@ void ArpeggiatorEditor::resized()
 	swingFactorSliderBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
 	swingFactorSliderBox.items.addArray({ makeSliderBoxItem(swingFactorSlider).withFlex(1) });
 
-	FlexBox arpSlotButtonsBox;
-	arpSlotButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	arpSlotButtonsBox.items.addArray({ makeButtonBoxItem(*arpSlotRadioGroup).withFlex(1) });
+	FlexBox slotButtonsBox;
+	slotButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
+	slotButtonsBox.items.addArray({ makeButtonBoxItem(slot1Button).withFlex(1),
+									makeButtonBoxItem(slot2Button).withFlex(1),
+									makeButtonBoxItem(slot3Button).withFlex(1),
+									makeButtonBoxItem(slot4Button).withFlex(1),
+	});
 
 	FlexBox masterBox;
 
@@ -163,7 +183,7 @@ void ArpeggiatorEditor::resized()
 								FlexItem(noteShiftLabelBox).withFlex(0.4),
 								FlexItem(noteShiftSliderBox).withFlex(1),
 								FlexItem(noteShiftSliderButtonsBox).withFlex(1),
-								FlexItem(arpSlotButtonsBox).withFlex(1),
+								FlexItem(slotButtonsBox).withFlex(1)
 	});
 
 	masterBox.performLayout(window);

@@ -5,7 +5,7 @@
 #include "NoteDivision.h"
 #include "LatchLock.h"
 #include "Notes.h"
-#include "ArpSlot.h"
+#include "SlotController.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -59,15 +59,16 @@ private:
 	float *swingFactor = nullptr;
 	float *shiftFactor = nullptr;
 
-
 	int CalculateNoteOnOffset(int beatPos, double notePos) const;
+
+	std::vector<bool> slots{ false, false, false, false };
 
 	NoteDivision noteDivision;
 	LatchMode latchMode;
 	ArpMode arpMode;
 	LatchLock latchLock;
-	ArpSlot arpSlot;
-	Notes notes{ latchMode, latchLock, arpMode};
+	SlotController slotController;
+	Notes notes{ latchMode, latchLock, arpMode, slotController };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)
 };

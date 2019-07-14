@@ -3,12 +3,13 @@
 #include "LatchMode.h"
 #include "LatchLock.h"
 #include "ArpMode.h"
+#include "SlotController.h"
 
 class Notes
 {
 public:
 
-	Notes(LatchMode& latchMode, LatchLock& latchLock, ArpMode& arpMode);
+	Notes(LatchMode& latchMode, LatchLock& latchLock, ArpMode& arpMode, SlotController& slotController);
 
 	~Notes();
 
@@ -21,6 +22,8 @@ public:
 
 	std::vector<int> notes;
 	std::vector<int> notesLatched;
+
+	std::vector<int> currentNotesPlayed;
 
 	bool lastNoteWasNoteOn { false };
 	int noteLengthInSamples { 0 };
@@ -45,6 +48,8 @@ private:
 	LatchMode& latchMode;
 	LatchLock& latchLock;
 	ArpMode& arpMode;
+	SlotController& slotController;
+
 	int currentNoteIndex { -1 };
 	int numberOfNotesToPlay { 0 };
 	int lastNoteValue { 0 };

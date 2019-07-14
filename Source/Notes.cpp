@@ -1,7 +1,8 @@
 #include "Notes.h"
 #include "Extensions.h"
 
-Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpMode& arpMode) : latchMode(latchMode), latchLock(latchLock), arpMode(arpMode)
+Notes::Notes(LatchMode& latchMode, LatchLock& latchLock, ArpMode& arpMode, SlotController& slotController)
+: latchMode(latchMode), latchLock(latchLock), arpMode(arpMode), slotController(slotController)
 {
 	notes.clear();
 	notes.reserve(100);
@@ -39,6 +40,10 @@ void Notes::PrepareToProcess()
 {
 	AssignLatchedNotes();
 	SortNotes();
+
+	currentNotesPlayed = latchMode.IsEnabled() ? notesLatched : notes;
+
+	slotController.UpdateSlots(currentNotesPlayed);
 
 	if (arpMode.StateChanged() || !AnyNotesToPlay())
 	{

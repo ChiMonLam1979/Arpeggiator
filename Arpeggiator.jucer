@@ -11,6 +11,8 @@
               resource="0" file="Source/ChoiceParameterRadioGroup.cpp"/>
       </GROUP>
       <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
+        <FILE id="gNxbb8" name="SlotButton.cpp" compile="1" resource="0" file="Source/SlotButton.cpp"/>
+        <FILE id="YhdmPy" name="SlotButton.h" compile="0" resource="0" file="Source/SlotButton.h"/>
         <GROUP id="{50C15424-81F7-72DF-FEAB-CA398831D6BB}" name="LookAndFeel">
           <FILE id="dmwfSc" name="MyLabelLookAndFeel.cpp" compile="1" resource="0"
                 file="Source/MyLabelLookAndFeel.cpp"/>
@@ -20,6 +22,10 @@
                 file="Source/MySliderLookAndFeel.cpp"/>
           <FILE id="DNS0EN" name="MySliderLookAndFeel.h" compile="0" resource="0"
                 file="Source/MySliderLookAndFeel.h"/>
+          <FILE id="HgSnMs" name="MySlotButtonLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/MySlotButtonLookAndFeel.cpp"/>
+          <FILE id="OC5bJq" name="MySlotButtonLookAndFeel.h" compile="0" resource="0"
+                file="Source/MySlotButtonLookAndFeel.h"/>
           <FILE id="v6MJwe" name="MyTextButtonLookAndFeel.cpp" compile="1" resource="0"
                 file="Source/MyTextButtonLookAndFeel.cpp"/>
           <FILE id="d47xha" name="MyTextButtonLookAndFeel.h" compile="0" resource="0"
@@ -31,8 +37,10 @@
               file="Source/ArpeggiatorEditor.cpp"/>
       </GROUP>
       <GROUP id="{931D8CFA-39BA-37B6-6641-E3CD9F1ADB98}" name="Core">
-        <FILE id="mfYmdf" name="ArpSlot.cpp" compile="1" resource="0" file="Source/ArpSlot.cpp"/>
-        <FILE id="sXb5LD" name="ArpSlot.h" compile="0" resource="0" file="Source/ArpSlot.h"/>
+        <FILE id="DmWt1L" name="SlotController.cpp" compile="1" resource="0"
+              file="Source/SlotController.cpp"/>
+        <FILE id="Ng9ngo" name="SlotController.h" compile="0" resource="0"
+              file="Source/SlotController.h"/>
         <FILE id="dnS4gS" name="LatchLock.h" compile="0" resource="0" file="Source/LatchLock.h"/>
         <FILE id="tItjXO" name="LatchMode.cpp" compile="1" resource="0" file="Source/LatchMode.cpp"/>
         <FILE id="HeL0iH" name="LatchMode.h" compile="0" resource="0" file="Source/LatchMode.h"/>

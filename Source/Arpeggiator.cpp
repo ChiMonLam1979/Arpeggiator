@@ -10,7 +10,10 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::ArpModeId, &arpMode);
 	treeState.addParameterListener(IDs::LatchModeId, &latchMode);
 	treeState.addParameterListener(IDs::LatchLockId, &latchLock);
-	treeState.addParameterListener(IDs::ArpSlotId, &arpSlot);
+	treeState.addParameterListener(IDs::Slot1Id, &slotController);
+	treeState.addParameterListener(IDs::Slot2Id, &slotController);
+	treeState.addParameterListener(IDs::Slot3Id, &slotController);
+	treeState.addParameterListener(IDs::Slot4Id, &slotController);
 }
 
 AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()
@@ -24,7 +27,11 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0.5f);
 	auto swingFactorParameter = std::make_unique<AudioParameterFloat>(IDs::SwingFactorId, ParameterNames::SwingFactorName, ParameterRanges::SwingFactorRange, 0.0f);
 	auto noteShiftParameter = std::make_unique<AudioParameterFloat>(IDs::NoteShiftId, ParameterNames::NoteShiftName, -32.0, 32.0, 0);
-	auto arpSlotParameter = std::make_unique<AudioParameterChoice>(IDs::ArpSlotId, ParameterNames::ArpSlotName, ParamterChoices::ArpSlotChoices, 0);
+
+	auto slot1Parameter = std::make_unique<AudioParameterBool>(IDs::Slot1Id, ParameterNames::Slot1Name, 0);
+	auto slot2Parameter = std::make_unique<AudioParameterBool>(IDs::Slot2Id, ParameterNames::Slot2Name, 0);
+	auto slot3Parameter = std::make_unique<AudioParameterBool>(IDs::Slot3Id, ParameterNames::Slot3Name, 0);
+	auto slot4Parameter = std::make_unique<AudioParameterBool>(IDs::Slot4Id, ParameterNames::Slot4Name, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(arpModeParameter));
@@ -33,7 +40,10 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	parameters.push_back(std::move(noteLengthParameter));
 	parameters.push_back(std::move(swingFactorParameter));
 	parameters.push_back(std::move(noteShiftParameter));
-	parameters.push_back(std::move(arpSlotParameter));
+	parameters.push_back(std::move(slot1Parameter));
+	parameters.push_back(std::move(slot2Parameter));
+	parameters.push_back(std::move(slot3Parameter));
+	parameters.push_back(std::move(slot4Parameter));
 
 	return { parameters.begin(), parameters.end() };
 }

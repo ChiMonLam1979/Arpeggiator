@@ -1,11 +1,12 @@
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MyTextButtonLookAndFeel.h"
 
-class MyTextButtonLookAndFeel : public LookAndFeel_V4
+class MySlotButtonLookAndFeel : public MyTextButtonLookAndFeel
 {
 public:
 
-	MyTextButtonLookAndFeel()
+	MySlotButtonLookAndFeel()
 	{
 	}
 
@@ -15,5 +16,5 @@ public:
 
 private:
 
-	bool buttonIsToggled { false };
+	bool buttonIsToggled{ false };
 };

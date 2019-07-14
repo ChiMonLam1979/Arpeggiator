@@ -11,7 +11,10 @@ namespace IDs
 	static String NoteShiftId{ "noteShift" };
 	static String SwingFactorId{ "swingAmount" };
 	static String TreeStateId{ "treeState" };
-	static String ArpSlotId{ "arpSlot" };
+	static String Slot1Id{ "slot1Id" };
+	static String Slot2Id{ "slot2Id" };
+	static String Slot3Id{ "slot3Id" };
+	static String Slot4Id{ "slot4Id" };
 }
 
 namespace ParameterNames
@@ -23,7 +26,10 @@ namespace ParameterNames
 	static String LatchLockName{ "Latch Lock" };
 	static String NoteShiftName{ "Note Shift" };
 	static String SwingFactorName{ "Swing Amount" };
-	static String ArpSlotName{ "Arp Slot" };
+	static String Slot1Name{ "Slot 1" };
+	static String Slot2Name{ "Slot 2" };
+	static String Slot3Name{ "Slot 3" };
+	static String Slot4Name{ "Slot 4" };
 }
 
 namespace ParamterChoices
@@ -45,19 +51,6 @@ namespace ParamterChoices
 	static String LatchOn{ "Latch On" };
 	static String LockOff{ "Lock Off" };
 	static String LockOn{ "Lock On" };
-
-	static String Slot1{ "Slot 1" };
-	static String Slot2{ "Slot 2" };
-	static String Slot3{ "Slot 3" };
-	static String Slot4{ "Slot 4" };
-
-	const StringArray ArpSlotChoices
-	{
-		Slot1,
-		Slot2,
-		Slot3,
-		Slot4
-	};
 
 	const StringArray NoteDivisionChoices
 	{
@@ -124,5 +117,5 @@ namespace Enums
 	enum arpMode { up, down, random, played };
 	enum latchLock { unlocked, locked };
 	enum orientation { horizontal, vertical };
-	enum slot { slotOne, slotTwo, slotThree, slotFour };
+	enum slotAction { clear, save };
 }

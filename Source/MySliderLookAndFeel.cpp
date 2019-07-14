@@ -141,10 +141,12 @@ Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 
 		layout.sliderBounds = window.removeFromLeft(window.getWidth() * 0.85);
 		window.setPosition(window.getX() + window.getWidth() / 2.5, window.getY());
-		layout.textBoxBounds = window.expanded(0, window.getHeight() * 0.95).removeFromLeft(window.getWidth() * 0.9);
+		layout.textBoxBounds = window.expanded(0, window.getHeight() * 0.75).removeFromLeft(window.getWidth() * 0.9);
 
 		return layout;
 	}
+
+	return layout;
 }
 
  void MySliderLookAndFeel::drawLabel(Graphics& g, Label& label)
