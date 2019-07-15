@@ -13,6 +13,7 @@ public:
 	MyTextButtonLookAndFeel buttonLookAndFeel;
 
 	Button* createSliderButton(Slider&, bool isIncrement) override;
+	void drawLabel(Graphics&, Label&) override;
 
 	bool isVertical{ true };
 };

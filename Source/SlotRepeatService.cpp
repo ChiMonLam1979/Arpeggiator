@@ -1,13 +1,13 @@
 #include "SlotRepeatService.h"
 
-SlotRepeatService::SlotRepeatService()
+SlotRepeatService::SlotRepeatService(SlotController& slotController) : slotController(slotController)
 {
 	
 }
 
 SlotRepeatService::~SlotRepeatService()
 {
-	
+
 }
 
 void SlotRepeatService::parameterChanged(const String& parameterID, float newValue)

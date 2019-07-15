@@ -42,6 +42,7 @@ private:
 	Label noteLengthLabel{ ParameterNames::NoteLengthName };
 	Label slotRepeatLabel{ ParameterNames::SlotRepeatName };
 	Label slotOrderLabel{ ParameterNames::SlotOrderName };
+	Label patternModeLabel{ ParameterNames::PatternModeName };
 
 	SlotButton slot1Button{ ParameterNames::Slot1Name };
 	SlotButton slot2Button{ ParameterNames::Slot2Name };
@@ -91,6 +92,8 @@ public:
 	std::unique_ptr<ChoiceParameterRadioGroup> arpModeRadioGroup;
 	std::unique_ptr<ChoiceParameterRadioGroup> latchModeRadioGroup;
 	std::unique_ptr<ChoiceParameterRadioGroup> latchLockRadioGroup;
+
+	std::unique_ptr<ChoiceParameterRadioGroup> patternModeRadioGroup;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };

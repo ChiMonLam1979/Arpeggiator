@@ -1,6 +1,6 @@
 #include "SlotOrderService.h"
 
-SlotOrderService::SlotOrderService()
+SlotOrderService::SlotOrderService(SlotController& slotController): slotController(slotController)
 {
 
 }

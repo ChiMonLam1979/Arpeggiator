@@ -1,8 +1,7 @@
 #include "SlotController.h"
 #include "Parameters.h"
 
-SlotController::SlotController(SlotRepeatService& slotRepeatService, SlotOrderService& slotOrderService)
-	: slotRepeatService(slotRepeatService), slotOrderService(slotOrderService)
+SlotController::SlotController()
 {
 
 }

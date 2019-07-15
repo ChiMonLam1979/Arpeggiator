@@ -23,6 +23,7 @@ namespace IDs
 	static String Slot2OrderId{ "slot2OrderId" };
 	static String Slot3OrderId{ "slot3OrderId" };
 	static String Slot4OrderId{ "slot4OrderId" };
+	static String PatternModeId{ "patternMode" };
 }
 
 namespace ParameterNames
@@ -48,6 +49,7 @@ namespace ParameterNames
 	static String Slot4OrderName{ "Slot 4 Order" };
 	static String SlotRepeatName{ "Slot Repeats" };
 	static String SlotOrderName{ "Slot Order" };
+	static String PatternModeName{ "Pattern Mode" };
 }
 
 namespace ParamterChoices
@@ -69,6 +71,9 @@ namespace ParamterChoices
 	static String LatchOn{ "Latch On" };
 	static String LockOff{ "Lock Off" };
 	static String LockOn{ "Lock On" };
+
+	static String PatternModeOff{ "Patterns Off" };
+	static String PatternModeOn{ "Patterns On" };
 
 	const StringArray NoteDivisionChoices
 	{
@@ -111,6 +116,12 @@ namespace ParamterChoices
 		LatchOff,
 		LatchOn
 	};
+
+	const StringArray PatternModeChoices
+	{
+		PatternModeOff,
+		PatternModeOn,
+	};
 }
 
 namespace ParameterRanges
@@ -136,4 +147,5 @@ namespace Enums
 	enum latchLock { unlocked, locked };
 	enum orientation { horizontal, vertical };
 	enum slotAction { clear, save };
+	enum patternMode { patternsOff, patternsOn };
 }

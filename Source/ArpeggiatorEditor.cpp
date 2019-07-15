@@ -12,6 +12,8 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	latchModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchModeId, ChoiceParameterRadioGroup::orientation::horizontal);
 	latchLockRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchLockId, ChoiceParameterRadioGroup::orientation::horizontal);
 
+	patternModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::PatternModeId, ChoiceParameterRadioGroup::orientation::horizontal);
+
 	slot1ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot1Id, slot1Button);
 	slot2ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot2Id, slot2Button);
 	slot3ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot3Id, slot3Button);
@@ -67,6 +69,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	noteLengthLabel.setLookAndFeel(&labelLookAndFeel);
 	slotRepeatLabel.setLookAndFeel(&labelLookAndFeel);
 	slotOrderLabel.setLookAndFeel(&labelLookAndFeel);
+	patternModeLabel.setLookAndFeel(&labelLookAndFeel);
 
 	slot1Button.setClickingTogglesState(true);
 	slot1Button.setLookAndFeel(&slotButtonLookAndFeel);
@@ -133,6 +136,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(arpModeRadioGroup.get());
 	addAndMakeVisible(latchModeRadioGroup.get());
 	addAndMakeVisible(latchLockRadioGroup.get());
+	addAndMakeVisible(patternModeRadioGroup.get());
 	addAndMakeVisible(noteDivisionLabel);
 	addAndMakeVisible(arpModeLabel);
 	addAndMakeVisible(latchModeLabel);
@@ -142,6 +146,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(noteLengthLabel);
 	addAndMakeVisible(slotRepeatLabel);
 	addAndMakeVisible(slotOrderLabel);
+	addAndMakeVisible(patternModeLabel);
 	addAndMakeVisible(slot1Button);
 	addAndMakeVisible(slot2Button);
 	addAndMakeVisible(slot3Button);
@@ -189,14 +194,16 @@ void ArpeggiatorEditor::resized()
 	latchModeLabelBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
 	latchModeLabelBox.items.addArray({ 
 										makeLabelBoxItem(latchModeLabel).withFlex(1),
-										makeLabelBoxItem(latchLockLabel).withFlex(1)
+										makeLabelBoxItem(latchLockLabel).withFlex(1),
+										makeLabelBoxItem(patternModeLabel).withFlex(1)
 									});
 
 	FlexBox latchModeButtonsBox;
 	latchModeButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
 	latchModeButtonsBox.items.addArray({ 
 										makeButtonBoxItem(*latchModeRadioGroup).withFlex(1),
-										makeButtonBoxItem(*latchLockRadioGroup).withFlex(1)
+										makeButtonBoxItem(*latchLockRadioGroup).withFlex(1),
+										makeButtonBoxItem(*patternModeRadioGroup).withFlex(1)
 									});
 
 	FlexBox noteLengthLabelBox;

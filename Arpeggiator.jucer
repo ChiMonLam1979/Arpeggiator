@@ -41,6 +41,8 @@
               file="Source/ArpeggiatorEditor.cpp"/>
       </GROUP>
       <GROUP id="{931D8CFA-39BA-37B6-6641-E3CD9F1ADB98}" name="Core">
+        <FILE id="v7F9HL" name="PatternMode.cpp" compile="1" resource="0" file="Source/PatternMode.cpp"/>
+        <FILE id="sOOcr8" name="PatternMode.h" compile="0" resource="0" file="Source/PatternMode.h"/>
         <FILE id="lG6K2U" name="SlotOrderService.cpp" compile="1" resource="0"
               file="Source/SlotOrderService.cpp"/>
         <FILE id="aBdwAf" name="SlotOrderService.h" compile="0" resource="0"
