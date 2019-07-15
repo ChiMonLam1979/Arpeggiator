@@ -26,6 +26,10 @@
                 file="Source/MySlotButtonLookAndFeel.cpp"/>
           <FILE id="OC5bJq" name="MySlotButtonLookAndFeel.h" compile="0" resource="0"
                 file="Source/MySlotButtonLookAndFeel.h"/>
+          <FILE id="Doks4b" name="MySlotSliderLookAndFeel.cpp" compile="1" resource="0"
+                file="Source/MySlotSliderLookAndFeel.cpp"/>
+          <FILE id="xbqfve" name="MySlotSliderLookAndFeel.h" compile="0" resource="0"
+                file="Source/MySlotSliderLookAndFeel.h"/>
           <FILE id="v6MJwe" name="MyTextButtonLookAndFeel.cpp" compile="1" resource="0"
                 file="Source/MyTextButtonLookAndFeel.cpp"/>
           <FILE id="d47xha" name="MyTextButtonLookAndFeel.h" compile="0" resource="0"
@@ -37,6 +41,14 @@
               file="Source/ArpeggiatorEditor.cpp"/>
       </GROUP>
       <GROUP id="{931D8CFA-39BA-37B6-6641-E3CD9F1ADB98}" name="Core">
+        <FILE id="lG6K2U" name="SlotOrderService.cpp" compile="1" resource="0"
+              file="Source/SlotOrderService.cpp"/>
+        <FILE id="aBdwAf" name="SlotOrderService.h" compile="0" resource="0"
+              file="Source/SlotOrderService.h"/>
+        <FILE id="AUccNN" name="SlotRepeatService.cpp" compile="1" resource="0"
+              file="Source/SlotRepeatService.cpp"/>
+        <FILE id="DwpQmX" name="SlotRepeatService.h" compile="0" resource="0"
+              file="Source/SlotRepeatService.h"/>
         <FILE id="DmWt1L" name="SlotController.cpp" compile="1" resource="0"
               file="Source/SlotController.cpp"/>
         <FILE id="Ng9ngo" name="SlotController.h" compile="0" resource="0"

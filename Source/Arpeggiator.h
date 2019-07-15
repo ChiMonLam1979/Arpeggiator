@@ -67,7 +67,9 @@ private:
 	LatchMode latchMode;
 	ArpMode arpMode;
 	LatchLock latchLock;
-	SlotController slotController;
+	SlotRepeatService slotRepeatService;
+	SlotOrderService slotOrderService;
+	SlotController slotController { slotRepeatService, slotOrderService };
 	Notes notes{ latchMode, latchLock, arpMode, slotController };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Arpeggiator)

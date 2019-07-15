@@ -41,9 +41,7 @@ void Notes::PrepareToProcess()
 	AssignLatchedNotes();
 	SortNotes();
 
-	currentNotesPlayed = latchMode.IsEnabled() ? notesLatched : notes;
-
-	slotController.UpdateSlots(currentNotesPlayed);
+	slotController.currentNotes = latchMode.IsEnabled() ? notesLatched : notes;
 
 	if (arpMode.StateChanged() || !AnyNotesToPlay())
 	{

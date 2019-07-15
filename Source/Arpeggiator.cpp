@@ -10,10 +10,21 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::ArpModeId, &arpMode);
 	treeState.addParameterListener(IDs::LatchModeId, &latchMode);
 	treeState.addParameterListener(IDs::LatchLockId, &latchLock);
+
 	treeState.addParameterListener(IDs::Slot1Id, &slotController);
 	treeState.addParameterListener(IDs::Slot2Id, &slotController);
 	treeState.addParameterListener(IDs::Slot3Id, &slotController);
 	treeState.addParameterListener(IDs::Slot4Id, &slotController);
+
+	treeState.addParameterListener(IDs::Slot1RepeatId, &slotRepeatService);
+	treeState.addParameterListener(IDs::Slot2RepeatId, &slotRepeatService);
+	treeState.addParameterListener(IDs::Slot3RepeatId, &slotRepeatService);
+	treeState.addParameterListener(IDs::Slot4RepeatId, &slotRepeatService);
+
+	treeState.addParameterListener(IDs::Slot1OrderId, &slotOrderService);
+	treeState.addParameterListener(IDs::Slot2OrderId, &slotOrderService);
+	treeState.addParameterListener(IDs::Slot3OrderId, &slotOrderService);
+	treeState.addParameterListener(IDs::Slot4OrderId, &slotOrderService);
 }
 
 AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()
@@ -33,6 +44,16 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto slot3Parameter = std::make_unique<AudioParameterBool>(IDs::Slot3Id, ParameterNames::Slot3Name, 0);
 	auto slot4Parameter = std::make_unique<AudioParameterBool>(IDs::Slot4Id, ParameterNames::Slot4Name, 0);
 
+	auto slot1RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot1RepeatId, ParameterNames::Slot1RepeatName, 0.0, 4.0, 0);
+	auto slot2RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot2RepeatId, ParameterNames::Slot2RepeatName, 0.0, 4.0, 0);
+	auto slot3RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot3RepeatId, ParameterNames::Slot3RepeatName, 0.0, 4.0, 0);
+	auto slot4RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot4RepeatId, ParameterNames::Slot4RepeatName, 0.0, 4.0, 0);
+
+	auto slot1OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot1OrderId, ParameterNames::Slot1OrderName, 1.0, 4.0, 1);
+	auto slot2OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot2OrderId, ParameterNames::Slot2OrderName, 1.0, 4.0, 2);
+	auto slot3OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot3OrderId, ParameterNames::Slot3OrderName, 1.0, 4.0, 3);
+	auto slot4OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot4OrderId, ParameterNames::Slot4OrderName, 1.0, 4.0, 4);
+
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(arpModeParameter));
 	parameters.push_back(std::move(latchModeParameter));
@@ -40,10 +61,21 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	parameters.push_back(std::move(noteLengthParameter));
 	parameters.push_back(std::move(swingFactorParameter));
 	parameters.push_back(std::move(noteShiftParameter));
+
 	parameters.push_back(std::move(slot1Parameter));
 	parameters.push_back(std::move(slot2Parameter));
 	parameters.push_back(std::move(slot3Parameter));
 	parameters.push_back(std::move(slot4Parameter));
+
+	parameters.push_back(std::move(slot1RepeatParameter));
+	parameters.push_back(std::move(slot2RepeatParameter));
+	parameters.push_back(std::move(slot3RepeatParameter));
+	parameters.push_back(std::move(slot4RepeatParameter));
+
+	parameters.push_back(std::move(slot1OrderParameter));
+	parameters.push_back(std::move(slot2OrderParameter));
+	parameters.push_back(std::move(slot3OrderParameter));
+	parameters.push_back(std::move(slot4OrderParameter));
 
 	return { parameters.begin(), parameters.end() };
 }

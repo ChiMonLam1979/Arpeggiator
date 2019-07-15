@@ -17,24 +17,34 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	slot3ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot3Id, slot3Button);
 	slot4ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot4Id, slot4Button);
 
+	slot1RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1RepeatId, slot1RepeatButtons);
+	slot2RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2RepeatId, slot2RepeatButtons);
+	slot3RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3RepeatId, slot3RepeatButtons);
+	slot4RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4RepeatId, slot4RepeatButtons);
+
+	slot1OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1OrderId, slot1OrderButtons);
+	slot2OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2OrderId, slot2OrderButtons);
+	slot3OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3OrderId, slot3OrderButtons);
+	slot4OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4OrderId, slot4OrderButtons);
+
 	setResizable(false, false);
 	setSize(550, 800);
 
-	noteLengthSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
+	noteLengthSlider.setTextBoxStyle(Slider::TextBoxRight, true, 80, 30);
 	noteLengthSlider.setRange(0.0, 1.0, 0.01);
 	noteLengthSlider.textFromValueFunction = nullptr;
 	noteLengthSlider.setNumDecimalPlacesToDisplay(2);
 	noteLengthSlider.setLookAndFeel(&sliderLookAndFeel);
 	noteLengthSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
-	swingFactorSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
+	swingFactorSlider.setTextBoxStyle(Slider::TextBoxRight, true, 80, 30);
 	swingFactorSlider.setRange(0.0, 1.0);
 	swingFactorSlider.textFromValueFunction = nullptr;
 	swingFactorSlider.setNumDecimalPlacesToDisplay(2);
 	swingFactorSlider.setLookAndFeel(&sliderLookAndFeel);
 	swingFactorSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
-	noteShiftSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 30);
+	noteShiftSlider.setTextBoxStyle(Slider::TextBoxRight, true, 80, 30);
 	noteShiftSlider.setRange(-32.0f, 32.0f, 0.5);
 	noteShiftSlider.setNumDecimalPlacesToDisplay(1);
 	noteShiftSlider.setLookAndFeel(&sliderLookAndFeel);
@@ -55,6 +65,8 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	noteShiftLabel.setLookAndFeel(&labelLookAndFeel);
 	swingFactorLabel.setLookAndFeel(&labelLookAndFeel);
 	noteLengthLabel.setLookAndFeel(&labelLookAndFeel);
+	slotRepeatLabel.setLookAndFeel(&labelLookAndFeel);
+	slotOrderLabel.setLookAndFeel(&labelLookAndFeel);
 
 	slot1Button.setClickingTogglesState(true);
 	slot1Button.setLookAndFeel(&slotButtonLookAndFeel);
@@ -64,6 +76,54 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	slot3Button.setLookAndFeel(&slotButtonLookAndFeel);
 	slot4Button.setClickingTogglesState(true);
 	slot4Button.setLookAndFeel(&slotButtonLookAndFeel);
+
+	slot1RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot1RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot1RepeatButtons.setNumDecimalPlacesToDisplay(0);
+	slot1RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot1RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+
+	slot2RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot2RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot2RepeatButtons.setNumDecimalPlacesToDisplay(0);
+	slot2RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot2RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+
+	slot3RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot3RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot3RepeatButtons.setNumDecimalPlacesToDisplay(0);
+	slot3RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot3RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+
+	slot4RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot4RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot4RepeatButtons.setNumDecimalPlacesToDisplay(0);
+	slot4RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot4RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+
+	slot1OrderButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot1OrderButtons.setRange(1.0f, 4.0f, 1.0f);
+	slot1OrderButtons.setNumDecimalPlacesToDisplay(0);
+	slot1OrderButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot1OrderButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	
+	slot2OrderButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot2OrderButtons.setRange(1.0f, 4.0f, 1.0f);
+	slot2OrderButtons.setNumDecimalPlacesToDisplay(0);
+	slot2OrderButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot2OrderButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	
+	slot3OrderButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot3OrderButtons.setRange(1.0f, 4.0f, 1.0f);
+	slot3OrderButtons.setNumDecimalPlacesToDisplay(0);
+	slot3OrderButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot3OrderButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	
+	slot4OrderButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot4OrderButtons.setRange(1.0f, 4.0f, 1.0f);
+	slot4OrderButtons.setNumDecimalPlacesToDisplay(0);
+	slot4OrderButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot4OrderButtons.setLookAndFeel(&slotSliderLookAndFeel);
 
 	addAndMakeVisible(noteLengthSlider);
 	addAndMakeVisible(swingFactorSlider);
@@ -80,10 +140,20 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(noteShiftLabel);
 	addAndMakeVisible(swingFactorLabel);
 	addAndMakeVisible(noteLengthLabel);
+	addAndMakeVisible(slotRepeatLabel);
+	addAndMakeVisible(slotOrderLabel);
 	addAndMakeVisible(slot1Button);
 	addAndMakeVisible(slot2Button);
 	addAndMakeVisible(slot3Button);
 	addAndMakeVisible(slot4Button);
+	addAndMakeVisible(slot1RepeatButtons);
+	addAndMakeVisible(slot2RepeatButtons);
+	addAndMakeVisible(slot3RepeatButtons);
+	addAndMakeVisible(slot4RepeatButtons);
+	addAndMakeVisible(slot1OrderButtons);
+	addAndMakeVisible(slot2OrderButtons);
+	addAndMakeVisible(slot3OrderButtons);
+	addAndMakeVisible(slot4OrderButtons);
 }
 
 ArpeggiatorEditor::~ArpeggiatorEditor()
@@ -159,11 +229,36 @@ void ArpeggiatorEditor::resized()
 
 	FlexBox slotButtonsBox;
 	slotButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	slotButtonsBox.items.addArray({ makeButtonBoxItem(slot1Button).withFlex(1),
+	slotButtonsBox.items.addArray({
+									makeButtonBoxItem(slot1Button).withFlex(1),
 									makeButtonBoxItem(slot2Button).withFlex(1),
 									makeButtonBoxItem(slot3Button).withFlex(1),
-									makeButtonBoxItem(slot4Button).withFlex(1),
+									makeButtonBoxItem(slot4Button).withFlex(1)
 	});
+
+	FlexBox slotRepeatLabelBox;
+	slotRepeatLabelBox.items.addArray({ makeSlotLabelBoxItem(slotRepeatLabel).withFlex(1) });
+
+	FlexBox slotRepeatButtonsBox;
+	slotRepeatButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
+	slotRepeatButtonsBox.items.addArray({
+										makeSlotIncBoxItem(slot1RepeatButtons).withFlex(1),
+										makeSlotIncBoxItem(slot2RepeatButtons).withFlex(1),
+										makeSlotIncBoxItem(slot3RepeatButtons).withFlex(1),
+										makeSlotIncBoxItem(slot4RepeatButtons).withFlex(1),
+	});
+
+	FlexBox slotOrderLabelBox;
+	slotOrderLabelBox.items.addArray({ makeSlotLabelBoxItem(slotOrderLabel).withFlex(1) });
+
+	FlexBox slotOrderButtonsBox;
+	slotOrderButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
+	slotOrderButtonsBox.items.addArray({
+										makeSlotIncBoxItem(slot1OrderButtons).withFlex(1),
+										makeSlotIncBoxItem(slot2OrderButtons).withFlex(1),
+										makeSlotIncBoxItem(slot3OrderButtons).withFlex(1),
+										makeSlotIncBoxItem(slot4OrderButtons).withFlex(1),
+		});
 
 	FlexBox masterBox;
 
@@ -183,7 +278,11 @@ void ArpeggiatorEditor::resized()
 								FlexItem(noteShiftLabelBox).withFlex(0.4),
 								FlexItem(noteShiftSliderBox).withFlex(1),
 								FlexItem(noteShiftSliderButtonsBox).withFlex(1),
-								FlexItem(slotButtonsBox).withFlex(1)
+								FlexItem(slotOrderLabelBox).withFlex(0.4),
+								FlexItem(slotOrderButtonsBox).withFlex(0.5),
+								FlexItem(slotRepeatLabelBox).withFlex(0.4),
+								FlexItem(slotRepeatButtonsBox).withFlex(0.5),
+								FlexItem(slotButtonsBox).withFlex(1),
 	});
 
 	masterBox.performLayout(window);
@@ -193,6 +292,8 @@ static constexpr float buttonHeight = 100.0f;
 static constexpr float sliderHeight = 100.0f;
 static constexpr float sliderButtonHeight = 100.0f;
 static constexpr float labelHeight = 100.0f;
+static constexpr float slotLabelHeight = 100.0f;
+static constexpr float slotIncButtonHeight = 100.0f;
 
 
 FlexItem ArpeggiatorEditor::makeButtonBoxItem(Component& component)
@@ -213,4 +314,14 @@ FlexItem ArpeggiatorEditor::makeSliderButtonBoxItem(Component& component)
 FlexItem ArpeggiatorEditor::makeLabelBoxItem(Component& component)
 {
 	return FlexItem(component).withMaxHeight(labelHeight).withFlex(1);
+}
+
+FlexItem ArpeggiatorEditor::makeSlotIncBoxItem(Component& component)
+{
+	return FlexItem(component).withMaxHeight(slotIncButtonHeight).withFlex(1);
+}
+
+FlexItem ArpeggiatorEditor::makeSlotLabelBoxItem(Component& component)
+{
+	return FlexItem(component).withMaxHeight(slotLabelHeight).withFlex(1);
 }

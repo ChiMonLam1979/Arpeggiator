@@ -6,6 +6,7 @@
 #include "MySliderLookAndFeel.h"
 #include "SlotButton.h"
 #include "MySlotButtonLookAndFeel.h"
+#include "MySlotSliderLookAndFeel.h"
 
 class ArpeggiatorEditor : public AudioProcessorEditor
 {
@@ -18,6 +19,12 @@ public:
 	void resized() override;
 
 private:
+
+	MyLabelLookAndFeel labelLookAndFeel;
+	MySliderLookAndFeel sliderLookAndFeel;
+	MyTextButtonLookAndFeel textButtonLookAndFeel;
+	MySlotButtonLookAndFeel slotButtonLookAndFeel;
+	MySlotSliderLookAndFeel slotSliderLookAndFeel;
 
 	Arpeggiator& processor;
 
@@ -33,21 +40,30 @@ private:
 	Label noteShiftLabel{ ParameterNames::NoteShiftName };
 	Label swingFactorLabel{ ParameterNames::SwingFactorName };
 	Label noteLengthLabel{ ParameterNames::NoteLengthName };
+	Label slotRepeatLabel{ ParameterNames::SlotRepeatName };
+	Label slotOrderLabel{ ParameterNames::SlotOrderName };
 
 	SlotButton slot1Button{ ParameterNames::Slot1Name };
 	SlotButton slot2Button{ ParameterNames::Slot2Name };
 	SlotButton slot3Button{ ParameterNames::Slot3Name };
 	SlotButton slot4Button{ ParameterNames::Slot4Name };
 
-	MyLabelLookAndFeel labelLookAndFeel;
-	MySliderLookAndFeel sliderLookAndFeel;
-	MyTextButtonLookAndFeel textButtonLookAndFeel;
-	MySlotButtonLookAndFeel slotButtonLookAndFeel;
+	Slider slot1RepeatButtons;
+	Slider slot2RepeatButtons;
+	Slider slot3RepeatButtons;
+	Slider slot4RepeatButtons;
+
+	Slider slot1OrderButtons;
+	Slider slot2OrderButtons;
+	Slider slot3OrderButtons;
+	Slider slot4OrderButtons;
 
 	static FlexItem makeButtonBoxItem(Component& component);
 	static FlexItem makeSliderBoxItem(Component& component);
 	static FlexItem makeSliderButtonBoxItem(Component& component);
 	static FlexItem makeLabelBoxItem(Component& component);
+	static FlexItem makeSlotIncBoxItem(Component& component);
+	static FlexItem makeSlotLabelBoxItem(Component& component);
 
 public:
 
@@ -60,6 +76,16 @@ public:
 	std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> slot2ButtonAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> slot3ButtonAttachment;
 	std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> slot4ButtonAttachment;
+
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot1RepeatButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot2RepeatButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot3RepeatButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot4RepeatButtonsAttachment;
+
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot1OrderButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot2OrderButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot3OrderButtonsAttachment;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> slot4OrderButtonsAttachment;
 
 	std::unique_ptr<ChoiceParameterRadioGroup> noteDivisionRadioGroup;
 	std::unique_ptr<ChoiceParameterRadioGroup> arpModeRadioGroup;

@@ -1,37 +1,28 @@
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Parameters.h"
+#include "SlotRepeatService.h"
+#include "SlotOrderService.h"
 
 class SlotController : public AudioProcessorValueTreeState::Listener
 {
 public:
 
-	SlotController();
+	SlotController(SlotRepeatService& slotRepeatService, SlotOrderService& slotOrderService);
 	~SlotController();
 
-	void UpdateSlots(std::vector<int>& notes);
-
-private:
+	std::vector<int> currentNotes;
 
 	std::vector<int> slot1Data;
 	std::vector<int> slot2Data;
 	std::vector<int> slot3Data;
 	std::vector<int> slot4Data;
 
-	Enums::slotAction slot1Action{ Enums::slotAction::clear };
-	Enums::slotAction slot2Action{ Enums::slotAction::clear };
-	Enums::slotAction slot3Action{ Enums::slotAction::clear };
-	Enums::slotAction slot4Action{ Enums::slotAction::clear };
+private:
 
-	Enums::slotAction slot1PreviousState{ Enums::slotAction::clear };
-	Enums::slotAction slot2PreviousState{ Enums::slotAction::clear };
-	Enums::slotAction slot3PreviousState{ Enums::slotAction::clear };
-	Enums::slotAction slot4PreviousState{ Enums::slotAction::clear };
+	SlotRepeatService& slotRepeatService;
+	SlotOrderService& slotOrderService;
 
-	bool slot1StateHasChanged{ false };
-	bool slot2StateHasChanged{ false };
-	bool slot3StateHasChanged{ false };
-	bool slot4StateHasChanged{ false };
+	std::vector<int>& GetSelectedSlot(const String& parameterID);
 
 	void parameterChanged(const String& parameterID, float newValue) override;
 };

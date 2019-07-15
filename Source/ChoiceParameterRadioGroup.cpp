@@ -93,12 +93,12 @@ public:
     }
 
 private:
+	MyTextButtonLookAndFeel textButtonLookAndFeel;
     AudioProcessorValueTreeState& state;
     std::vector<std::unique_ptr<Button>> buttons;
     orientation orientation;
     String parameterID;
     AudioParameterChoice* parameter = nullptr;
     bool updating = false;
-	MyTextButtonLookAndFeel textButtonLookAndFeel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameterRadioGroup)
 };
