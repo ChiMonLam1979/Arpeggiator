@@ -13,7 +13,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	latchLockRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchLockId, ChoiceParameterRadioGroup::orientation::horizontal);
 
 	patternModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::PatternModeId, ChoiceParameterRadioGroup::orientation::horizontal);
-	patternButtonAttachment = std::make_unique<PatternButtonAttachment>(processor.treeState, IDs::PatternModeId);
+	patternButtonAttachment = std::make_unique<PatternButtonAttachment>(processor.treeState, IDs::PatternModeId, slot1Button, slot2Button, slot3Button, slot4Button);
 
 	slot1ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot1Id, slot1Button);
 	slot2ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot2Id, slot2Button);

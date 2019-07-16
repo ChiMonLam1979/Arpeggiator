@@ -19,8 +19,6 @@ public:
 	void paint(Graphics&) override;
 	void resized() override;
 
-	std::unique_ptr<PatternButtonAttachment> patternButtonAttachment;
-
 private:
 
 	MyLabelLookAndFeel labelLookAndFeel;
@@ -47,10 +45,10 @@ private:
 	Label slotOrderLabel{ ParameterNames::SlotOrderName };
 	Label patternModeLabel{ ParameterNames::PatternModeName };
 
-	SlotButton slot1Button{ ParameterNames::Slot1Name, patternButtonAttachment };
-	SlotButton slot2Button{ ParameterNames::Slot2Name, patternButtonAttachment };
-	SlotButton slot3Button{ ParameterNames::Slot3Name, patternButtonAttachment };
-	SlotButton slot4Button{ ParameterNames::Slot4Name, patternButtonAttachment };
+	SlotButton slot1Button{ ParameterNames::Slot1Name };
+	SlotButton slot2Button{ ParameterNames::Slot2Name };
+	SlotButton slot3Button{ ParameterNames::Slot3Name };
+	SlotButton slot4Button{ ParameterNames::Slot4Name };
 
 	Slider slot1RepeatButtons;
 	Slider slot2RepeatButtons;
@@ -97,6 +95,7 @@ public:
 	std::unique_ptr<ChoiceParameterRadioGroup> latchLockRadioGroup;
 
 	std::unique_ptr<ChoiceParameterRadioGroup> patternModeRadioGroup;
+	std::unique_ptr<PatternButtonAttachment> patternButtonAttachment;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ArpeggiatorEditor)
 };
