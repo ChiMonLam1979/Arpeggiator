@@ -25,8 +25,13 @@ void PatternMode::parameterChanged(const String& parameterID, float newValue)
 
 void PatternMode::UpdatePattern()
 {
-	slotController.pattern[0] = assignVectorPlayCount(slotController.slot1Data, slotController.slot1PlayCount);
-	slotController.pattern[1] = assignVectorPlayCount(slotController.slot2Data, slotController.slot2PlayCount);
-	slotController.pattern[2] = assignVectorPlayCount(slotController.slot3Data, slotController.slot3PlayCount);
-	slotController.pattern[3] = assignVectorPlayCount(slotController.slot4Data, slotController.slot4PlayCount);
+	auto slot1Index = static_cast<int>(slotController.slotsOrder[0]) - 1;
+	auto slot2Index = static_cast<int>(slotController.slotsOrder[1]) - 1;
+	auto slot3Index = static_cast<int>(slotController.slotsOrder[2]) - 1;
+	auto slot4Index = static_cast<int>(slotController.slotsOrder[3]) - 1;
+
+	slotController.pattern[slot1Index] = assignVectorPlayCount(slotController.slot1Data, slotController.slot1PlayCount);
+	slotController.pattern[slot2Index] = assignVectorPlayCount(slotController.slot2Data, slotController.slot2PlayCount);
+	slotController.pattern[slot3Index] = assignVectorPlayCount(slotController.slot3Data, slotController.slot3PlayCount);
+	slotController.pattern[slot4Index] = assignVectorPlayCount(slotController.slot4Data, slotController.slot4PlayCount);
 }

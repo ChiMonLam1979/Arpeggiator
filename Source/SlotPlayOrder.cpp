@@ -38,6 +38,8 @@ void SlotPlayOrder::sliderValueChanged(Slider* slider)
 	{
 		UpdateSlotButtons(3, value);
 	}
+
+	UpdateDisplay();
 }
 
 void SlotPlayOrder::UpdateSlotButtons(int slot, double value)

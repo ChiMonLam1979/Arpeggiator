@@ -14,4 +14,5 @@ private:
 	SlotController& slotController;
 
 	void parameterChanged(const String& parameterID, float newValue) override;
+	void UpdateSlotOrder(int slot, int playOrder);
 };
