@@ -16,10 +16,10 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::Slot3Id, &slotController);
 	treeState.addParameterListener(IDs::Slot4Id, &slotController);
 
-	treeState.addParameterListener(IDs::Slot1RepeatId, &slotRepeatService);
-	treeState.addParameterListener(IDs::Slot2RepeatId, &slotRepeatService);
-	treeState.addParameterListener(IDs::Slot3RepeatId, &slotRepeatService);
-	treeState.addParameterListener(IDs::Slot4RepeatId, &slotRepeatService);
+	treeState.addParameterListener(IDs::Slot1PlayCountId, &slotPlayCountService);
+	treeState.addParameterListener(IDs::Slot2PlayCountId, &slotPlayCountService);
+	treeState.addParameterListener(IDs::Slot3PlayCountId, &slotPlayCountService);
+	treeState.addParameterListener(IDs::Slot4PlayCountId, &slotPlayCountService);
 
 	treeState.addParameterListener(IDs::Slot1OrderId, &slotOrderService);
 	treeState.addParameterListener(IDs::Slot2OrderId, &slotOrderService);
@@ -27,8 +27,6 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::Slot4OrderId, &slotOrderService);
 
 	treeState.addParameterListener(IDs::PatternModeId, &patternMode);
-
-	treeState.addParameterListener(IDs::PatternModeId, &slotController);
 }
 
 AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()
@@ -48,10 +46,10 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto slot3Parameter = std::make_unique<AudioParameterBool>(IDs::Slot3Id, ParameterNames::Slot3Name, 0);
 	auto slot4Parameter = std::make_unique<AudioParameterBool>(IDs::Slot4Id, ParameterNames::Slot4Name, 0);
 
-	auto slot1RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot1RepeatId, ParameterNames::Slot1RepeatName, 0.0, 4.0, 0);
-	auto slot2RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot2RepeatId, ParameterNames::Slot2RepeatName, 0.0, 4.0, 0);
-	auto slot3RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot3RepeatId, ParameterNames::Slot3RepeatName, 0.0, 4.0, 0);
-	auto slot4RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot4RepeatId, ParameterNames::Slot4RepeatName, 0.0, 4.0, 0);
+	auto slot1RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot1PlayCountId, ParameterNames::Slot1PlayCountName, 0.0, 4.0, 0);
+	auto slot2RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot2PlayCountId, ParameterNames::Slot2PlayCountName, 0.0, 4.0, 0);
+	auto slot3RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot3PlayCountId, ParameterNames::Slot3PlayCountName, 0.0, 4.0, 0);
+	auto slot4RepeatParameter = std::make_unique<AudioParameterFloat>(IDs::Slot4PlayCountId, ParameterNames::Slot4PlayCountName, 0.0, 4.0, 0);
 
 	auto slot1OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot1OrderId, ParameterNames::Slot1OrderName, 1.0, 4.0, 1);
 	auto slot2OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot2OrderId, ParameterNames::Slot2OrderName, 1.0, 4.0, 2);

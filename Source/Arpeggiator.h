@@ -7,8 +7,8 @@
 #include "Notes.h"
 #include "SlotController.h"
 #include "SlotOrderService.h"
-#include "SlotRepeatService.h"
 #include "PatternMode.h"
+#include "SlotPlayCountService.h"
 
 class Arpeggiator : public AudioProcessor
 {
@@ -68,9 +68,9 @@ private:
 	LatchMode latchMode;
 	ArpMode arpMode;
 	LatchLock latchLock;
-	PatternMode patternMode;
-	SlotController slotController { patternMode };
-	SlotRepeatService slotRepeatService { slotController };
+	SlotController slotController;
+	PatternMode patternMode{ slotController };
+	SlotPlayCountService slotPlayCountService { slotController };
 	SlotOrderService slotOrderService { slotController };
 	Notes notes{ latchMode, latchLock, arpMode, slotController };
 

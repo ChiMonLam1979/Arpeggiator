@@ -15,10 +15,10 @@ namespace IDs
 	static String Slot2Id{ "slot2Id" };
 	static String Slot3Id{ "slot3Id" };
 	static String Slot4Id{ "slot4Id" };
-	static String Slot1RepeatId{ "slot1RepeatId" };
-	static String Slot2RepeatId{ "slot2RepeatId" };
-	static String Slot3RepeatId{ "slot3RepeatId" };
-	static String Slot4RepeatId{ "slot4RepeatId" };
+	static String Slot1PlayCountId{ "slot1PlayCountId" };
+	static String Slot2PlayCountId{ "slot2PlayCountId" };
+	static String Slot3PlayCountId{ "slot3PlayCountId" };
+	static String Slot4PlayCountId{ "slot4PlayCountId" };
 	static String Slot1OrderId{ "slot1OrderId" };
 	static String Slot2OrderId{ "slot2OrderId" };
 	static String Slot3OrderId{ "slot3OrderId" };
@@ -39,15 +39,15 @@ namespace ParameterNames
 	static String Slot2Name{ "Slot 2" };
 	static String Slot3Name{ "Slot 3" };
 	static String Slot4Name{ "Slot 4" };
-	static String Slot1RepeatName{ "Slot 1 Repeat" };
-	static String Slot2RepeatName{ "Slot 2 Repeat" };
-	static String Slot3RepeatName{ "Slot 3 Repeat" };
-	static String Slot4RepeatName{ "Slot 4 Repeat" };
+	static String Slot1PlayCountName{ "Slot 1 Play Count" };
+	static String Slot2PlayCountName{ "Slot 2 Play Count" };
+	static String Slot3PlayCountName{ "Slot 3 Play Count" };
+	static String Slot4PlayCountName{ "Slot 4 Play Count" };
 	static String Slot1OrderName{ "Slot 1 Order" };
 	static String Slot2OrderName{ "Slot 2 Order" };
 	static String Slot3OrderName{ "Slot 3 Order" };
 	static String Slot4OrderName{ "Slot 4 Order" };
-	static String SlotRepeatName{ "Slot Repeats" };
+	static String SlotPlayCountName{ "Slot Play Count" };
 	static String SlotOrderName{ "Slot Order" };
 	static String PatternModeName{ "Pattern Mode" };
 }

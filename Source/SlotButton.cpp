@@ -5,7 +5,6 @@ SlotButton::SlotButton(const String& buttonName)
 {
 }
 
-
 SlotButton::~SlotButton()
 {
 }

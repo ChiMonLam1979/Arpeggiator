@@ -11,6 +11,9 @@
               resource="0" file="Source/ChoiceParameterRadioGroup.cpp"/>
       </GROUP>
       <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
+        <FILE id="ThtvrM" name="SlotPlayOrder.cpp" compile="1" resource="0"
+              file="Source/SlotPlayOrder.cpp"/>
+        <FILE id="jZPLly" name="SlotPlayOrder.h" compile="0" resource="0" file="Source/SlotPlayOrder.h"/>
         <FILE id="aqypzl" name="PatternButtonAttachment.cpp" compile="1" resource="0"
               file="Source/PatternButtonAttachment.cpp"/>
         <FILE id="w5vXdT" name="PatternButtonAttachment.h" compile="0" resource="0"
@@ -51,10 +54,10 @@
               file="Source/SlotOrderService.cpp"/>
         <FILE id="aBdwAf" name="SlotOrderService.h" compile="0" resource="0"
               file="Source/SlotOrderService.h"/>
-        <FILE id="AUccNN" name="SlotRepeatService.cpp" compile="1" resource="0"
-              file="Source/SlotRepeatService.cpp"/>
-        <FILE id="DwpQmX" name="SlotRepeatService.h" compile="0" resource="0"
-              file="Source/SlotRepeatService.h"/>
+        <FILE id="AUccNN" name="SlotPlayCountService.cpp" compile="1" resource="0"
+              file="Source/SlotPlayCountService.cpp"/>
+        <FILE id="DwpQmX" name="SlotPlayCountService.h" compile="0" resource="0"
+              file="Source/SlotPlayCountService.h"/>
         <FILE id="DmWt1L" name="SlotController.cpp" compile="1" resource="0"
               file="Source/SlotController.cpp"/>
         <FILE id="Ng9ngo" name="SlotController.h" compile="0" resource="0"

@@ -2,12 +2,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SlotController.h"
 
-class SlotRepeatService : public AudioProcessorValueTreeState::Listener
+class SlotPlayCountService : public AudioProcessorValueTreeState::Listener
 {
 public:
 
-	SlotRepeatService(SlotController& slotController);
-	~SlotRepeatService();
+	SlotPlayCountService(SlotController& slotController);
+	~SlotPlayCountService();
 
 private:
 

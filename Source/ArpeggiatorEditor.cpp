@@ -13,22 +13,41 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	latchLockRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::LatchLockId, ChoiceParameterRadioGroup::orientation::horizontal);
 
 	patternModeRadioGroup = std::make_unique<ChoiceParameterRadioGroup>(processor.treeState, IDs::PatternModeId, ChoiceParameterRadioGroup::orientation::horizontal);
-	patternButtonAttachment = std::make_unique<PatternButtonAttachment>(processor.treeState, IDs::PatternModeId, slot1Button, slot2Button, slot3Button, slot4Button);
+	patternButtonAttachment = std::make_unique<PatternButtonAttachment>(
+		processor.treeState,
+		IDs::PatternModeId,
+		slot1Button,
+		slot2Button,
+		slot3Button,
+		slot4Button,
+		slot1PlayCountButtons,
+		slot2PlayCountButtons,
+		slot3PlayCountButtons,
+		slot4PlayCountButtons,
+		slot1OrderButtons,
+		slot2OrderButtons,
+		slot3OrderButtons,
+		slot4OrderButtons);
+
+	slot1OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1OrderId, slot1OrderButtons);
+	slot2OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2OrderId, slot2OrderButtons);
+	slot3OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3OrderId, slot3OrderButtons);
+	slot4OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4OrderId, slot4OrderButtons);
+
+	slot1OrderButtons.addListener(&slotPlayOrder);
+	slot2OrderButtons.addListener(&slotPlayOrder);
+	slot3OrderButtons.addListener(&slotPlayOrder);
+	slot4OrderButtons.addListener(&slotPlayOrder);
 
 	slot1ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot1Id, slot1Button);
 	slot2ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot2Id, slot2Button);
 	slot3ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot3Id, slot3Button);
 	slot4ButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(processor.treeState, IDs::Slot4Id, slot4Button);
 
-	slot1RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1RepeatId, slot1RepeatButtons);
-	slot2RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2RepeatId, slot2RepeatButtons);
-	slot3RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3RepeatId, slot3RepeatButtons);
-	slot4RepeatButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4RepeatId, slot4RepeatButtons);
-
-	slot1OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1OrderId, slot1OrderButtons);
-	slot2OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2OrderId, slot2OrderButtons);
-	slot3OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3OrderId, slot3OrderButtons);
-	slot4OrderButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4OrderId, slot4OrderButtons);
+	slot1PlayCountButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot1PlayCountId, slot1PlayCountButtons);
+	slot2PlayCountButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot2PlayCountId, slot2PlayCountButtons);
+	slot3PlayCountButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot3PlayCountId, slot3PlayCountButtons);
+	slot4PlayCountButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4PlayCountId, slot4PlayCountButtons);
 
 	setResizable(false, false);
 	setSize(550, 800);
@@ -68,7 +87,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	noteShiftLabel.setLookAndFeel(&labelLookAndFeel);
 	swingFactorLabel.setLookAndFeel(&labelLookAndFeel);
 	noteLengthLabel.setLookAndFeel(&labelLookAndFeel);
-	slotRepeatLabel.setLookAndFeel(&labelLookAndFeel);
+	slotPlayCountLabel.setLookAndFeel(&labelLookAndFeel);
 	slotOrderLabel.setLookAndFeel(&labelLookAndFeel);
 	patternModeLabel.setLookAndFeel(&labelLookAndFeel);
 
@@ -81,29 +100,29 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	slot4Button.setClickingTogglesState(true);
 	slot4Button.setLookAndFeel(&slotButtonLookAndFeel);
 
-	slot1RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
-	slot1RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
-	slot1RepeatButtons.setNumDecimalPlacesToDisplay(0);
-	slot1RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
-	slot1RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	slot1PlayCountButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot1PlayCountButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot1PlayCountButtons.setNumDecimalPlacesToDisplay(0);
+	slot1PlayCountButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot1PlayCountButtons.setLookAndFeel(&slotSliderLookAndFeel);
 
-	slot2RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
-	slot2RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
-	slot2RepeatButtons.setNumDecimalPlacesToDisplay(0);
-	slot2RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
-	slot2RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	slot2PlayCountButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot2PlayCountButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot2PlayCountButtons.setNumDecimalPlacesToDisplay(0);
+	slot2PlayCountButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot2PlayCountButtons.setLookAndFeel(&slotSliderLookAndFeel);
 
-	slot3RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
-	slot3RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
-	slot3RepeatButtons.setNumDecimalPlacesToDisplay(0);
-	slot3RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
-	slot3RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	slot3PlayCountButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot3PlayCountButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot3PlayCountButtons.setNumDecimalPlacesToDisplay(0);
+	slot3PlayCountButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot3PlayCountButtons.setLookAndFeel(&slotSliderLookAndFeel);
 
-	slot4RepeatButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
-	slot4RepeatButtons.setRange(0.0f, 4.0f, 1.0f);
-	slot4RepeatButtons.setNumDecimalPlacesToDisplay(0);
-	slot4RepeatButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
-	slot4RepeatButtons.setLookAndFeel(&slotSliderLookAndFeel);
+	slot4PlayCountButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
+	slot4PlayCountButtons.setRange(0.0f, 4.0f, 1.0f);
+	slot4PlayCountButtons.setNumDecimalPlacesToDisplay(0);
+	slot4PlayCountButtons.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	slot4PlayCountButtons.setLookAndFeel(&slotSliderLookAndFeel);
 
 	slot1OrderButtons.setTextBoxStyle(Slider::TextBoxRight, true, 50, 30);
 	slot1OrderButtons.setRange(1.0f, 4.0f, 1.0f);
@@ -145,17 +164,17 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	addAndMakeVisible(noteShiftLabel);
 	addAndMakeVisible(swingFactorLabel);
 	addAndMakeVisible(noteLengthLabel);
-	addAndMakeVisible(slotRepeatLabel);
+	addAndMakeVisible(slotPlayCountLabel);
 	addAndMakeVisible(slotOrderLabel);
 	addAndMakeVisible(patternModeLabel);
 	addAndMakeVisible(slot1Button);
 	addAndMakeVisible(slot2Button);
 	addAndMakeVisible(slot3Button);
 	addAndMakeVisible(slot4Button);
-	addAndMakeVisible(slot1RepeatButtons);
-	addAndMakeVisible(slot2RepeatButtons);
-	addAndMakeVisible(slot3RepeatButtons);
-	addAndMakeVisible(slot4RepeatButtons);
+	addAndMakeVisible(slot1PlayCountButtons);
+	addAndMakeVisible(slot2PlayCountButtons);
+	addAndMakeVisible(slot3PlayCountButtons);
+	addAndMakeVisible(slot4PlayCountButtons);
 	addAndMakeVisible(slot1OrderButtons);
 	addAndMakeVisible(slot2OrderButtons);
 	addAndMakeVisible(slot3OrderButtons);
@@ -245,16 +264,16 @@ void ArpeggiatorEditor::resized()
 	});
 
 	FlexBox slotRepeatLabelBox;
-	slotRepeatLabelBox.items.addArray({ makeSlotLabelBoxItem(slotRepeatLabel).withFlex(1) });
+	slotRepeatLabelBox.items.addArray({ makeSlotLabelBoxItem(slotPlayCountLabel).withFlex(1) });
 
 	FlexBox slotRepeatButtonsBox;
 	slotRepeatButtonsBox.justifyContent = FlexBox::JustifyContent::spaceBetween;
 	slotRepeatButtonsBox.items.addArray({
-										makeSlotIncBoxItem(slot1RepeatButtons).withFlex(1),
-										makeSlotIncBoxItem(slot2RepeatButtons).withFlex(1),
-										makeSlotIncBoxItem(slot3RepeatButtons).withFlex(1),
-										makeSlotIncBoxItem(slot4RepeatButtons).withFlex(1),
-	});
+										makeSlotIncBoxItem(slot1PlayCountButtons).withFlex(1),
+										makeSlotIncBoxItem(slot2PlayCountButtons).withFlex(1),
+										makeSlotIncBoxItem(slot3PlayCountButtons).withFlex(1),
+										makeSlotIncBoxItem(slot4PlayCountButtons).withFlex(1),
+		});
 
 	FlexBox slotOrderLabelBox;
 	slotOrderLabelBox.items.addArray({ makeSlotLabelBoxItem(slotOrderLabel).withFlex(1) });

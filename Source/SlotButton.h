@@ -10,9 +10,8 @@ public:
 
 	void clicked() override;
 
-	const String buttonName;
-
 private:
 
+	const String buttonName;
 	int state{ 0 };
 };

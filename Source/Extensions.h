@@ -26,3 +26,18 @@ void transposeNotes(std::vector<T>& vector, T const& noteValue)
 		note = note + transposeValue;
 	}
 }
+
+template<typename T>
+std::vector<T> assignVectorPlayCount(std::vector<T>& vector, const int numberOfTimesToPlay)
+{
+	std::vector<T> result;
+
+	const int sizeOfVector = vector.size();
+
+	for(int i = 0; i < numberOfTimesToPlay; i++)
+	{
+		result.insert(result.end(), vector.begin(), vector.begin() + sizeOfVector);
+	}
+
+	return result;
+}

@@ -1,6 +1,7 @@
 #include "PatternMode.h"
+#include "Extensions.h"
 
-PatternMode::PatternMode()
+PatternMode::PatternMode(SlotController& slotController) : slotController(slotController)
 {
 }
 
@@ -12,10 +13,20 @@ void PatternMode::parameterChanged(const String& parameterID, float newValue)
 {
 	auto choice = static_cast<int>(newValue);
 
-	state = static_cast<Enums::patternMode>(choice);
+	mode = static_cast<Enums::patternMode>(choice);
+
+	slotController.patternModeIsOn = mode == Enums::patternsOn;
+
+	if(slotController.patternModeIsOn)
+	{
+		UpdatePattern();
+	}
 }
 
-bool PatternMode::IsEnabled() const
+void PatternMode::UpdatePattern()
 {
-	return state == Enums::patternMode::patternsOn;
+	slotController.pattern[0] = assignVectorPlayCount(slotController.slot1Data, slotController.slot1PlayCount);
+	slotController.pattern[1] = assignVectorPlayCount(slotController.slot2Data, slotController.slot2PlayCount);
+	slotController.pattern[2] = assignVectorPlayCount(slotController.slot3Data, slotController.slot3PlayCount);
+	slotController.pattern[3] = assignVectorPlayCount(slotController.slot4Data, slotController.slot4PlayCount);
 }
