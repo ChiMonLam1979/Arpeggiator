@@ -27,6 +27,8 @@ treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 	treeState.addParameterListener(IDs::Slot4OrderId, &slotOrderService);
 
 	treeState.addParameterListener(IDs::PatternModeId, &patternMode);
+
+	treeState.addParameterListener(IDs::PatternModeId, &slotController);
 }
 
 AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout()

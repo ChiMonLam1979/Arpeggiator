@@ -1,11 +1,12 @@
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "PatternMode.h"
 
 class SlotController : public AudioProcessorValueTreeState::Listener
 {
 public:
 
-	SlotController();
+	SlotController(PatternMode& patternMode);
 	~SlotController();
 
 	std::vector<int> currentNotes;
@@ -29,7 +30,11 @@ public:
 
 private:
 
+	PatternMode& patternMode;
+
 	std::vector<int>& GetSelectedSlot(const String& parameterID);
 
 	void parameterChanged(const String& parameterID, float newValue) override;
+
+	void UpdatePattern();
 };

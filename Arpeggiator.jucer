@@ -11,6 +11,10 @@
               resource="0" file="Source/ChoiceParameterRadioGroup.cpp"/>
       </GROUP>
       <GROUP id="{D03BE22B-79A9-A94E-EF12-8D69F633235B}" name="UI">
+        <FILE id="aqypzl" name="PatternButtonAttachment.cpp" compile="1" resource="0"
+              file="Source/PatternButtonAttachment.cpp"/>
+        <FILE id="w5vXdT" name="PatternButtonAttachment.h" compile="0" resource="0"
+              file="Source/PatternButtonAttachment.h"/>
         <FILE id="gNxbb8" name="SlotButton.cpp" compile="1" resource="0" file="Source/SlotButton.cpp"/>
         <FILE id="YhdmPy" name="SlotButton.h" compile="0" resource="0" file="Source/SlotButton.h"/>
         <GROUP id="{50C15424-81F7-72DF-FEAB-CA398831D6BB}" name="LookAndFeel">

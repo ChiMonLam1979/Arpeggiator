@@ -7,6 +7,7 @@
 #include "SlotButton.h"
 #include "MySlotButtonLookAndFeel.h"
 #include "MySlotSliderLookAndFeel.h"
+#include "PatternButtonAttachment.h"
 
 class ArpeggiatorEditor : public AudioProcessorEditor
 {
@@ -17,6 +18,8 @@ public:
 
 	void paint(Graphics&) override;
 	void resized() override;
+
+	std::unique_ptr<PatternButtonAttachment> patternButtonAttachment;
 
 private:
 
@@ -44,10 +47,10 @@ private:
 	Label slotOrderLabel{ ParameterNames::SlotOrderName };
 	Label patternModeLabel{ ParameterNames::PatternModeName };
 
-	SlotButton slot1Button{ ParameterNames::Slot1Name };
-	SlotButton slot2Button{ ParameterNames::Slot2Name };
-	SlotButton slot3Button{ ParameterNames::Slot3Name };
-	SlotButton slot4Button{ ParameterNames::Slot4Name };
+	SlotButton slot1Button{ ParameterNames::Slot1Name, patternButtonAttachment };
+	SlotButton slot2Button{ ParameterNames::Slot2Name, patternButtonAttachment };
+	SlotButton slot3Button{ ParameterNames::Slot3Name, patternButtonAttachment };
+	SlotButton slot4Button{ ParameterNames::Slot4Name, patternButtonAttachment };
 
 	Slider slot1RepeatButtons;
 	Slider slot2RepeatButtons;

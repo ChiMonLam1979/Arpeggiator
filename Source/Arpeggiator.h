@@ -69,7 +69,7 @@ private:
 	ArpMode arpMode;
 	LatchLock latchLock;
 	PatternMode patternMode;
-	SlotController slotController;
+	SlotController slotController { patternMode };
 	SlotRepeatService slotRepeatService { slotController };
 	SlotOrderService slotOrderService { slotController };
 	Notes notes{ latchMode, latchLock, arpMode, slotController };
