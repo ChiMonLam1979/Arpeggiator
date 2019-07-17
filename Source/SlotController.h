@@ -22,6 +22,8 @@ public:
 
 	bool patternModeIsOn{ false };
 
+	bool patternModeHasChanged{ false };
+
 	std::vector<double> slotsOrder{ 1.0, 2.0, 3.0, 4.0 };
 
 	std::vector<std::vector<int>> pattern{ slot1Data, slot2Data, slot3Data, slot4Data};

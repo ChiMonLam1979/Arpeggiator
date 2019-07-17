@@ -15,6 +15,8 @@ void PatternMode::parameterChanged(const String& parameterID, float newValue)
 
 	mode = static_cast<Enums::patternMode>(choice);
 
+	slotController.patternModeHasChanged = true;
+
 	slotController.patternModeIsOn = mode == Enums::patternsOn;
 
 	if(slotController.patternModeIsOn)

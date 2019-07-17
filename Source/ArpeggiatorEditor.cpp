@@ -67,14 +67,14 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	swingFactorSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 
 	noteShiftSlider.setTextBoxStyle(Slider::TextBoxRight, true, 80, 30);
-	noteShiftSlider.setRange(-32.0f, 32.0f, 0.5);
+	noteShiftSlider.setRange(-32.0f, 32.0f, 0.25);
 	noteShiftSlider.setNumDecimalPlacesToDisplay(1);
 	noteShiftSlider.setLookAndFeel(&sliderLookAndFeel);
 	noteShiftSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
 	noteShiftSlider.onValueChange = [this] { noteShiftButtonsSlider.setValue(noteShiftSlider.getValue()); };
 
 	noteShiftButtonsSlider.setTextBoxStyle(Slider::NoTextBox, true, 80, 30);
-	noteShiftButtonsSlider.setRange(-32.0f, 32.0f, 0.5);
+	noteShiftButtonsSlider.setRange(-32.0f, 32.0f, 0.25);
 	noteShiftButtonsSlider.setNumDecimalPlacesToDisplay(1);
 	noteShiftButtonsSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
 	noteShiftButtonsSlider.setLookAndFeel(&sliderLookAndFeel);
