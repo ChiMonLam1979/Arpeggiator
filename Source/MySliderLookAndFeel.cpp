@@ -140,8 +140,8 @@ Slider::SliderLayout MySliderLookAndFeel::getSliderLayout(Slider& slider)
 		auto window = slider.getLocalBounds().reduced(slider.getWidth() * 0.06f);
 
 		layout.sliderBounds = window.removeFromLeft(window.getWidth() * 0.85);
-		window.setPosition(window.getX() + window.getWidth() / 2.5, window.getY());
-		layout.textBoxBounds = window.expanded(0, 20).removeFromLeft(window.getWidth() * 0.9);
+		window.setPosition(window.getX() + window.getWidth() / 2.5, window.getY() - 10);
+		layout.textBoxBounds = window.expanded(0, window.getWidth() * 0.2).removeFromLeft(window.getWidth() * 0.9);
 
 		return layout;
 	}

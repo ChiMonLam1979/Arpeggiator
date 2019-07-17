@@ -50,7 +50,7 @@ ArpeggiatorEditor::ArpeggiatorEditor(Arpeggiator& p) : AudioProcessorEditor(&p),
 	slot4PlayCountButtonsAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, IDs::Slot4PlayCountId, slot4PlayCountButtons);
 
 	setResizable(false, false);
-	setSize(550, 800);
+	setSize(600, 650);
 
 	noteLengthSlider.setTextBoxStyle(Slider::TextBoxRight, true, 80, 30);
 	noteLengthSlider.setRange(0.0, 1.0, 0.01);
