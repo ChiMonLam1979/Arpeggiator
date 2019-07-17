@@ -26,6 +26,8 @@ public:
 
 	std::vector<std::vector<int>> pattern{ slot1Data, slot2Data, slot3Data, slot4Data};
 
+	std::vector<int> patternToPlay;
+
 private:
 
 	std::vector<int>& GetSelectedSlot(const String& parameterID);

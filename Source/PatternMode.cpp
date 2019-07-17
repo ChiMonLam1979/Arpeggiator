@@ -34,4 +34,11 @@ void PatternMode::UpdatePattern()
 	slotController.pattern[slot2Index] = assignVectorPlayCount(slotController.slot2Data, slotController.slot2PlayCount);
 	slotController.pattern[slot3Index] = assignVectorPlayCount(slotController.slot3Data, slotController.slot3PlayCount);
 	slotController.pattern[slot4Index] = assignVectorPlayCount(slotController.slot4Data, slotController.slot4PlayCount);
+
+	slotController.patternToPlay.clear();
+
+	for(std::vector<int>& vector: slotController.pattern)
+	{
+		slotController.patternToPlay.insert(slotController.patternToPlay.end(), vector.begin(), vector.end());
+	}
 }

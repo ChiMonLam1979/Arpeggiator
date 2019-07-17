@@ -71,12 +71,26 @@ void Notes::SortNotes()
 
 void Notes::GetNumberOfNotes()
 {
-	numberOfNotesToPlay = latchMode.IsEnabled() ? notesLatched.size() : notes.size();
+	if(slotController.patternModeIsOn)
+	{
+		numberOfNotesToPlay = slotController.patternToPlay.size();
+	}
+	else
+	{
+		numberOfNotesToPlay = latchMode.IsEnabled() ? notesLatched.size() : notes.size();
+	}
 }
 
 bool Notes::AnyNotesToPlay() const
 {
-	return latchMode.IsEnabled() ? !notesLatched.empty() : !notes.empty();
+	if (slotController.patternModeIsOn)
+	{
+		return  !slotController.patternToPlay.empty();
+	}
+	else
+	{
+		return latchMode.IsEnabled() ? !notesLatched.empty() : !notes.empty();
+	}
 }
 
 void Notes::InitializeNoteIndex()
@@ -85,16 +99,23 @@ void Notes::InitializeNoteIndex()
 
 	const auto lastIndexOfNotesToPlay = numberOfNotesToPlay - 1;
 
-	switch (arpMode.state)
+	if(slotController.patternModeIsOn)
 	{
-	case Enums::arpMode::up: currentNoteIndex = -1;
-		break;
-	case Enums::arpMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
-		break;
-	case Enums::arpMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-		break;
-	case Enums::arpMode::played: currentNoteIndex = -1;
-		break;
+		currentNoteIndex = -1;
+	}
+	else
+	{
+		switch (arpMode.state)
+		{
+		case Enums::arpMode::up: currentNoteIndex = -1;
+			break;
+		case Enums::arpMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
+			break;
+		case Enums::arpMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+			break;
+		case Enums::arpMode::played: currentNoteIndex = -1;
+			break;
+		}
 	}
 }
 
@@ -102,16 +123,23 @@ void Notes::UpdateNoteValue()
 {
 	GetNumberOfNotes();
 
-	switch (arpMode.state)
+	if (slotController.patternModeIsOn)
 	{
-	case Enums::arpMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-		break;
-	case Enums::arpMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
-		break;
-	case Enums::arpMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
-		break;
-	case Enums::arpMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
-		break;
+		currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+	}
+	else
+	{
+		switch (arpMode.state)
+		{
+		case Enums::arpMode::up: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+			break;
+		case Enums::arpMode::down: currentNoteIndex = inRange(currentNoteIndex, 0, numberOfNotesToPlay) ? (currentNoteIndex - 1) : numberOfNotesToPlay - 1;
+			break;
+		case Enums::arpMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+			break;
+		case Enums::arpMode::played: currentNoteIndex = (currentNoteIndex + 1) % numberOfNotesToPlay;
+			break;
+		}
 	}
 
 	lastNoteValue = SetLastNoteValue();
@@ -119,7 +147,14 @@ void Notes::UpdateNoteValue()
 
 int Notes::SetLastNoteValue()
 {
-	return latchMode.IsEnabled() ? notesLatched[currentNoteIndex] : notes[currentNoteIndex];
+	if(slotController.patternModeIsOn)
+	{
+		return slotController.patternToPlay[currentNoteIndex];
+	}
+	else
+	{
+		return latchMode.IsEnabled() ? notesLatched[currentNoteIndex] : notes[currentNoteIndex];
+	}
 }
 
 void Notes::AddNotes(MidiBuffer& midiMessages, int noteOnOffset)
