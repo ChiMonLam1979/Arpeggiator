@@ -1,5 +1,4 @@
 #include "NoteDivision.h"
-#include <shlwapi.h>
 
 NoteDivision::NoteDivision()
 {
