@@ -157,6 +157,8 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 
 	if (positionInfo.isPlaying)
 	{
+		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
+
 		if (notes.ShouldAddNoteOff() || (noteDivision.StateChanged() && notes.lastNoteWasNoteOn))
 		{
 			notes.AddNoteOff(midiMessages);
@@ -173,8 +175,6 @@ void Arpeggiator::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessa
 			noteOnOffset = CalculateNoteOnOffset(OddNoteDivisionStartPositionAsInt, OddNoteDivisionStartPosition);
 			notes.AddNotes(midiMessages, noteOnOffset);
 		}
-
-		notes.samplesFromLastNoteOnUntilBufferEnds = (notes.samplesFromLastNoteOnUntilBufferEnds + numberOfSamplesInBuffer);
 	}
 
 	if (!positionInfo.isPlaying)
