@@ -106,7 +106,7 @@ void Notes::InitializeNoteIndex()
 		break;
 	case Enums::arpMode::down: currentNoteIndex = lastIndexOfNotesToPlay;
 		break;
-	case Enums::arpMode::random: currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay));
+	case Enums::arpMode::random: numberOfNotesToPlay > 0 ? currentNoteIndex = Random::getSystemRandom().nextInt(Range<int>(0, numberOfNotesToPlay)) : -1;
 		break;
 	case Enums::arpMode::played: currentNoteIndex = -1;
 		break;
