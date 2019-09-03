@@ -33,10 +33,10 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 {
 	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
 
-	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParamterChoices::NoteDivisionChoices, 0);
-	auto arpModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpModeId, ParameterNames::ArpModeName, ParamterChoices::ArpModeChoices, 0);
-	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParamterChoices::LatchModeChoices, 0);
-	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParamterChoices::LatchLockChoices, 0);
+	auto noteDivionParameter = std::make_unique<AudioParameterChoice>(IDs::NoteDivisionId, ParameterNames::NoteDivisionName, ParameterChoices::NoteDivisionChoices, 0);
+	auto arpModeParameter = std::make_unique<AudioParameterChoice>(IDs::ArpModeId, ParameterNames::ArpModeName, ParameterChoices::ArpModeChoices, 0);
+	auto latchModeParameter = std::make_unique<AudioParameterChoice>(IDs::LatchModeId, ParameterNames::LatchModeName, ParameterChoices::LatchModeChoices, 0);
+	auto latchLockParameter = std::make_unique<AudioParameterChoice>(IDs::LatchLockId, ParameterNames::LatchLockName, ParameterChoices::LatchLockChoices, 0);
 	auto noteLengthParameter = std::make_unique<AudioParameterFloat>(IDs::NoteLengthId, ParameterNames::NoteLengthName, ParameterRanges::NoteLengthRange, 0.5f);
 	auto swingFactorParameter = std::make_unique<AudioParameterFloat>(IDs::SwingFactorId, ParameterNames::SwingFactorName, ParameterRanges::SwingFactorRange, 0.0f);
 	auto noteShiftParameter = std::make_unique<AudioParameterFloat>(IDs::NoteShiftId, ParameterNames::NoteShiftName, -32.0, 32.0, 0);
@@ -56,7 +56,7 @@ AudioProcessorValueTreeState::ParameterLayout Arpeggiator::createParameterLayout
 	auto slot3OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot3OrderId, ParameterNames::Slot3OrderName, 1.0, 4.0, 3);
 	auto slot4OrderParameter = std::make_unique<AudioParameterFloat>(IDs::Slot4OrderId, ParameterNames::Slot4OrderName, 1.0, 4.0, 4);
 
-	auto patternModeParameter = std::make_unique<AudioParameterChoice>(IDs::PatternModeId, ParameterNames::PatternModeName, ParamterChoices::PatternModeChoices, 0);
+	auto patternModeParameter = std::make_unique<AudioParameterChoice>(IDs::PatternModeId, ParameterNames::PatternModeName, ParameterChoices::PatternModeChoices, 0);
 
 	parameters.push_back(std::move(noteDivionParameter));
 	parameters.push_back(std::move(arpModeParameter));

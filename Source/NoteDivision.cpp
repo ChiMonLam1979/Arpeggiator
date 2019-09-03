@@ -10,9 +10,9 @@ NoteDivision::~NoteDivision()
 
 void NoteDivision::parameterChanged(const String& parameterID, float newValue)
 {
-	const auto choice = ParamterChoices::NoteDivisionChoices[newValue];
+	const auto choice = ParameterChoices::NoteDivisionChoices[newValue];
 
-	factor = ParamterChoices::NoteDivisionDictionary[choice];
+	factor = ParameterChoices::NoteDivisionDictionary[choice];
 }
 
 bool NoteDivision::StateChanged()

@@ -52,7 +52,7 @@ namespace ParameterNames
 	static String PatternModeName{ "Pattern Mode" };
 }
 
-namespace ParamterChoices
+namespace ParameterChoices
 {
 	static String Up{ "Up" };
 	static String Down{ "Down" };

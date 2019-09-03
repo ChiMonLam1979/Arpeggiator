@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="lfxRzK" name="Arpeggiator" projectType="audioplug" jucerVersion="5.4.3"
+<JUCERPROJECT id="lfxRzK" name="Arpeggiator" projectType="audioplug" jucerVersion="5.4.4"
               pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginFormats="buildVST3">
   <MAINGROUP id="jeytrH" name="Arpeggiator">
